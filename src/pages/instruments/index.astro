@@ -29,7 +29,11 @@ const items = [
       {
         name === 'Indian Surbahar' ? (
           <a class="gothic-link" href="/instruments/Surbahar">{name}</a>
-        ) : (
+        ) : name === 'Turkish Baglama Saz 1' ? (
+          <a class="gothic-link" href="/instruments/BaglamaSaz1">{name}</a>
+      ) : name === 'Arabic Oud' ? (
+          <a class="gothic-link" href="/instruments/ArabicOud">{name}</a>
+      ) : (
           <a class="gothic-link" href="#">{name}</a>
         )
       }
