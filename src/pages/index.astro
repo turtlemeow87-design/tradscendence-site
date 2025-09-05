@@ -60,14 +60,50 @@ Every instrument has an origin story.  Sometimes these stories are pretty well-d
 
 
 <!-- 3 featured instruments with audio teasers -->
+<!-- 3 featured instruments with audio teasers -->
 <section class="mx-auto max-w-6xl px-4">
   <h2 class="font-display text-2xl mb-4">Featured sounds</h2>
   <div class="grid gap-6 md:grid-cols-3">
-    <FeaturedInstrumentCard title="Surbahar"     imgSrc="/media/inst-surbahar.jpg"    audioSrc="/media/surbahar.m4a" />
-    <FeaturedInstrumentCard title="Baglama Saz"  imgSrc="/media/inst-baglamasaz.jpg"  audioSrc="/media/baglamasaz1.m4a" />
-    <FeaturedInstrumentCard title="Arabic Oud"   imgSrc="/media/inst-arabicoud.jpg"   audioSrc="/media/arabicoud.m4a" />
+    
+    <!-- Surbahar -->
+    <div class="space-y-2">
+      <FeaturedInstrumentCard 
+        title="Surbahar" 
+        imgSrc="/media/inst-surbahar.jpg" 
+        audioSrc="/media/surbahar.m4a" 
+      />
+      <a href="/instruments/Surbahar" class="gothic-link text-sm font-bold hover:uppercase">
+        Explore more Surbahar →
+      </a>
+    </div>
+
+    <!-- Baglama Saz -->
+    <div class="space-y-2">
+      <FeaturedInstrumentCard 
+        title="Baglama Saz" 
+        imgSrc="/media/inst-baglamasaz.jpg" 
+        audioSrc="/media/baglamasaz1.m4a" 
+      />
+      <a href="/instruments/baglamasaz" class="gothic-link text-sm font-bold hover:uppercase">
+        Explore more Baglama Saz →
+      </a>
+    </div>
+
+    <!-- Arabic Oud -->
+    <div class="space-y-2">
+      <FeaturedInstrumentCard 
+        title="Arabic Oud" 
+        imgSrc="/media/inst-arabicoud.jpg" 
+        audioSrc="/media/arabicoud.m4a" 
+      />
+      <a href="/instruments/arabicoud" class="gothic-link text-sm font-bold hover:uppercase">
+        Explore more Arabic Oud →
+      </a>
+    </div>
+
   </div>
 </section>
+
 
 <!-- Client-only audio logic (safe for SSR) -->
 <script is:inline>
