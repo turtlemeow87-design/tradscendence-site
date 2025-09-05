@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const photos = Array.from({ length: 6 });
+---
+
+<BaseLayout title="Memories — Tradscendence">
+  <section class="mx-auto max-w-6xl px-4 py-10 space-y-6 text-black">
+    <h1 class="font-display text-3xl">Memories</h1>
+    <p>Gallery / stories from performances. Placeholder grid to be replaced with real images &amp; captions.</p>
+
+    <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+      {photos.map((_, i) => (
+        <div class="frame rounded-xl h-44 bg-ebony/40 flex items-center justify-center opacity-70">
+          Photo {i + 1}
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

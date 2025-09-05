@@ -1,0 +1,47 @@
+---
+const { title, imgSrc, audioSrc, href = '/instruments' } = Astro.props;
+---
+<div class="js-teaser-card cursor-pointer rounded-xl overflow-hidden frame shadow-soft">
+  <div class="relative">
+    <img src={imgSrc} alt={title} class="w-full h-48 object-cover" />
+    <span class="absolute top-2 right-2 play-icon bg-black/50 text-white text-sm px-2 py-1 rounded">▶︎</span>
+  </div>
+  <div class="p-3 font-display text-lg">{title}</div>
+  <audio class="teaser hidden" preload="auto" src={audioSrc}></audio>
+</div>
+
+
+<script>
+const root = document.currentScript?.parentElement;
+const audio = root?.querySelector('audio.teaser');
+const playBtn = root?.querySelector('button.play-btn');
+
+
+// Hover play (desktop)
+if (root) {
+  root.addEventListener('mouseenter', () => {
+    if (audio) audio.play().catch(() => {});
+  });
+  root.addEventListener('mouseleave', () => {
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  });
+}
+
+// Click/tap toggle (mobile friendly)
+if (playBtn) {
+  playBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!audio) return;
+
+    if (audio.paused) {
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+    }
+  });
+}
+
+</script>

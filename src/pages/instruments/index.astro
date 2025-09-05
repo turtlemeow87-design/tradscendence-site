@@ -1,0 +1,100 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const items = [
+  { name: 'Indian Sitar', file: '/media/sitar.m4a' },
+  { name: 'Indian Surbahar', file: '/media/surbahar.m4a' },
+  { name: 'Indian Tanpura', file: '/media/tanpura.m4a' },
+  { name: 'Pakistani Rabab', file: '/media/rabab.mp3' },
+  { name: 'Turkish Baglama Saz 1', file: '/media/baglamasaz1.m4a' },
+  { name: 'Turkish Cümbüş Tanbur', file: '/media/cumbus-tanbur.mp3' },
+  { name: 'Persian Setar', file: '/media/setar.mp3' },
+  { name: 'Armenian Duduk', file: '/media/duduk.mp3' },
+  { name: 'Chinese Pipa', file: '/media/pipa.mp3' },
+  { name: 'Arabic Oud', file: '/media/arabicoud.m4a' },
+  { name: 'Turkish Oud', file: '/media/oud-turkish.mp3' },
+  { name: 'Azeri Tar', file: '/media/tar.mp3' },
+  { name: '12-string Acoustic', file: '/media/acoustic12.mp3' },
+];
+---
+
+<BaseLayout title="My Instruments — Tradscendence">
+  <section class="mx-auto max-w-6xl px-4 py-10 space-y-6">
+    <h1 class="font-display text-3xl">My Instruments</h1>
+    <p class="opacity-80">Instruments that I've collected and learned to play over the years. Hit the play button to hear a quick teaser that I made!  Clicking the instrument's name sends you to the instrument's page.  I hope you find a sound that you like! :)</p>
+
+    <ul class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+      {items.map(({ name, file }) => (
+        <li class="frame rounded-xl p-3 flex items-center justify-between">
+          <a class="gothic-link" href="#">{name}</a>
+          <button
+            type="button"
+            class="opacity-60 hover:opacity-100 transition"
+            data-audio={file}
+            aria-label={`Play ${name} sample`}
+          >
+            ▶︎
+          </button>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const supportsHover = window.matchMedia('(hover: hover)').matches;
+
+      const players = new Map();
+      let current = null;
+
+      function getPlayer(src) {
+        if (!players.has(src)) {
+          const a = new Audio(src);
+          a.preload = 'none';
+          players.set(src, a);
+        }
+        return players.get(src);
+      }
+
+      function stopCurrent() {
+        if (current && !current.paused) {
+          current.pause();
+          current.currentTime = 0;
+        }
+      }
+
+      async function play(src) {
+        stopCurrent();
+        const a = getPlayer(src);
+        current = a;
+        a.currentTime = 0;
+        a.volume = 0.9;
+        try {
+          await a.play();
+        } catch (err) {
+          // Autoplay blocked or other issue — fail silently for hover
+          // console.debug(err);
+        }
+      }
+
+      document.querySelectorAll('[data-audio]').forEach((btn) => {
+        const src = btn.getAttribute('data-audio');
+
+        // Tap/click works on mobile & desktop (counts as user gesture)
+        btn.addEventListener('click', () => play(src), { passive: true });
+
+        // Optional hover preview for desktops only
+        if (supportsHover) {
+          btn.addEventListener('mouseenter', () => play(src));
+          btn.addEventListener('mouseleave', () => stopCurrent());
+          btn.addEventListener('blur', () => stopCurrent());
+        }
+      });
+
+      // Pause if the tab goes to background
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stopCurrent();
+      });
+    });
+  </script>
+</BaseLayout>
