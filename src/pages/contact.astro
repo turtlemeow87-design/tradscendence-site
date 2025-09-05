@@ -38,46 +38,18 @@ const email = 'HunterEast.Musiq@gmail.com';
         <textarea class="bg-ebony/60 frame rounded-xl px-3 py-2" rows="6" name="message"></textarea>
       </label>
 
+      <!-- Optional: helps you tell which form sent it -->
+      <input type="hidden" name="formName" value="Contact Page" />
+
       <div class="flex items-center gap-3">
         <button
-          id="mailto-send"
           class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame"
-          type="button"
+          type="submit"
         >
           Send
         </button>
         <a class="gothic-link" href={`mailto:${email}`}>or email me directly →</a>
       </div>
     </form>
-
-    <p id="send-hint" class="text-sm opacity-70"></p>
   </section>
-
-<script is:inline>
-  const email = JSON.parse(`{JSON.stringify(email)}`);
-  const form = document.getElementById('contact-form');
-  const btn = document.getElementById('mailto-send');
-  const hint = document.getElementById('send-hint');
-
-  btn?.addEventListener('click', () => {
-    const data = new FormData(form);
-    const name = data.get('name') || '';
-    const fromEmail = data.get('email') || '';
-    const phone = data.get('phone') || '';
-    const date = data.get('date') || '';
-    const location = data.get('location') || '';
-    const message = data.get('message') || '';
-
-    const subject = encodeURIComponent(`Booking inquiry from ${name}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${fromEmail}\nPhone: ${phone}\nEvent date: ${date}\nLocation: ${location}\n\nMessage:\n${message}`
-    );
-
-    const href = `mailto:${email}?subject=${subject}&body=${body}`;
-    window.location.href = href;
-
-    if (hint) hint.textContent = "If your email app didn't open, click the 'email me directly' link or copy my address.";
-  });
-</script>
-
 </BaseLayout>
