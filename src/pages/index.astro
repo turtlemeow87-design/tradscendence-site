@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Divider from "../components/Divider.astro";
+import FeaturedInstrumentCard from "../components/FeaturedInstrumentCard.astro";
+const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
+---
+<BaseLayout {title}>
+<!-- Header block with name, handle, catchphrase, logo placeholder -->
+<section class="mx-auto max-w-6xl px-4 pt-10">
+<div class="flex items-center justify-between gap-6">
+<div>
+<h1 class="font-display text-4xl sm:text-5xl opacity-75 bg-gradient-to-r from-black via-black/85 to-transparent rounded-md bg-clip-text text-transparent drop-shadow-[0_0_1px_ivory]">
+  ~Sound Beyond Borders~
+</h1>
+<p class="mt-2 text-lg opacity-50 bg-gradient-to-r from-rosewood via-rosewood/10 to-transparent rounded-md">Transcend the traditional.</p>
+</div>
+<!-- Square logo placeholder -->
+<div class="w-full max-w-[200px] aspect-square rounded-xl frame flex items-center justify-center opacity-60">
+    <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover" />
+</div>
+</section>
+
+
+<Divider />
+
+
+<!-- Hero: wide image + caption -->
+<section class="mx-auto max-w-6xl px-4">
+<figure class="rounded-2xl overflow-hidden frame shadow-soft">
+<img src="/media/hero-placeholder.jpg" alt="Hunter with instruments" class="w-full h-[42vh] sm:h-[56vh] object-cover" />
+<figcaption class="p-4 text-sm bg-gradient-to-r from-ebony via-ebony to-transparent">
+<div class="font-display">What is sound beyond borders?</div>
+<div class="opacity-80">Music as a bridge between cultures, not a separation.</div>
+</figcaption>
+</figure>
+</section>
+
+
+<Divider />
+
+
+<!-- Two-column intro -->
+<section class="mx-auto max-w-6xl px-4 grid md:grid-cols-2 gap-8 items-start">
+<div class="space-y-4">
+<h2 class="font-display text-2xl">About my approach</h2>
+<p>
+Every instrument has an origin story.  Sometimes these stories are pretty well-documented, and other times we are left to fill in the blanks for ourselves.  In fact, academic studies such as organology exist for that purpose.  The same is true for the sound that comes out of those instruments.  Ethnomusicology exists for that purpose.  And as beautiful as it is to be able to discover and study all of the ways in which a particular sound, or musical framework (theory) relate to their culture or country of origin: what is equally as beautiful, to me, is to be able to take a particular sound, and make it relatable to anybody from any culture. 
+</p>
+<p class="opacity-90">Music is important for different people at different times in different ways.  I'm available for intimate events: private weddings, ceremonies, small gatherings, and yes, even funerals.~</p>
+<p><a href="/instruments" class="gothic-link mr-4 font-bold hover:uppercase">Explore the instruments →</a></p>
+<p><a href="/about" class="gothic-link font-bold hover:uppercase">More about me and my approach →</a></p>
+</div>
+<div class="rounded-2xl overflow-hidden frame">
+<img src="/media/intro-placeholder.jpg" alt="Performance" class="w-full h-[320px] object-cover" />
+</div>
+</section>
+
+
+<Divider />
+
+
+<!-- 3 featured instruments with audio teasers -->
+<section class="mx-auto max-w-6xl px-4">
+  <h2 class="font-display text-2xl mb-4">Featured sounds</h2>
+  <div class="grid gap-6 md:grid-cols-3">
+    <FeaturedInstrumentCard title="Surbahar"     imgSrc="/media/inst-surbahar.jpg"    audioSrc="/media/surbahar.m4a" />
+    <FeaturedInstrumentCard title="Baglama Saz"  imgSrc="/media/inst-baglamasaz.jpg"  audioSrc="/media/baglamasaz1.m4a" />
+    <FeaturedInstrumentCard title="Arabic Oud"   imgSrc="/media/inst-arabicoud.jpg"   audioSrc="/media/arabicoud.m4a" />
+  </div>
+</section>
+
+<!-- Client-only audio logic (safe for SSR) -->
+<script is:inline>
+  // Toggle play/pause on click of any teaser card.
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('.js-teaser-card');
+    if (!card) return;
+
+    const audio = card.querySelector('audio.teaser');
+    if (!audio) return;
+
+    // Pause & reset all *other* teasers
+    document.querySelectorAll('audio.teaser').forEach((a) => {
+      if (a !== audio) {
+        try { a.pause(); a.currentTime = 0; } catch {}
+      }
+    });
+
+    // Start/stop this one
+    if (audio.paused) {
+      audio.muted = false;
+      audio.volume = 1;
+      audio.play().catch((err) => console.warn('play failed:', err));
+    } else {
+      audio.pause();
+    }
+  });
+
+  // Keep the icon in sync with the audio state
+  const attachIconSync = (a) => {
+    const card = a.closest('.js-teaser-card');
+    const icon = card?.querySelector('.play-icon');
+    if (!icon) return;
+    a.addEventListener('play',  () => icon.textContent = '❚❚');
+    a.addEventListener('pause', () => icon.textContent = '▶︎');
+    a.addEventListener('ended', () => { icon.textContent = '▶︎'; a.currentTime = 0; });
+  };
+  document.querySelectorAll('audio.teaser').forEach(attachIconSync);
+</script>
+
+
+</BaseLayout>
