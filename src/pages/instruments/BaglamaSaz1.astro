@@ -1,0 +1,213 @@
+---
+// src/pages/instruments/Surbahar.astro
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// Replace these with your real video sources/posters when ready.
+// You can use either <video> files (mp4/webm) or iframes (YouTube/Vimeo).
+// For now, we’ll show a tasteful placeholder.
+const videos = [
+  {
+    id: "v1",
+    label: "Alap (slow, meditative)",
+    type: "placeholder", // "video" | "iframe" | "placeholder"
+    src: "",             // e.g. "/media/surbahar-alap.mp4"
+    poster: "",          // e.g. "/media/surbahar-alap-poster.jpg"
+  },
+  {
+    id: "v2",
+    label: "Gat (rhythmic composition)",
+    type: "placeholder", // "video" | "iframe" | "placeholder"
+    src: "",             // e.g. "/media/surbahar-gat.mp4"
+    poster: "",          // e.g. "/media/surbahar-gat-poster.jpg"
+  },
+];
+---
+
+<BaseLayout title="Surbahar — Tradscendence" description="Two contrasting performances on Surbahar (bass sitar): alap and gat.">
+  <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
+    <header class="space-y-2">
+      <h1 class="font-display text-3xl md:text-4xl">Baglama Saz (long neck)</h1>
+      <p class="opacity-80 max-w-3xl">
+        Baglama Saz words and stuff.
+      </p>
+    </header>
+
+    <!-- Tabbed Hero Video -->
+    <section class="rounded-2xl overflow-hidden frame border border-black/40 bg-black/20">
+      <!-- Tabs -->
+      <div class="flex flex-wrap items-center gap-1 px-3 pt-3 sm:px-4 sm:pt-4" role="tablist" aria-label="Choose performance">
+        {videos.map((v, i) => (
+          <button
+            class="tab-button"
+            data-tab={v.id}
+            role="tab"
+            aria-selected={i === 0 ? "true" : "false"}
+            aria-controls={`pane-${v.id}`}
+            id={`tab-${v.id}`}
+          >
+            {v.label}
+          </button>
+        ))}
+      </div>
+
+      <!-- Video area -->
+      <div class="relative">
+        <!-- Maintain 16:9; swap to any ratio you prefer -->
+        <div class="aspect-video relative">
+          {videos.map((v, i) => (
+            <div
+              id={`pane-${v.id}`}
+              data-pane={v.id}
+              role="tabpanel"
+              aria-labelledby={`tab-${v.id}`}
+              class={`video-pane ${i === 0 ? "is-active" : ""}`}
+            >
+              {v.type === "video" && v.src ? (
+                <video
+                  class="h-full w-full object-cover"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster={v.poster || undefined}
+                >
+                  <source src={v.src} />
+                </video>
+              ) : v.type === "iframe" && v.src ? (
+                // Example (YouTube): set src like "https://www.youtube.com/embed/VIDEO_ID"
+                <iframe
+                  class="h-full w-full"
+                  src={v.src}
+                  title={v.label}
+                  loading="lazy"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                ></iframe>
+              ) : (
+                // Graceful placeholder (until you add real videos)
+                <div class="placeholder">
+                  <div class="placeholder-inner">
+                    <span class="placeholder-title">Video coming soon</span>
+                    <span class="placeholder-sub">Upload your source in this file’s <code>videos[]</code> config.</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Story / description block -->
+    <section class="prose-block">
+      <h2 class="font-display text-2xl md:text-3xl">About this instrument</h2>
+      <p class="opacity-80">
+        The Baglama Saz does stuff.
+      </p>
+    </section>
+  </section>
+
+  <style lang="css">
+  /* ===== Tabs styling ===== */
+  .tab-button {
+    position: relative;
+    padding: 0.5rem 0.9rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    background: transparent;
+    color: var(--ivory);
+    border: 1px solid transparent;
+    transition: transform 160ms ease;
+    outline: none;
+  }
+  .tab-button::after {
+    /* underline animation */
+    content: "";
+    position: absolute;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: -2px;
+    height: 2px;
+    background: var(--accent-gold);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 220ms ease;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 6px rgba(194,164,95,0.65)); /* subtle glow */
+  }
+  .tab-button:hover {
+    transform: translateY(-1px);
+  }
+  .tab-button:hover::after {
+    transform: scaleX(1);
+  }
+  .tab-button[aria-selected="true"] {
+    border-color: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
+  }
+  .tab-button[aria-selected="true"]::after {
+    transform: scaleX(1);
+  }
+
+  /* ===== Crossfade panes ===== */
+  .video-pane {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 360ms ease;
+    background: #000; /* prevents flash on load */
+    display: flex;
+  }
+  .video-pane.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    position: absolute; /* stacked for smooth crossfade */
+  }
+
+  /* ===== Placeholder ===== */
+  .placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(1200px 500px at 10% 10%, rgba(194,164,95,0.08), transparent 60%),
+      radial-gradient(1000px 500px at 90% 30%, rgba(110,42,42,0.12), transparent 60%),
+      rgba(0,0,0,0.5);
+    display: grid;
+    place-items: center;
+  }
+  .placeholder-inner {
+    text-align: center;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
+  }
+  .placeholder-title {
+    display: block;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--ivory);
+  }
+  .placeholder-sub {
+    display: block;
+    margin-top: 0.25rem;
+    opacity: 0.7;
+  }
+
+  /* ===== Prose block ===== */
+  .prose-block {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  /* Ensure aspect-ratio utility works across browsers */
+  .aspect-video {
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+</style>
