@@ -3,38 +3,81 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 const email = 'HunterEast.Musiq@gmail.com';
 ---
 <BaseLayout title="Contact / Booking — Tradscendence">
-<section class="mx-auto max-w-3xl px-4 py-10 space-y-6">
-<h1 class="font-display text-3xl">Contact / Booking</h1>
-<p class="opacity-80">Please share details about your event; I’ll reply promptly.</p>
-<form class="grid gap-4">
-<label class="grid gap-1">
-<span class="text-sm">Your name</span>
-<input class="bg-ebony/60 frame rounded-xl px-3 py-2" name="name" required />
-</label>
-<label class="grid gap-1">
-<span class="text-sm">Email</span>
-<input class="bg-ebony/60 frame rounded-xl px-3 py-2" type="email" name="email" required />
-</label>
-<label class="grid gap-1">
-<span class="text-sm">Phone (optional)</span>
-<input class="bg-ebony/60 frame rounded-xl px-3 py-2" name="phone" />
-</label>
-<label class="grid gap-1">
-<span class="text-sm">Event date (optional)</span>
-<input class="bg-ebony/60 frame rounded-xl px-3 py-2" type="date" name="date" />
-</label>
-<label class="grid gap-1">
-<span class="text-sm">Location (city/venue)</span>
-<input class="bg-ebony/60 frame rounded-xl px-3 py-2" name="location" />
-</label>
-<label class="grid gap-1">
-<span class="text-sm">Message</span>
-<textarea class="bg-ebony/60 frame rounded-xl px-3 py-2" rows="6" name="message"></textarea>
-</label>
-<div class="flex items-center gap-3">
-<button class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame" type="submit">Send</button>
-<a class="gothic-link" href={`mailto:${email}`}>or email me directly →</a>
-</div>
-</form>
-</section>
+  <section class="mx-auto max-w-3xl px-4 py-10 space-y-6">
+    <h1 class="font-display text-3xl">Contact / Booking</h1>
+    <p class="opacity-80">Please share details about your event; I’ll reply promptly.</p>
+
+    <form id="contact-form" class="grid gap-4" onsubmit="return false;">
+      <label class="grid gap-1">
+        <span class="text-sm">Your name</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2" name="name" required />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Email</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2" type="email" name="email" required />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Phone (optional)</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2" name="phone" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Event date (optional)</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2" type="date" name="date" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Location (city/venue)</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2" name="location" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Message</span>
+        <textarea class="bg-ebony/60 frame rounded-xl px-3 py-2" rows="6" name="message"></textarea>
+      </label>
+
+      <div class="flex items-center gap-3">
+        <button
+          id="mailto-send"
+          class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame"
+          type="button"
+        >
+          Send
+        </button>
+        <a class="gothic-link" href={`mailto:${email}`}>or email me directly →</a>
+      </div>
+    </form>
+
+    <p id="send-hint" class="text-sm opacity-70"></p>
+  </section>
+
+<script is:inline>
+  const email = JSON.parse(`{JSON.stringify(email)}`);
+  const form = document.getElementById('contact-form');
+  const btn = document.getElementById('mailto-send');
+  const hint = document.getElementById('send-hint');
+
+  btn?.addEventListener('click', () => {
+    const data = new FormData(form);
+    const name = data.get('name') || '';
+    const fromEmail = data.get('email') || '';
+    const phone = data.get('phone') || '';
+    const date = data.get('date') || '';
+    const location = data.get('location') || '';
+    const message = data.get('message') || '';
+
+    const subject = encodeURIComponent(`Booking inquiry from ${name}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${fromEmail}\nPhone: ${phone}\nEvent date: ${date}\nLocation: ${location}\n\nMessage:\n${message}`
+    );
+
+    const href = `mailto:${email}?subject=${subject}&body=${body}`;
+    window.location.href = href;
+
+    if (hint) hint.textContent = "If your email app didn't open, click the 'email me directly' link or copy my address.";
+  });
+</script>
+
 </BaseLayout>
