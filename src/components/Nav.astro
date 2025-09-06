@@ -88,4 +88,23 @@ const links = [
   btn?.addEventListener('click', toggleMenu);
 
   // Click outside (overlay)
-  shade?.addEven
+  shade?.addEventListener('click', closeMenu);
+
+  // Close when any mobile link is clicked
+  menu?.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element)) return;
+    const a = e.target.closest('a');
+    if (a) closeMenu();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  // If viewport jumps to desktop, ensure menu is closed
+  const mq = window.matchMedia('(min-width: 768px)');
+  mq.addEventListener('change', (e) => {
+    if (e.matches) closeMenu();
+  });
+</script>
