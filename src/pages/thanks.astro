@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const title = "Thank you — Tradscendence";
+---
+
+<BaseLayout {title}>
+  <section class="mx-auto max-w-6xl px-4 py-12">
+    <!-- Grid: Left = message, Middle = CTA links, Right = photo -->
+    <div class="grid gap-8 md:gap-10 md:grid-cols-[1fr_auto_minmax(260px,360px)] items-start">
+      <!-- LEFT: Thank-you + space for disclaimers -->
+      <div class="space-y-5">
+        <h1 class="font-display text-4xl sm:text-5xl leading-tight">
+          Thank you for reaching out.
+        </h1>
+        <p class="opacity-80 text-base sm:text-lg">
+          I received your message and I’ll reply as soon as I can. In the meantime, feel free to keep exploring the instruments and recordings.
+        </p>
+
+        <!-- Your custom sentences / disclaimers -->
+        <div class="mt-6 rounded-xl frame border border-black/30 bg-black/20 p-4 sm:p-5">
+          <h2 class="font-display text-lg mb-2">Notes & disclaimers</h2>
+          <p class="text-sm leading-relaxed opacity-90">
+            <!-- Edit these lines with your own copy -->
+            • Typical response time is 24–48 hours.<br />
+            • For bookings outside the tri-state area, please mention travel details.<br />
+            • Rates are tailored to the event, instrumentation, and set length.
+          </p>
+        </div>
+      </div>
+
+      <!-- MIDDLE: two stacked links with arrows (like home page) -->
+      <nav aria-label="Next steps" class="flex flex-col gap-3 md:gap-4">
+        <a
+          href="/instruments"
+          class="group inline-flex items-center gap-2 rounded-lg px-3 py-2 frame border border-black/30 hover:border-black/50 hover:bg-black/10"
+        >
+          <span class="font-semibold">Keep exploring</span>
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+        </a>
+
+        <a
+          href="/"
+          class="group inline-flex items-center gap-2 rounded-lg px-3 py-2 frame border border-black/30 hover:border-black/50 hover:bg-black/10"
+        >
+          <span class="font-semibold">Home</span>
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+        </a>
+      </nav>
+
+      <!-- RIGHT: vertical photo + small caption -->
+      <figure class="rounded-2xl overflow-hidden frame shadow-soft">
+        <img
+          src="/images/thankyou-guitar.jpg"
+          alt="Hunter Eastland holding a guitar"
+          class="w-full h-full object-cover max-h-[560px]"
+          loading="lazy"
+        />
+        <figcaption class="text-xs opacity-80 px-3 py-2 bg-black/40">
+          Old portrait — “Guitar study.” Shot on 35mm. (Describe date/location here.)
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- Optional: subtle divider & a small footer note -->
+    <div class="mt-10 h-px bg-[var(--line)] opacity-60"></div>
+    <p class="mt-6 text-sm opacity-70">
+      If you made a mistake in your submission, you can <a href="/contact" class="underline decoration-[var(--accent-gold)] decoration-2 underline-offset-2 hover:opacity-100">go back to the contact form</a> and send another message.
+    </p>
+  </section>
+</BaseLayout>
