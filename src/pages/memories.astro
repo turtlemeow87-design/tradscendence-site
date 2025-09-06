@@ -1,19 +1,162 @@
 ---
+// src/pages/memories.astro
 import BaseLayout from "../layouts/BaseLayout.astro";
-const photos = Array.from({ length: 6 });
+
+// Example data — replace with real events as you collect them.
+// You can use either `video.src` for a local file OR `video.youtubeId` for a YouTube embed.
+type Media = { src?: string; poster?: string; youtubeId?: string };
+type Photo = { src: string; alt?: string };
+
+type Memory = {
+  title: string;
+  date: string;        // ISO date e.g. "2025-08-15" (used for sorting)
+  location?: string;
+  reflection: string;
+  video?: Media;
+  photos?: Photo[];
+};
+
+const memories: Memory[] = [
+  {
+    title: "Palestinian-Style Wedding",
+    date: "2024-09-08",
+    location: "Wintergreen, VA",
+    reflection:
+      "This was a beautiful wedding in the mountains, where I took the opportunity to enhance the atomosphere with some Arabic-style taqsim.  The entire trip was a pleasure, the couple and their family were very warm, and I am proud to have this as my first professional memory with music.",
+    video: { youtubeId: "dQw4w9WgXcQ" }, // or your real video src
+    photos: [
+      { src: "/media/memories/pal-wed-1.jpg", alt: "" },
+      { src: "/media/memories/pal-wed-2.jpg", alt: "" },
+    ],
+  },
+
+  // {
+  //   title: "Sufi Night • Surbahar + Tanpura",
+  //   date: "2025-07-12",
+  //   location: "Queens, NY",
+  //   reflection:
+  //     "Slow-blooming alap on surbahar; you could feel the room exhale together. Later, we shifted into devotional call-and-response.",
+  //   video: { src: "/media/sufi-night.mp4", poster: "/media/sufi-night-cover.jpg" },
+  //   photos: [
+  //     { src: "/media/memories/sufi-1.jpg", alt: "Surbahar on stage" },
+  //     { src: "/media/memories/sufi-2.jpg", alt: "Audience with candles" },
+  //     { src: "/media/memories/sufi-3.jpg", alt: "Tanpura drone" },
+  //   ],
+  // },
+
+  // {
+  //   title: "Persian Tea House Set",
+  //   date: "2025-05-04",
+  //   location: "Jersey City, NJ",
+  //   reflection:
+  //     "Kept it intimate — setar miniatures between stories from the old masters. Perfectly paired with cardamom tea.",
+  //   photos: [
+  //     { src: "/media/memories/tea-1.jpg", alt: "Setar performance" },
+  //   ],
+  // },
+];
+
+
+// Sort newest → oldest (so scrolling goes back in time)
+const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
 ---
 
 <BaseLayout title="Memories — Tradscendence">
-  <section class="mx-auto max-w-6xl px-4 py-10 space-y-6 text-black">
-    <h1 class="font-display text-3xl">Memories</h1>
-    <p>Gallery / stories from performances. Placeholder grid to be replaced with real images &amp; captions.</p>
+  <section class="mx-auto max-w-6xl px-4 py-10 space-y-8 text-ivory">
+    <header class="space-y-2">
+      <h1 class="font-display text-3xl">Memories</h1>
+      <p class="opacity-80">
+        A living timeline of performances — brief reflections, sounds, and images. Newest first.
+      </p>
+    </header>
 
-    <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-      {photos.map((_, i) => (
-        <div class="frame rounded-xl h-44 bg-ebony/40 flex items-center justify-center opacity-70">
-          Photo {i + 1}
-        </div>
+    <!-- Timeline -->
+    <ol class="relative pl-6 sm:pl-8">
+      <!-- vertical line -->
+      <div
+        class="absolute left-2 sm:left-3 top-0 bottom-0"
+        style="width:2px;background:var(--accent-gold);"
+        aria-hidden="true"
+      ></div>
+
+      {sorted.map((m) => (
+        <li class="relative mb-10 last:mb-0">
+          <!-- dot -->
+          <span
+            class="absolute -left-0.5 sm:-left-1 top-1.5 inline-block rounded-full ring-2"
+            style="
+              width:14px;height:14px;
+              background:var(--accent-gold);
+              box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
+            "
+            aria-hidden="true"
+          ></span>
+
+          <article class="ml-6 sm:ml-8 grid gap-4">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h2 class="font-display text-xl leading-snug">{m.title}</h2>
+              <span class="text-xs px-2 py-0.5 rounded-full"
+                    style="background:color-mix(in oklab, var(--accent-gold) 20%, transparent); color:var(--ivory); border:1px solid rgba(0,0,0,.35);">
+                {new Date(m.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </span>
+              {m.location && (
+                <span class="text-sm opacity-80">• {m.location}</span>
+              )}
+            </div>
+
+            <p class="opacity-90">{m.reflection}</p>
+
+            {/* media block */}
+            {(m.video || (m.photos && m.photos.length)) && (
+              <div class="grid gap-4 md:grid-cols-5">
+                {/* Video (if present) */}
+                {m.video && (
+                  <div class="md:col-span-3 rounded-xl overflow-hidden frame bg-ebony/60">
+                    {m.video.youtubeId ? (
+                      <div class="aspect-video">
+                        <iframe
+                          class="w-full h-full"
+                          src={"media/PalestinianOud.mp4"}
+                          title={`${m.title} video`}
+                          loading="lazy"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowfullscreen
+                        ></iframe>
+                      </div>
+                    ) : (
+                      <video
+                        class="w-full h-auto block"
+                        controls
+                        preload="metadata"
+                        poster={m.video.poster}
+                      >
+                        <source src={m.video.src} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                  </div>
+                )}
+
+                {/* Photos */}
+                {m.photos && m.photos.length > 0 && (
+                  <div class={`grid gap-3 ${m.video ? 'md:col-span-2' : 'md:col-span-5 md:grid-cols-2'}`}>
+                    {m.photos.slice(0,4).map((p) => (
+                      <figure class="rounded-xl overflow-hidden frame bg-ebony/40">
+                        <img
+                          src={p.src}
+                          alt={p.alt || m.title}
+                          class="w-full h-40 object-cover"
+                          loading="lazy"
+                        />
+                      </figure>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </article>
+        </li>
       ))}
-    </div>
+    </ol>
   </section>
 </BaseLayout>
