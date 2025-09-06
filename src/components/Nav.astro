@@ -1,52 +1,54 @@
 ---
 const links = [
-{ href: '/', label: 'Home' },
-{ href: '/about', label: 'About' },
-{ href: '/contact', label: 'Contact / Booking' },
-{ href: '/instruments', label: 'My Instruments' },
-{ href: '/memories', label: 'Memories' },
-// Future (hidden in header, present in footer):
-{ href: '/blog', label: 'Blog', future: true },
-{ href: '/calendar', label: 'Calendar', future: true },
-{ href: '/store', label: 'Store', future: true },
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact / Booking' },
+  { href: '/instruments', label: 'My Instruments' },
+  { href: '/memories', label: 'Memories' },
+  // Future (hidden in header, present in footer):
+  { href: '/blog', label: 'Blog', future: true },
+  { href: '/calendar', label: 'Calendar', future: true },
+  { href: '/store', label: 'Store', future: true },
 ];
 ---
-<header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70 border-b border-black/40">
- <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip"> {/* clip any brief overflow */}
-    <div class="flex items-center justify-between py-3 min-w-0"> {/* allow children to shrink */}
-      {/* Left: brand + handle */}
-      <div class="flex flex-col leading-tight">
-  <a href="/" class="hover:underline decoration-rosewood">
-    <span class="font-display bg-gradient-to-r from-rosewood via-rosewood/50 to-transparent 
-                 text-2xl tracking-wide">
-      HunterEastlandMusiq
-    </span>
-  </a>
-  <a href="/#footer" class="text-sm opacity-80 hover:underline decoration-rosewood">
-     @Tradscendence
-  </a>
-</div>
 
-      {/* Desktop nav */}
+<!-- Site Header -->
+<header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70 border-b border-black/40">
+  <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip">
+    <div class="flex items-center justify-between py-3 min-w-0">
+      <!-- Left: brand + handle -->
+      <div class="flex flex-col leading-tight">
+        <a href="/" class="hover:underline decoration-rosewood">
+          <span class="font-display bg-gradient-to-r from-rosewood via-rosewood/50 to-transparent text-2xl tracking-wide">
+            HunterEastlandMusiq
+          </span>
+        </a>
+        <a href="/#footer" class="text-sm opacity-80 hover:underline decoration-rosewood">
+          @Tradscendence
+        </a>
+      </div>
+
+      <!-- Desktop nav -->
       <nav class="p-[6px] hidden md:flex gap-6 border bg-gradient-to-r from-rosewood via-gold/50 to-cedar border-ivory/50 rounded-md">
         {links.filter(l => !l.future).map(l => (
           <a class="gothic-link text-ivory hover:text-rosewood" href={l.href}>{l.label}</a>
         ))}
       </nav>
 
-      {/* Mobile menu button */}
-<button
-  id="menuBtn"
-  class="md:hidden frame rounded-xl shrink-0 mr-4 min-w-[44px] min-h-[44px] grid place-items-center text-xl"
-  aria-label="Open Menu"
->
-  ☰
-</button>
-
+      <!-- Mobile menu button -->
+      <button
+        id="menuBtn"
+        class="md:hidden frame rounded-xl shrink-0 mr-4 min-w-[44px] min-h-[44px] grid place-items-center text-xl"
+        aria-label="Open Menu"
+        aria-controls="mobileMenu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
     </div>
 
-    {/* Mobile dropdown */}
-    <div id="mobileMenu" class="md:hidden hidden pb-3">
+    <!-- Mobile dropdown -->
+    <div id="mobileMenu" class="md:hidden hidden pb-3 relative z-50">
       <div class="flex flex-col gap-3">
         {links.filter(l => !l.future).map(l => (
           <a class="gothic-link text-ivory" href={l.href}>{l.label}</a>
@@ -56,12 +58,34 @@ const links = [
   </div>
 </header>
 
-
+<!-- Screen overlay (lighter, click to close) -->
+<div id="menuOverlay" class="md:hidden hidden fixed inset-0 z-40 bg-black/10"></div>
 
 <script>
-const btn = document.getElementById('menuBtn');
-const menu = document.getElementById('mobileMenu');
-btn?.addEventListener('click', () => {
-menu?.classList.toggle('hidden');
-});
-</script>
+  const btn   = document.getElementById('menuBtn');
+  const menu  = document.getElementById('mobileMenu');
+  const shade = document.getElementById('menuOverlay');
+
+  const openMenu = () => {
+    menu?.classList.remove('hidden');
+    shade?.classList.remove('hidden');
+    btn?.setAttribute('aria-expanded', 'true');
+    document.documentElement.style.overflow = 'hidden';
+  };
+
+  const closeMenu = () => {
+    menu?.classList.add('hidden');
+    shade?.classList.add('hidden');
+    btn?.setAttribute('aria-expanded', 'false');
+    document.documentElement.style.overflow = '';
+  };
+
+  const toggleMenu = () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    isOpen ? closeMenu() : openMenu();
+  };
+
+  btn?.addEventListener('click', toggleMenu);
+
+  // Click outside (overlay)
+  shade?.addEven
