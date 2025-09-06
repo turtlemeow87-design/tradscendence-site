@@ -1,7 +1,6 @@
 ---
-const email = 'HunterEast.Musiq@gmail.com';
+/* no frontmatter needed */
 ---
-
 <!-- Floating “Book me” button -->
 <div class="fixed right-4 bottom-4 md:bottom-auto md:top-4 z-50">
   <button
@@ -17,9 +16,25 @@ const email = 'HunterEast.Musiq@gmail.com';
   <form
     action="https://formspree.io/f/mldwoalq"
     method="POST"
-    class="p-5 space-y-4 bg-neutral-900 text-neutral-100 rounded-2xl"
+    class="relative p-5 space-y-4 bg-neutral-900 text-neutral-100 rounded-2xl"
   >
+    <!-- Top-right X close -->
+    <button
+      type="button"
+      id="close-book"
+      aria-label="Close"
+      class="absolute top-2 right-2 w-8 h-8 rounded-full bg-neutral-800 hover:bg-neutral-700 flex items-center justify-center"
+    >
+      &times;
+    </button>
+
     <h2 class="text-xl font-semibold">Quick booking</h2>
+
+    <!-- Notes above the mini form -->
+    <div class="rounded-xl border border-gold/40 bg-gold/10 p-3 text-sm leading-relaxed frame">
+      <p><strong>I require booking inquiries to be at minimum one month out from the date of your event!</strong></p>
+      <p class="mt-1"><strong>I'm available for intimate events: private weddings, other ceremonies, small gatherings, funerals, and studio sessions.</strong></p>
+    </div>
 
     <label class="block">
       <span class="text-sm">Your name</span>
@@ -32,7 +47,7 @@ const email = 'HunterEast.Musiq@gmail.com';
     </label>
 
     <label class="block">
-      <span class="text-sm">Event date</span>
+      <span class="text-sm">Event date (If Applicable)</span>
       <input name="date" type="date" class="w-full mt-1 rounded-xl bg-black/40 p-2" />
     </label>
 
@@ -44,21 +59,12 @@ const email = 'HunterEast.Musiq@gmail.com';
     <input type="hidden" name="formName" value="Quick booking" />
 
     <div class="flex items-center justify-between gap-3">
+      <a href="/contact" class="rounded-xl px-4 py-2 bg-neutral-700 text-neutral-100 frame">Full Contact Page</a>
       <button
         type="submit"
         class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame"
       >
         Send
-      </button>
-      <a href={`mailto:${email}`} class="rounded-xl px-4 py-2 bg-neutral-700 text-neutral-100">
-        Email me
-      </a>
-      <button
-        type="button"
-        id="close-book"
-        class="px-4 py-2 rounded-xl bg-neutral-700"
-      >
-        Close
       </button>
     </div>
   </form>
@@ -71,4 +77,14 @@ const email = 'HunterEast.Musiq@gmail.com';
 
   openBtn?.addEventListener('click', () => dialog?.showModal());
   closeBtn?.addEventListener('click', () => dialog?.close());
+
+  // Optional: close on backdrop click
+  dialog?.addEventListener('click', (e) => {
+    const rect = dialog.getBoundingClientRect();
+    const clickedInside = (
+      e.clientX >= rect.left && e.clientX <= rect.right &&
+      e.clientY >= rect.top && e.clientY <= rect.bottom
+    );
+    if (!clickedInside) dialog.close();
+  });
 </script>

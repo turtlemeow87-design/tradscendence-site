@@ -7,6 +7,12 @@ const email = 'HunterEast.Musiq@gmail.com';
     <h1 class="font-display text-3xl">Contact / Booking</h1>
     <p class="opacity-80">Please share details about your event; I’ll reply promptly.</p>
 
+    <!-- Notes above the form -->
+    <div class="rounded-xl border border-gold/40 bg-gold/10 p-3 text-sm leading-relaxed frame">
+      <p><strong>I require booking inquiries to be at minimum one month out from the date of your event!</strong></p>
+      <p class="mt-1"><strong>I'm available for intimate events: private weddings, other ceremonies, small gatherings, funerals, and studio sessions.</strong></p>
+    </div>
+
     <form action="https://formspree.io/f/mldwoalq" method="POST" id="contact-form" class="grid gap-4">
       <label class="grid gap-1">
         <span class="text-sm">Your name</span>
@@ -24,7 +30,7 @@ const email = 'HunterEast.Musiq@gmail.com';
       </label>
 
       <label class="grid gap-1">
-        <span class="text-sm">Event date (optional)</span>
+        <span class="text-sm">Event date (If Applicable)</span>
         <input class="bg-ebony/60 frame rounded-xl px-3 py-2" type="date" name="date" />
       </label>
 
@@ -48,7 +54,9 @@ const email = 'HunterEast.Musiq@gmail.com';
         >
           Send
         </button>
-        <a class="gothic-link" href={`mailto:${email}`}>or email me directly →</a>
+        <a class="gothic-link" href={`mailto:${email}`}>
+          Don't want to use the form? Just click here and email me.
+        </a>
       </div>
     </form>
   </section>
