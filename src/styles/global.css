@@ -40,6 +40,20 @@ input:focus, textarea:focus {
 }
 }
 
+.logo-fade {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem; /* match your rounded-xl */
+}
+
+.logo-fade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 70%, rgba(17,17,17,0.8) 100%);
+  pointer-events: none;
+}
+
 /* (rest of your file unchanged) */
 * { transition: color 200ms ease, background-color 200ms ease, border-color 200ms ease; }
 .hr-gothic {
