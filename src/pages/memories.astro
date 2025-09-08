@@ -19,14 +19,14 @@ type Memory = {
 const memories: Memory[] = [
   {
     title: "Palestinian-Style Wedding",
-    date: "2024-09-08",
+    date: "2024-09-13",
     location: "Wintergreen, VA",
     reflection:
       "This was a beautiful wedding in the mountains, where I took the opportunity to enhance the atomosphere with some Arabic-style taqsim.  The entire trip was a pleasure, the couple and their family were very warm, and I am proud to have this as my first professional memory with music.",
     video: { youtubeId: "dQw4w9WgXcQ" }, // or your real video src
     photos: [
-      { src: "/media/memories/pal-wed-1.jpg", alt: "" },
-      { src: "/media/memories/pal-wed-2.jpg", alt: "" },
+      { src: "/media/BrideandGroom1.jpg", alt: "" },
+     // { src: "/media/memories/pal-wed-2.jpg", alt: "" },
     ],
   },
 
@@ -145,7 +145,7 @@ const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
                         <img
                           src={p.src}
                           alt={p.alt || m.title}
-                          class="w-full h-40 object-cover"
+                          class="w-full h-100 object-cover"
                           loading="lazy"
                         />
                       </figure>
