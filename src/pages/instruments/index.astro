@@ -119,12 +119,33 @@ const items = [
   <!-- Scoped styles so only this page is affected -->
   <style>
     .instruments-page ul li.frame {
+      position: relative;
       background: linear-gradient(
         to right,
         rgba(205, 127, 50, 0.15),
         transparent
       );
-      border: 1px solid var(--bronze, #CD7F32);
+      border-radius: 0.75rem;
+      overflow: hidden; /* keep pseudo border inside rounded corners */
+    }
+
+    .instruments-page ul li.frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px; /* border thickness */
+      background: linear-gradient(
+        to right,
+        rgba(205, 127, 50, 0.8),
+        transparent
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events: none;
     }
 
     .instruments-page button[data-audio] {
