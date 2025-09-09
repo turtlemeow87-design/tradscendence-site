@@ -40,6 +40,21 @@ input:focus, textarea:focus {
 }
 }
 
+button[data-audio] {
+  color: var(--accent-ivory);
+  font-size: 1.75rem;
+  text-shadow: 0 0 6px rgba(194, 164, 95, 0.8);
+}
+
+ul li {
+  color: var(--accent-gold);
+}
+
+ul li.frame {
+  background-color: linear-gradient(to right, rgba(205, 127, 50, 0.15), transparent); /* faint bronze tint */
+  border: 1px solid var(--bronze);
+}
+
 .logo-fade {
   position: relative;
   overflow: hidden;
