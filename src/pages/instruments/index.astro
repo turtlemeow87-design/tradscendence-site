@@ -23,36 +23,40 @@ const items = [
 ---
 
 <BaseLayout title="My Instruments — Tradscendence">
-  <section class="mx-auto max-w-6xl px-4 py-10 space-y-6">
+  <!-- added instruments-page class -->
+  <section class="instruments-page mx-auto max-w-6xl px-4 py-10 space-y-6">
     <h1 class="font-display text-3xl">My Instruments</h1>
-    <p class="opacity-80">Instruments that I've collected and learned to play over the years. Hit the play button to hear a quick teaser that I made!  Clicking the instrument's name sends you to the instrument's page.  I hope you find a sound that you like! :)</p>
+    <p class="opacity-80">
+      Instruments that I've collected and learned to play over the years. Hit the play
+      button to hear a quick teaser that I made! Clicking the instrument's name sends
+      you to the instrument's page. I hope you find a sound that you like! :)
+    </p>
 
-<ul class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-  {items.map(({ name, file }) => (
-    <li class="frame rounded-xl p-3 flex items-center justify-between">
-      {
-        name === 'Indian Surbahar' ? (
-          <a class="gothic-link" href="/instruments/Surbahar">{name}</a>
-        ) : name === 'Turkish Baglama Saz 1' ? (
-          <a class="gothic-link" href="/instruments/BaglamaSaz1">{name}</a>
-      ) : name === 'Arabic Oud' ? (
-          <a class="gothic-link" href="/instruments/ArabicOud">{name}</a>
-      ) : (
-          <a class="gothic-link" href="#">{name}</a>
-        )
-      }
-      <button
-        type="button"
-        class="opacity-60 hover:opacity-100 transition"
-        data-audio={file}
-        aria-label={`Play ${name} sample`}
-      >
-        ▶︎
-      </button>
-    </li>
-  ))}
-</ul>
-
+    <ul class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+      {items.map(({ name, file }) => (
+        <li class="frame rounded-xl p-3 flex items-center justify-between">
+          {
+            name === 'Indian Surbahar' ? (
+              <a class="gothic-link" href="/instruments/Surbahar">{name}</a>
+            ) : name === 'Turkish Baglama Saz 1' ? (
+              <a class="gothic-link" href="/instruments/BaglamaSaz1">{name}</a>
+            ) : name === 'Arabic Oud' ? (
+              <a class="gothic-link" href="/instruments/ArabicOud">{name}</a>
+            ) : (
+              <a class="gothic-link" href="#">{name}</a>
+            )
+          }
+          <button
+            type="button"
+            class="opacity-60 hover:opacity-100 transition"
+            data-audio={file}
+            aria-label={`Play ${name} sample`}
+          >
+            ▶︎
+          </button>
+        </li>
+      ))}
+    </ul>
   </section>
 
   <script>
@@ -88,14 +92,13 @@ const items = [
           await a.play();
         } catch (err) {
           // Autoplay blocked or other issue — fail silently for hover
-          // console.debug(err);
         }
       }
 
       document.querySelectorAll('[data-audio]').forEach((btn) => {
         const src = btn.getAttribute('data-audio');
 
-        // Tap/click works on mobile & desktop (counts as user gesture)
+        // Tap/click works on mobile & desktop
         btn.addEventListener('click', () => play(src), { passive: true });
 
         // Optional hover preview for desktops only
@@ -112,4 +115,23 @@ const items = [
       });
     });
   </script>
+
+  <!-- Scoped styles so only this page is affected -->
+  <style>
+    .instruments-page ul li.frame {
+      background: linear-gradient(
+        to right,
+        rgba(205, 127, 50, 0.15),
+        transparent
+      );
+      border: 1px solid var(--bronze, #CD7F32);
+    }
+
+    .instruments-page button[data-audio] {
+      color: var(--accent-gold, #C2A45F);
+      font-size: 1.75rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6),
+                   -1px -1px 1px rgba(255, 255, 255, 0.2);
+    }
+  </style>
 </BaseLayout>
