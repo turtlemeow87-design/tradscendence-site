@@ -28,6 +28,7 @@
   border: 1px solid rgba(255,255,255,0.1);
 }
 
+
 input::placeholder,
 textarea::placeholder {
   color: rgba(245, 241, 232, 0.5); /* softened ivory for placeholder text */
