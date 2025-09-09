@@ -149,10 +149,19 @@ const items = [
     }
 
     .instruments-page button[data-audio] {
-      color: var(--accent-gold, #C2A45F);
-      font-size: 1.75rem;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6),
-                   -1px -1px 1px rgba(255, 255, 255, 0.2);
-    }
+  font-size: 1.75rem;
+  color: var(--accent-gold, #C2A45F);
+  text-shadow:
+  2px 0 var(--bronze, #CD7F32),
+ -2px 0 var(--bronze, #CD7F32),
+  0 2px var(--bronze, #CD7F32),
+  0 -2px var(--bronze, #CD7F32),
+  2px 2px var(--bronze, #CD7F32),
+ -3px -3px var(--bronze, #CD7F32),
+  2px -2px var(--bronze, #CD7F32),
+ -3px 3px var(--bronze, #CD7F32);
+
+}
+
   </style>
 </BaseLayout>
