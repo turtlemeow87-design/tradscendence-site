@@ -12,13 +12,12 @@ const links = [
 ];
 ---
 <header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70 border-b border-black/40">
-  <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip"> {/* clip any brief overflow */}
-    <div class="flex items-center justify-between py-3 min-w-0"> {/* allow children to shrink */}
-      {/* Left: brand + handle */}
+  <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip">
+    <div class="flex items-center justify-between py-3 min-w-0">
+      <!-- Left: brand + handle -->
       <div class="flex flex-col leading-tight">
         <a href="/" class="hover:underline decoration-rosewood">
-          <span class="font-display bg-gradient-to-r from-rosewood via-rosewood/50 to-transparent 
-                       text-2xl tracking-wide">
+          <span class="font-display bg-gradient-to-r from-rosewood via-rosewood/50 to-transparent text-2xl tracking-wide">
             HunterEastlandMusiq
           </span>
         </a>
@@ -27,24 +26,46 @@ const links = [
         </a>
       </div>
 
-      {/* Desktop nav */}
+      <!-- Desktop nav -->
       <nav class="p-[6px] hidden md:flex gap-6 border bg-gradient-to-r from-rosewood via-gold/50 to-cedar border-ivory/50 rounded-md">
         {links.filter(l => !l.future).map(l => (
           <a class="gothic-link text-ivory hover:text-rosewood" href={l.href}>{l.label}</a>
         ))}
       </nav>
 
-      {/* Mobile menu button */}
+      <!-- Mobile menu button (embossed + three-side border) -->
       <button
         id="menuBtn"
-        class="md:hidden frame rounded-xl shrink-0 mr-4 min-w-[44px] min-h-[44px] grid place-items-center text-xl"
+        class="md:hidden relative shrink-0 mr-4 size-12 grid place-items-center rounded-tr-2xl rounded-br-2xl rounded-tl-2xl 
+               border-t border-r border-b border-gold/60 
+               bg-[linear-gradient(to_bottom,_rgba(255,255,255,.06),_rgba(0,0,0,.35))] 
+               backdrop-blur-sm 
+               shadow-[0_6px_16px_rgba(0,0,0,.45)] 
+               [box-shadow:inset_0_1px_0_rgba(255,255,255,.18),inset_0_-1px_0_rgba(0,0,0,.35)] 
+               ring-1 ring-rosewood/30 
+               text-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal 
+               data-[open=true]:ring-rosewood/60 data-[open=true]:shadow-[0_8px_20px_rgba(194,164,95,.35)]"
         aria-label="Open Menu"
+        aria-expanded="false"
+        aria-controls="mobileMenu"
+        title="Menu"
       >
-        ☰
+        <!-- subtle left-edge accent to hint the control without a full border-left -->
+        <span class="pointer-events-none absolute left-0 top-1 bottom-1 w-px bg-gradient-to-b from-transparent via-gold/40 to-transparent"></span>
+
+        <!-- Icon: SVG with slight depth and glow when open -->
+        <svg class="h-6 w-6 drop-shadow-sm transition-transform duration-200 ease-out data-[open=true]:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16" class="opacity-95"/>
+          <path d="M4 12h16" class="opacity-95"/>
+          <path d="M8 17h12" class="opacity-95"/>
+        </svg>
+
+        <!-- glow ring when open -->
+        <span class="pointer-events-none absolute inset-0 rounded-tr-2xl rounded-br-2xl rounded-tl-2xl ring-2 ring-transparent data-[open=true]:ring-gold/40"></span>
       </button>
     </div>
 
-    {/* Mobile dropdown */}
+    <!-- Mobile dropdown -->
     <div id="mobileMenu" class="md:hidden hidden pb-3">
       <div class="flex flex-col gap-3 bg-charcoal/95 p-4 rounded-xl shadow-lg">
         {links.filter(l => !l.future).map(l => (
@@ -60,16 +81,38 @@ const links = [
   const menu = document.getElementById('mobileMenu');
 
   btn?.addEventListener('click', (e) => {
-    e.stopPropagation(); // prevent triggering outside-click handler
-    menu?.classList.toggle('hidden');
+    e.stopPropagation();
+    const open = menu?.classList.toggle('hidden') === false; // true if now visible
+    if (btn) {
+      btn.dataset.open = String(open);
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Close Menu' : 'Open Menu');
+    }
   });
 
-  // Close menu if clicking outside (with type guards for VS Code)
+  // Close menu if clicking outside
   document.addEventListener('click', (e) => {
     if (menu && !menu.classList.contains('hidden')) {
       const target = e.target;
       if (target instanceof Node && !menu.contains(target) && target !== btn) {
         menu.classList.add('hidden');
+        if (btn) {
+          btn.dataset.open = 'false';
+          btn.setAttribute('aria-expanded', 'false');
+          btn.setAttribute('aria-label', 'Open Menu');
+        }
+      }
+    }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) {
+      menu.classList.add('hidden');
+      if (btn) {
+        btn.dataset.open = 'false';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-label', 'Open Menu');
       }
     }
   });
