@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const email = "HunterEast.Musiq@gmail.com";
+---
+
+<BaseLayout title="Coming Soon — Tradscendence">
+  <section class="mx-auto max-w-3xl px-4 py-16 space-y-8 text-center">
+    <header class="space-y-3">
+      <h1 class="font-display text-4xl">Coming Soon!</h1>
+      <p class="opacity-80">
+        This page is brewing. I’m tuning details and polishing audio—check back soon.
+      </p>
+    </header>
+
+    <!-- Decorative card -->
+    <div class="rounded-2xl border border-gold/40 bg-gold/10 p-6 frame space-y-3">
+      <p>
+        In the meantime, you can explore other parts of the site or reach out if you’re planning an event.
+      </p>
+      <p class="text-sm opacity-80">
+        I’m available for intimate events: private weddings, ceremonies, small gatherings, funerals, and studio sessions.
+      </p>
+    </div>
+
+    <!-- Optional notify form (Formspree) -->
+    <form
+      action="https://formspree.io/f/mldwoalq"
+      method="POST"
+      class="mx-auto grid gap-3 sm:grid-cols-[1fr_auto] max-w-md"
+    >
+      <label class="sr-only" for="notify-email">Email</label>
+      <input
+        id="notify-email"
+        type="email"
+        name="email"
+        required
+        autocomplete="email"
+        placeholder="Get a quick note when this page goes live"
+        class="bg-ebony/60 text-ivory frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] placeholder:opacity-60 sm:rounded-r-none"
+      />
+      <input type="hidden" name="formName" value="Coming Soon Notify" />
+      <button
+        type="submit"
+        class="rounded-xl sm:rounded-l-none px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame"
+      >
+        Notify Me
+      </button>
+    </form>
+
+    <!-- Helpful links -->
+    <nav class="flex flex-col sm:flex-row items-center justify-center gap-6 pt-2">
+      <a class="gothic-link" href="/">Return Home</a>
+      <a class="gothic-link" href="/contact">Contact / Booking</a>
+      <a class="gothic-link" href={`mailto:${email}`}>Email Me Directly</a>
+    </nav>
+
+    <!-- Soft divider -->
+    <div class="mx-auto h-px w-2/3 bg-gradient-to-r from-transparent via-[var(--accent-bronze)]/60 to-transparent rounded-full"></div>
+
+    <!-- Subtle reassurance footer -->
+    <p class="text-sm opacity-70">
+      Quality over haste—thanks for your patience.
+    </p>
+  </section>
+
+  <!-- Ensure selects & options match dark theme if you reuse this template elsewhere -->
+  <style is:global>
+    select { background-color: rgba(24,24,24,0.6); color: var(--ivory, #fdfbf5); }
+    select option { background-color: rgba(24,24,24,0.95); color: var(--ivory, #fdfbf5); }
+  </style>
+</BaseLayout>

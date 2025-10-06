@@ -2,7 +2,6 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const items = [
-  { name: 'Indian Sitar', file: '/media/sitar.m4a' },
   { name: 'Indian Surbahar', file: '/media/surbahar.m4a' },
   { name: 'Indian Tanpura', file: '/media/tanpura.m4a' },
   { name: 'Pakistani Rabab', file: '/media/rabab.m4a' },
@@ -38,10 +37,36 @@ const items = [
           {
             name === 'Indian Surbahar' ? (
               <a class="gothic-link" href="/instruments/Surbahar">{name}</a>
-            ) : name === 'Turkish Baglama Saz 1' ? (
-              <a class="gothic-link" href="/instruments/BaglamaSaz1">{name}</a>
+            ) : name === 'Indian Tanpura' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Pakistani Rabab' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Indian Esraj' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Turkish Kabak Kemane' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Turkish Baglama Saz' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Turkish Divan Saz' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Turkish Cümbüş Tanbur' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Persian Setar' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Armenian Duduk' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Chinese Hulusi' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Chinese Pipa' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
             ) : name === 'Arabic Oud' ? (
-              <a class="gothic-link" href="/instruments/ArabicOud">{name}</a>
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Turkish Oud' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Azeri Tar' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
+            ) : name === 'Octave Mandolin' ? (
+              <a class="gothic-link" href="/coming-soon">{name}</a>
             ) : (
               <a class="gothic-link" href="#">{name}</a>
             )
