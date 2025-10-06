@@ -2,23 +2,21 @@
 // src/pages/instruments/Surbahar.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-// Replace these with your real video sources/posters when ready.
-// You can use either <video> files (mp4/webm) or iframes (YouTube/Vimeo).
-// For now, we’ll show a tasteful placeholder.
+// Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
     id: "v1",
-    label: "Alap (slow, meditative)",
-    type: "placeholder", // "video" | "iframe" | "placeholder"
-    src: "",             // e.g. "/media/surbahar-alap.mp4"
-    poster: "",          // e.g. "/media/surbahar-alap-poster.jpg"
+    label: "Upper Register",
+    type: "video",
+    src: "/media/Surbahar1.mp4",
+    poster: "",
   },
   {
     id: "v2",
-    label: "Gat (rhythmic composition)",
-    type: "placeholder", // "video" | "iframe" | "placeholder"
-    src: "",             // e.g. "/media/surbahar-gat.mp4"
-    poster: "",          // e.g. "/media/surbahar-gat-poster.jpg"
+    label: "Lower Register",
+    type: "video",
+    src: "/media/Surbahar2.mp4",
+    poster: "",
   },
 ];
 ---
@@ -50,51 +48,47 @@ const videos = [
         ))}
       </div>
 
-      <!-- Video area -->
-      <div class="relative">
-        <!-- Maintain 16:9; swap to any ratio you prefer -->
-        <div class="aspect-video relative">
-          {videos.map((v, i) => (
-            <div
-              id={`pane-${v.id}`}
-              data-pane={v.id}
-              role="tabpanel"
-              aria-labelledby={`tab-${v.id}`}
-              class={`video-pane ${i === 0 ? "is-active" : ""}`}
-            >
-              {v.type === "video" && v.src ? (
-                <video
-                  class="h-full w-full object-cover"
-                  controls
-                  playsinline
-                  preload="metadata"
-                  poster={v.poster || undefined}
-                >
-                  <source src={v.src} />
-                </video>
-              ) : v.type === "iframe" && v.src ? (
-                // Example (YouTube): set src like "https://www.youtube.com/embed/VIDEO_ID"
-                <iframe
-                  class="h-full w-full"
-                  src={v.src}
-                  title={v.label}
-                  loading="lazy"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen
-                ></iframe>
-              ) : (
-                // Graceful placeholder (until you add real videos)
-                <div class="placeholder">
-                  <div class="placeholder-inner">
-                    <span class="placeholder-title">Video coming soon</span>
-                    <span class="placeholder-sub">Upload your source in this file’s <code>videos[]</code> config.</span>
-                  </div>
+      <!-- Adaptive ratio shell (aspect-ratio driven by --ar) -->
+      <div id="video-shell" class="relative w-full bg-black" style="aspect-ratio: var(--ar, 16 / 9);">
+        {videos.map((v, i) => (
+          <div
+            id={`pane-${v.id}`}
+            data-pane={v.id}
+            role="tabpanel"
+            aria-labelledby={`tab-${v.id}`}
+            class={`video-pane ${i === 0 ? "is-active" : ""}`}
+            data-ratio={v.ratio || ""}
+          >
+            {v.type === "video" && v.src ? (
+              <video
+                class="h-full w-full object-contain"  /* avoid cropping since shell matches ratio */
+                controls
+                playsinline
+                preload="metadata"
+                poster={v.poster || undefined}
+              >
+                <source src={v.src} />
+              </video>
+            ) : v.type === "iframe" && v.src ? (
+              <iframe
+                class="h-full w-full"
+                src={v.src}
+                title={v.label}
+                loading="lazy"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            ) : (
+              <div class="placeholder">
+                <div class="placeholder-inner">
+                  <span class="placeholder-title">Video coming soon</span>
+                  <span class="placeholder-sub">Upload your source in this file’s <code>videos[]</code> config.</span>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </section>
 
@@ -107,7 +101,8 @@ const videos = [
         stories here about the instrument’s setup, strings, meend technique, and what drew me to it.
       </p>
     </section>
-     <!-- Keep Exploring link -->
+
+    <!-- Keep Exploring link -->
     <div class="pt-8">
       <a
         href="/instruments"
@@ -146,7 +141,6 @@ const videos = [
     outline: none;
   }
   .tab-button::after {
-    /* underline animation */
     content: "";
     position: absolute;
     left: 0.9rem;
@@ -158,37 +152,31 @@ const videos = [
     transform-origin: left center;
     transition: transform 220ms ease;
     opacity: 0.9;
-    filter: drop-shadow(0 0 6px rgba(194,164,95,0.65)); /* subtle glow */
+    filter: drop-shadow(0 0 6px rgba(194,164,95,0.65));
   }
-  .tab-button:hover {
-    transform: translateY(-1px);
-  }
-  .tab-button:hover::after {
-    transform: scaleX(1);
-  }
+  .tab-button:hover { transform: translateY(-1px); }
+  .tab-button:hover::after { transform: scaleX(1); }
   .tab-button[aria-selected="true"] {
     border-color: rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.04);
     box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
   }
-  .tab-button[aria-selected="true"]::after {
-    transform: scaleX(1);
-  }
+  .tab-button[aria-selected="true"]::after { transform: scaleX(1); }
 
   /* ===== Crossfade panes ===== */
+  #video-shell { position: relative; }
   .video-pane {
     position: absolute;
     inset: 0;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 360ms ease;
-    background: #000; /* prevents flash on load */
+    transition: opacity 320ms ease;
+    background: #000;
     display: flex;
   }
   .video-pane.is-active {
     opacity: 1;
     pointer-events: auto;
-    position: absolute; /* stacked for smooth crossfade */
   }
 
   /* ===== Placeholder ===== */
@@ -224,14 +212,128 @@ const videos = [
   }
 
   /* ===== Prose block ===== */
-  .prose-block {
-    display: grid;
-    gap: 0.75rem;
+  .prose-block { display: grid; gap: 0.75rem; }
+  </style>
+
+  <script type="module">
+  // Tab behavior + adaptive aspect ratio
+  const tablist = document.querySelector('[role="tablist"]');
+  const shell = document.getElementById('video-shell');
+  const buttons = tablist ? Array.from(tablist.querySelectorAll('.tab-button')) : [];
+  const panes = Array.from(document.querySelectorAll('.video-pane'));
+
+  // Cache of pane.id -> "w / h" string
+  const ratioMap = new Map();
+
+  // Helper: set shell aspect ratio
+  const setShellRatio = (ratioString) => {
+    if (!shell) return;
+    shell.style.setProperty('--ar', ratioString || '16 / 9');
+  };
+
+  // Measure videos once metadata is available
+  const measurePane = (pane) => {
+    // If author provided a ratio on the pane (or in data), prefer it
+    const manual = pane.getAttribute('data-ratio');
+    if (manual && manual.includes('/')) {
+      ratioMap.set(pane.id, manual);
+      return;
+    }
+
+    const vid = pane.querySelector('video');
+    if (vid) {
+      const apply = () => {
+        const w = vid.videoWidth, h = vid.videoHeight;
+        if (w && h) ratioMap.set(pane.id, `${w} / ${h}`);
+      };
+      if (vid.readyState >= 1) {
+        apply();
+      } else {
+        vid.addEventListener('loadedmetadata', apply, { once: true });
+      }
+      return;
+    }
+
+    // iframe fallback: if no manual ratio, assume 16/9
+    const ifr = pane.querySelector('iframe');
+    if (ifr) {
+      ratioMap.set(pane.id, manual || '16 / 9');
+    }
+  };
+
+  // Initialize measurements
+  panes.forEach(measurePane);
+
+  const activate = (id) => {
+    // Update buttons
+    for (const btn of buttons) {
+      const isSelected = btn.dataset.tab === id;
+      btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+      btn.tabIndex = isSelected ? 0 : -1;
+    }
+    // Update panes, pause hidden media
+    for (const pane of panes) {
+      const isActive = pane.dataset.pane === id;
+      pane.classList.toggle('is-active', isActive);
+
+      if (!isActive) {
+        const vid = pane.querySelector('video');
+        if (vid) vid.pause();
+        const ifr = pane.querySelector('iframe');
+        if (ifr) { const src = ifr.src; ifr.src = src; }
+      } else {
+        // Apply the measured ratio (or default)
+        const r = ratioMap.get(pane.id) || pane.getAttribute('data-ratio') || '16 / 9';
+        setShellRatio(r);
+      }
+    }
+  };
+
+  // Click handling
+  if (tablist) {
+    tablist.addEventListener('click', (e) => {
+      const btn = e.target.closest('.tab-button');
+      if (!btn) return;
+      activate(btn.dataset.tab);
+    });
+
+    // Keyboard support
+    tablist.addEventListener('keydown', (e) => {
+      const currentIndex = buttons.findIndex(b => b.getAttribute('aria-selected') === 'true');
+      if (e.key === 'ArrowRight' || e.key === 'Right') {
+        const next = buttons[(currentIndex + 1) % buttons.length];
+        next.focus(); activate(next.dataset.tab); e.preventDefault();
+      } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+        const prev = buttons[(currentIndex - 1 + buttons.length) % buttons.length];
+        prev.focus(); activate(prev.dataset.tab); e.preventDefault();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        const btn = document.activeElement;
+        if (btn && btn.classList.contains('tab-button')) {
+          activate(btn.dataset.tab); e.preventDefault();
+        }
+      }
+    });
   }
 
-  /* Ensure aspect-ratio utility works across browsers */
-  .aspect-video {
-    aspect-ratio: 16 / 9;
-    background: #000;
+  // On first paint: ensure initial ratio matches the initially active pane
+  const initiallyActive = panes.find(p => p.classList.contains('is-active')) || panes[0];
+  if (initiallyActive) {
+    // If metadata isn't ready yet, we’ll re-apply when it loads
+    const applyInitial = () => {
+      const r = ratioMap.get(initiallyActive.id) || initiallyActive.getAttribute('data-ratio') || '16 / 9';
+      setShellRatio(r);
+    };
+
+    const vid = initiallyActive.querySelector('video');
+    if (vid && !(vid.readyState >= 1)) {
+      vid.addEventListener('loadedmetadata', applyInitial, { once: true });
+    } else {
+      applyInitial();
+    }
   }
-</style>
+
+  // Make only the initially selected button focusable
+  const initiallySelected = buttons.find(b => b.getAttribute('aria-selected') === 'true') || buttons[0];
+  buttons.forEach(b => (b.tabIndex = b === initiallySelected ? 0 : -1));
+  </script>
+</BaseLayout>
