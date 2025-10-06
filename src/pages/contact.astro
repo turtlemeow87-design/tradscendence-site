@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 const email = 'HunterEast.Musiq@gmail.com';
 ---
+
 <BaseLayout title="Contact / Booking — Tradscendence">
   <section class="mx-auto max-w-3xl px-4 py-10 space-y-6">
     <h1 class="font-display text-3xl">Contact / Booking</h1>
@@ -11,52 +12,169 @@ const email = 'HunterEast.Musiq@gmail.com';
     <div class="rounded-xl border border-gold/40 bg-gold/10 p-3 text-sm leading-relaxed frame">
       <p><strong>I require booking inquiries to be at minimum one month out from the date of your event!</strong></p>
       <p class="mt-1"><strong>I'm available for intimate events: private weddings, other ceremonies, small gatherings, funerals, and studio sessions.</strong></p>
+      <p class="mt-1"><strong>*Any particular dress code requests for an event will be taken into account once an official date/set of dates is established.  Whether any dollar amount for attire is included in the customer fee, provided by the customer with no fee, or fully provided by me will be determined on a case-by-case basis.  I am open-minded*</strong></p>
     </div>
 
     <form action="https://formspree.io/f/mldwoalq" method="POST" id="contact-form" class="grid gap-4">
+      <!-- Required: Name -->
       <label class="grid gap-1">
-        <span class="text-sm">Your name</span>
-        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" name="name" required />
+        <span class="text-sm font-semibold">Your name</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+               name="name" required />
       </label>
 
+      <!-- Required: Email -->
       <label class="grid gap-1">
-        <span class="text-sm">Email</span>
-        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" type="email" name="email" required />
+        <span class="text-sm font-semibold">Email</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+               type="email" name="email" required />
       </label>
 
+      <!-- Optional: Phone -->
       <label class="grid gap-1">
         <span class="text-sm">Phone (optional)</span>
         <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" name="phone" />
       </label>
 
+      <!-- Optional: Event date -->
       <label class="grid gap-1">
         <span class="text-sm">Event date (If Applicable)</span>
-        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" type="date" name="date" />
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+               type="date" name="date" />
       </label>
 
+      <!-- Required: Location -->
       <label class="grid gap-1">
-        <span class="text-sm">Location (city/venue)</span>
-        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" name="location" />
+        <span class="text-sm font-semibold">Location (city/venue)</span>
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+               name="location" required />
       </label>
 
+      <!-- Optional: Instrument(s) -->
       <label class="grid gap-1">
-        <span class="text-sm">Message</span>
-        <textarea class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" rows="6" name="message"></textarea>
+        <span class="text-sm">Instrument(s) (optional)</span>
+        <select id="instrument-select"
+                name="instrument"
+                class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]">
+          <option value="">— Select an instrument —</option>
+          <option>Surbahar</option>
+          <option>Tanpura</option>
+          <option>Rabab</option>
+          <option>Esraj</option>
+          <option>Kabak Kemane</option>
+          <option>Bağlama Saz</option>
+          <option>Divan Saz</option>
+          <option>Cümbüş Oud</option>
+          <option>Cümbüş Tanbur</option>
+          <option>Setar</option>
+          <option>Duduk</option>
+          <option>Hulusi</option>
+          <option>Pipa</option>
+          <option>Arabic Oud</option>
+          <option>Turkish Oud</option>
+          <option>Azeri Tar</option>
+          <option>Octave Mandolin</option>
+          <option value="multi">More than one?</option>
+        </select>
+      </label>
+
+      <!-- Revealed when "More than one?" is chosen -->
+      <label id="instrument-list-wrap" class="grid gap-1 hidden">
+        <span class="text-sm">List them here</span>
+        <textarea name="instrument_list"
+                  rows="3"
+                  class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+                  placeholder="e.g., Arabic Oud, Tanpura, Duduk"></textarea>
+      </label>
+
+      <!-- Optional: Genre(s) -->
+      <label class="grid gap-1">
+        <span class="text-sm">Genre(s) (optional)</span>
+        <select id="genre-select"
+                name="genre"
+                class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]">
+          <option value="">— Select a genre —</option>
+          <option>Classical</option>
+          <option>Blues</option>
+          <option>Traditional/Folk</option>
+          <option>Metal/Alternative</option>
+          <option>Pop</option>
+          <option>Rock</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <!-- Revealed when "Other" is chosen -->
+      <label id="genre-other-wrap" class="grid gap-1 hidden">
+        <span class="text-sm">Describe the genre(s) / vibe</span>
+        <textarea name="genre_other"
+                  rows="3"
+                  class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+                  placeholder="e.g., mystical, atmospheric, Sufi-inspired, cinematic"></textarea>
+      </label>
+
+      <!-- Required: Message -->
+      <label class="grid gap-1">
+        <span class="text-sm font-semibold">Message</span>
+        <textarea class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+                  rows="6" name="message" required></textarea>
       </label>
 
       <input type="hidden" name="formName" value="Contact Page" />
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-6 mt-2">
         <button
           class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame"
-          type="submit"
-        >
+          type="submit">
           Send
         </button>
         <a class="gothic-link" href={`mailto:${email}`}>
-          Don't want to use the form? Just click here and email me.
+          Or ... Don't want to use the form? Just click here and email me.
         </a>
       </div>
     </form>
   </section>
+
+  <style is:global>
+  select {
+    background-color: rgba(24, 24, 24, 0.6); /* same as bg-ebony/60 */
+    color: var(--ivory, #fdfbf5);
+  }
+  select option {
+    background-color: rgba(24, 24, 24, 0.95); /* darker for clarity */
+    color: var(--ivory, #fdfbf5);
+  }
+</style>
+
+  <!-- Tiny progressive-enhancement script for conditional fields -->
+  <script is:raw>
+    (function () {
+      const instrumentSelect = document.getElementById('instrument-select');
+      const instrumentWrap = document.getElementById('instrument-list-wrap');
+      const genreSelect = document.getElementById('genre-select');
+      const genreWrap = document.getElementById('genre-other-wrap');
+
+      function toggleInstrument() {
+        const multi = instrumentSelect && instrumentSelect.value === 'multi';
+        if (instrumentWrap) {
+          instrumentWrap.classList.toggle('hidden', !multi);
+          instrumentWrap.querySelector('textarea')?.setAttribute('aria-hidden', String(!multi));
+        }
+      }
+      function toggleGenre() {
+        const other = genreSelect && genreSelect.value === 'other';
+        if (genreWrap) {
+          genreWrap.classList.toggle('hidden', !other);
+          genreWrap.querySelector('textarea')?.setAttribute('aria-hidden', String(!other));
+        }
+      }
+
+      instrumentSelect?.addEventListener('change', toggleInstrument);
+      genreSelect?.addEventListener('change', toggleGenre);
+
+      // Initialize on page load (handles back/forward cache)
+      toggleInstrument();
+      toggleGenre();
+    })();
+  </script>
 </BaseLayout>
