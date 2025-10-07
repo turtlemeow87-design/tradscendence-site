@@ -26,7 +26,7 @@ const videos = [
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Turkish Oud</h1>
       <p class="opacity-80 max-w-3xl">
-       Turkish Oud Stuff
+        A sharp and distinguised voice..
       </p>
     </header>
 
@@ -100,7 +100,7 @@ const videos = [
     <section class="prose-block">
       <h2 class="font-display text-2xl md:text-3xl">About this instrument</h2>
       <p class="opacity-80">
-       Turkish Oud Stuff
+       The Turkish Oud shares much with its <a href="/instruments/ArabicOud">Arabic</a> relative, yet it carries its own distinct energy—brighter, a bit sharper, and somehow more daring.  The tone cuts through with clarity, yet still holds that deep, emotional pull that defines the Oud.  Whether played more traditionally or blending it into more modern genres, it always brings a spark of vitality to the moment. <p>I will likely revisit making one of these videos again later, as they are more similar to each other than intended.  I was tired and trying to get this website up and running!</p>
       </p>
     </section>
 
@@ -239,6 +239,11 @@ const videos = [
   /* ===== Prose block ===== */
   .prose-block { display: grid; gap: 0.75rem; }
 
+    .prose-block a {
+    color: var(--accent-gold);
+    text-decoration: none;
+    transition: color 0.25s ease;
+  }
   /* Optional: slightly tighter gold underline on very narrow phones */
   @media (max-width: 360px) {
     .tab-button { padding-inline: 0.7rem; }

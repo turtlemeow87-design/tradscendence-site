@@ -26,7 +26,7 @@ const videos = [
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Esraj</h1>
       <p class="opacity-80 max-w-3xl">
-        Esraj stuff
+        Cries arguably harder than a violin..
       </p>
     </header>
 
@@ -101,7 +101,7 @@ const videos = [
     <section class="prose-block">
       <h2 class="font-display text-2xl md:text-3xl">About this instrument</h2>
       <p class="opacity-80">
-        Esraj Stuff
+Like the <a href="/instruments/Rabab">Rabab</a>, this instrument carries that same echoing resonance—like a drum sounding in a distant cave—yet it projects its voice in a completely different way. What first drew me to it was the raw, emotional quality of the bow; it feels both ancient and deeply contemplative in its beauty. There’s a certain unpolished character to it—less refined than instruments of the violin family—but that’s precisely what gives it depth. It seems to reach straight into the soul and carry it somewhere beyond words..  This would be good for any event that is emotionally-driven, but without fear of the raw nature of such emotions. <p>In these videos I am using what is considered a "major/minor" sort of scale mode, which demonstrates a spectrum of feelings.  In the first video, I am taking a slower, more contemplative approach, and in the second video, driving the feelings home with more speed and complexity. </p>
       </p>
     </section>
 
@@ -240,6 +240,15 @@ const videos = [
   /* ===== Prose block ===== */
   .prose-block { display: grid; gap: 0.75rem; }
 
+  .prose-block a {
+    color: var(--accent-gold);
+    text-decoration: none;
+    transition: color 0.25s ease;
+  }
+
+  .prose-block a:hover {
+    color: var(--accent-rosewood);
+  }
   /* Optional: slightly tighter gold underline on very narrow phones */
   @media (max-width: 360px) {
     .tab-button { padding-inline: 0.7rem; }
