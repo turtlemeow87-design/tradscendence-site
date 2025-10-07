@@ -2,27 +2,26 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const items = [
-  { name: 'Indian Surbahar', file: '/media/surbahar.m4a' },
-  { name: 'Indian Tanpura', file: '/media/tanpura.m4a' },
-  { name: 'Pakistani Rabab', file: '/media/rabab.m4a' },
-  { name: 'Indian Esraj', file: '/media/esraj.m4a' },
-  { name: 'Turkish Kabak Kemane', file: '/media/kemane.m4a' },
-  { name: 'Turkish Baglama Saz', file: '/media/baglamasaz1.m4a' },
-  { name: 'Turkish Divan Saz', file: '/media/divansaz.m4a' },
-  { name: 'Turkish Cümbüş Tanbur', file: '/media/tanbur.m4a' },
-  { name: 'Persian Setar', file: '/media/setar.m4a' },
-  { name: 'Armenian Duduk', file: '/media/duduk.m4a' },
-  { name: 'Chinese Hulusi', file: '/media/hulusi.m4a' },
-  { name: 'Chinese Pipa', file: '/media/pipa.m4a' },
-  { name: 'Arabic Oud', file: '/media/arabicoud.m4a' },
-  { name: 'Turkish Oud', file: '/media/turkishoud.m4a' },
-  { name: 'Azeri Tar', file: '/media/tar.m4a' },
-  { name: 'Octave Mandolin', file: '/media/octavemandolin.m4a' },
+  { name: "Indian Surbahar",        file: "/media/surbahar.m4a",      href: "/instruments/Surbahar" },
+  { name: "Indian Tanpura",         file: "/media/tanpura.m4a",       href: "/instruments/Tanpura"  },
+  { name: "Pakistani Rabab",        file: "/media/rabab.m4a",         href: "/coming-soon" },
+  { name: "Indian Esraj",           file: "/media/esraj.m4a",         href: "/instruments/Esraj" },
+  { name: "Turkish Kabak Kemane",   file: "/media/kemane.m4a",        href: "/coming-soon" },
+  { name: "Turkish Baglama Saz",    file: "/media/baglamasaz1.m4a",   href: "/instruments/BaglamaSaz" },
+  { name: "Turkish Divan Saz",      file: "/media/divansaz.m4a",      href: "/instruments/DivanSaz" },
+  { name: "Turkish Cümbüş Tanbur",  file: "/media/tanbur.m4a",        href: "/instruments/Tanbur" },
+  { name: "Persian Setar",          file: "/media/setar.m4a",         href: "/coming-soon" },
+  { name: "Armenian Duduk",         file: "/media/duduk.m4a",         href: "/instruments/Duduk" },
+  { name: "Chinese Hulusi",         file: "/media/hulusi.m4a",        href: "/instruments/Hulusi" },
+  { name: "Chinese Pipa",           file: "/media/pipa.m4a",          href: "/coming-soon" },
+  { name: "Arabic Oud",             file: "/media/arabicoud.m4a",     href: "/instruments/ArabicOud" },
+  { name: "Turkish Oud",            file: "/media/turkishoud.m4a",    href: "/instruments/TOud" },
+  { name: "Azeri Tar",              file: "/media/tar.m4a",           href: "/coming-soon" },
+  { name: "Octave Mandolin",        file: "/media/octavemandolin.m4a",href: "/instruments/OM" },
 ];
 ---
 
 <BaseLayout title="My Instruments — Tradscendence">
-  <!-- added instruments-page class -->
   <section class="instruments-page mx-auto max-w-6xl px-4 py-10 space-y-6">
     <h1 class="font-display text-3xl">My Instruments</h1>
     <p class="opacity-80">
@@ -32,45 +31,9 @@ const items = [
     </p>
 
     <ul class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-      {items.map(({ name, file }) => (
+      {items.map(({ name, file, href }) => (
         <li class="frame rounded-xl p-3 flex items-center justify-between">
-          {
-            name === 'Indian Surbahar' ? (
-              <a class="gothic-link" href="/instruments/Surbahar">{name}</a>
-            ) : name === 'Indian Tanpura' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Pakistani Rabab' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Indian Esraj' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Turkish Kabak Kemane' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Turkish Baglama Saz' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Turkish Divan Saz' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Turkish Cümbüş Tanbur' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Persian Setar' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Armenian Duduk' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Chinese Hulusi' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Chinese Pipa' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Arabic Oud' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Turkish Oud' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Azeri Tar' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : name === 'Octave Mandolin' ? (
-              <a class="gothic-link" href="/coming-soon">{name}</a>
-            ) : (
-              <a class="gothic-link" href="#">{name}</a>
-            )
-          }
+          <a class="gothic-link" href={href}>{name}</a>
           <button
             type="button"
             class="opacity-60 hover:opacity-100 transition"
@@ -123,10 +86,8 @@ const items = [
       document.querySelectorAll('[data-audio]').forEach((btn) => {
         const src = btn.getAttribute('data-audio');
 
-        // Tap/click works on mobile & desktop
         btn.addEventListener('click', () => play(src), { passive: true });
 
-        // Optional hover preview for desktops only
         if (supportsHover) {
           btn.addEventListener('mouseenter', () => play(src));
           btn.addEventListener('mouseleave', () => stopCurrent());
@@ -134,14 +95,12 @@ const items = [
         }
       });
 
-      // Pause if the tab goes to background
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) stopCurrent();
       });
     });
   </script>
 
-  <!-- Scoped styles so only this page is affected -->
   <style>
     .instruments-page ul li.frame {
       position: relative;
@@ -151,7 +110,7 @@ const items = [
         transparent
       );
       border-radius: 0.75rem;
-      overflow: hidden; /* keep pseudo border inside rounded corners */
+      overflow: hidden;
     }
 
     .instruments-page ul li.frame::before {
@@ -159,7 +118,7 @@ const items = [
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      padding: 1px; /* border thickness */
+      padding: 1px;
       background: linear-gradient(
         to right,
         rgba(205, 127, 50, 0.8),
@@ -174,19 +133,17 @@ const items = [
     }
 
     .instruments-page button[data-audio] {
-  font-size: 1.75rem;
-  color: var(--accent-gold, #C2A45F);
-  text-shadow:
-  2px 0 var(--bronze, #CD7F32),
- -2px 0 var(--bronze, #CD7F32),
-  0 2px var(--bronze, #CD7F32),
-  0 -2px var(--bronze, #CD7F32),
-  2px 2px var(--bronze, #CD7F32),
- -3px -3px var(--bronze, #CD7F32),
-  2px -2px var(--bronze, #CD7F32),
- -3px 3px var(--bronze, #CD7F32);
-
-}
-
+      font-size: 1.75rem;
+      color: var(--accent-gold, #C2A45F);
+      text-shadow:
+        2px 0 var(--bronze, #CD7F32),
+       -2px 0 var(--bronze, #CD7F32),
+        0 2px var(--bronze, #CD7F32),
+        0 -2px var(--bronze, #CD7F32),
+        2px 2px var(--bronze, #CD7F32),
+       -3px -3px var(--bronze, #CD7F32),
+        2px -2px var(--bronze, #CD7F32),
+       -3px 3px var(--bronze, #CD7F32);
+    }
   </style>
 </BaseLayout>
