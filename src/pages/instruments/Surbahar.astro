@@ -33,7 +33,11 @@ const videos = [
     <!-- Tabbed Hero Video -->
     <section class="rounded-2xl overflow-hidden frame border border-black/40 bg-black/20">
       <!-- Tabs -->
-      <div class="flex flex-wrap items-center gap-1 px-3 pt-3 sm:px-4 sm:pt-4" role="tablist" aria-label="Choose performance">
+      <div
+        class="tab-strip px-3 pt-3 sm:px-4 sm:pt-4"
+        role="tablist"
+        aria-label="Choose performance"
+      >
         {videos.map((v, i) => (
           <button
             class="tab-button"
@@ -61,7 +65,7 @@ const videos = [
           >
             {v.type === "video" && v.src ? (
               <video
-                class="h-full w-full object-contain"  /* avoid cropping since shell matches ratio */
+                class="h-full w-full object-contain"
                 controls
                 playsinline
                 preload="metadata"
@@ -127,18 +131,41 @@ const videos = [
   </section>
 
   <style lang="css">
-  /* ===== Tabs styling ===== */
+  /* ===== Tab strip: always single row; mobile scroll instead of wrapping ===== */
+  .tab-strip {
+    display: flex;
+    flex-wrap: nowrap;           /* do not stack vertically */
+    gap: 0.375rem;
+    overflow-x: auto;            /* horizontal scroll on small screens */
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;       /* Firefox hide scrollbar */
+    mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+  }
+  .tab-strip::-webkit-scrollbar { display: none; } /* WebKit hide scrollbar */
+
+  /* ===== Tabs styling (restores the “gold underline” look) ===== */
   .tab-button {
     position: relative;
-    padding: 0.5rem 0.9rem;
+    flex: 0 0 auto;              /* do not stretch */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4ch;
+    min-height: 2.2rem;
+    padding: 0.55rem 0.9rem;
     border-radius: 0.75rem;
     font-weight: 600;
     line-height: 1;
+    white-space: nowrap;         /* keep labels on one line */
+    min-width: max-content;      /* prevent squish */
     background: transparent;
     color: var(--ivory);
     border: 1px solid transparent;
-    transition: transform 160ms ease;
+    transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
     outline: none;
+    scroll-snap-align: start;
   }
   .tab-button::after {
     content: "";
@@ -213,6 +240,12 @@ const videos = [
 
   /* ===== Prose block ===== */
   .prose-block { display: grid; gap: 0.75rem; }
+
+  /* Optional: slightly tighter gold underline on very narrow phones */
+  @media (max-width: 360px) {
+    .tab-button { padding-inline: 0.7rem; }
+    .tab-button::after { left: 0.7rem; right: 0.7rem; }
+  }
   </style>
 
   <script type="module">
@@ -318,7 +351,6 @@ const videos = [
   // On first paint: ensure initial ratio matches the initially active pane
   const initiallyActive = panes.find(p => p.classList.contains('is-active')) || panes[0];
   if (initiallyActive) {
-    // If metadata isn't ready yet, we’ll re-apply when it loads
     const applyInitial = () => {
       const r = ratioMap.get(initiallyActive.id) || initiallyActive.getAttribute('data-ratio') || '16 / 9';
       setShellRatio(r);
