@@ -1,0 +1,144 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// 👇 Edit this list to your heart's content.
+// id must be unique strings; url is where to buy.
+const WISHLIST = [
+  { id: "setar-strings", name: "Gawharet El Fan – Setar strings (light)", url: "https://example.com/setar-strings" },
+  { id: "oud-rosin",     name: "Premium oud rosin",                      url: "https://example.com/oud-rosin" },
+  { id: "zoom-h6-case",  name: "Zoom H6 padded case",                    url: "https://example.com/zoom-h6-case" },
+];
+---
+
+<BaseLayout title="My Wish List — Tradscendence" description="Hunter’s wish list for gear and goodies.">
+  <section class="mx-auto max-w-3xl px-4 py-10 space-y-8">
+    <header class="space-y-2">
+      <h1 class="font-display text-3xl md:text-4xl">My Wish List</h1>
+      <p class="opacity-80">
+        If you pick something up, tick its box so it won’t be purchased more than twice.
+        After the second purchase, the item will be crossed out.
+      </p>
+
+      <!-- Prototype notice -->
+      <div class="text-sm italic opacity-70">
+        This private preview stores counts in your browser only (localStorage).
+        For a shared, multi-visitor counter, see the “Production” note in the code.
+      </div>
+    </header>
+
+    <ul id="wish-list" class="space-y-4">
+      {WISHLIST.map((item) => (
+        <li
+          class="frame rounded-xl border border-[var(--accent-bronze)]/70 p-4 flex items-start justify-between gap-4"
+          data-item-id={item.id}
+        >
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="item-title font-medium">{item.name}</span>
+            </div>
+            <div class="text-sm opacity-80">
+              <a href={item.url} target="_blank" rel="noopener" class="gothic-link underline-offset-4 hover:underline">
+                Where to buy →
+              </a>
+            </div>
+            <div class="mt-2 text-sm">
+              Purchased already:
+              <span class="purchase-count font-semibold">None</span>.
+            </div>
+          </div>
+
+          <label class="select-none flex items-center gap-2 shrink-0">
+            <input
+              type="checkbox"
+              class="h-5 w-5 rounded border-[var(--accent-bronze)]"
+              data-checkbox
+              aria-label={`Mark ${item.name} as purchased`}
+            />
+            <span class="text-sm">I bought this</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+
+    <footer class="pt-4">
+      <button id="reset-demo"
+        class="text-xs opacity-60 hover:opacity-90 underline underline-offset-4"
+        type="button"
+        title="Reset counts in this browser only"
+      >
+        Reset local demo counts
+      </button>
+    </footer>
+  </section>
+
+  <script is:raw>
+    (function () {
+      const KEY = "tradscendence:wishlist:v1"; // localStorage key
+      const listEl = document.getElementById("wish-list");
+      if (!listEl) return;
+
+      // Load counts object: { [id]: number(0..2) }
+      const load = () => {
+        try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
+        catch { return {}; }
+      };
+      const save = (data) => localStorage.setItem(KEY, JSON.stringify(data));
+
+      const counts = load();
+
+      // Helpers
+      const countLabel = (n) => (n <= 0 ? "None" : n === 1 ? "Once" : "Twice");
+      const applyState = (li, n) => {
+        const title = li.querySelector(".item-title");
+        const countEl = li.querySelector(".purchase-count");
+        const checkbox = li.querySelector("[data-checkbox]");
+
+        // Strike-through + fade once count >= 2
+        if (n >= 2) {
+          li.classList.add("opacity-60");
+          title.classList.add("line-through");
+          checkbox.disabled = true;
+          checkbox.checked = true; // show it's maxed
+        } else {
+          li.classList.remove("opacity-60");
+          title.classList.remove("line-through");
+          checkbox.disabled = false;
+          // Only pre-check if this browser has "contributed" one (optional UX).
+          checkbox.checked = false;
+        }
+        countEl.textContent = countLabel(n);
+      };
+
+      // Init each row from counts
+      [...listEl.querySelectorAll("li[data-item-id]")].forEach((li) => {
+        const id = li.getAttribute("data-item-id");
+        const n = Math.max(0, Math.min(2, counts[id] ?? 0));
+        counts[id] = n;
+        applyState(li, n);
+
+        const cb = li.querySelector("[data-checkbox]");
+        cb?.addEventListener("change", (e) => {
+          // One-way increment UX: checking adds 1 if possible; unchecking does nothing.
+          // (Keeps things simpler in a local demo. In production, you'd use a server to gate increments.)
+          cb.checked = false; // reset visual; we reflect “contribution” in the counter instead
+          const current = Math.max(0, Math.min(2, counts[id] ?? 0));
+          if (current >= 2) return; // already maxed
+          const next = current + 1;
+          counts[id] = next;
+          save(counts);
+          applyState(li, next);
+        });
+      });
+
+      // Reset button for local testing
+      document.getElementById("reset-demo")?.addEventListener("click", () => {
+        localStorage.removeItem(KEY);
+        [...listEl.querySelectorAll("li[data-item-id]")].forEach((li) => {
+          const id = li.getAttribute("data-item-id");
+          counts[id] = 0;
+          applyState(li, 0);
+        });
+      });
+    })();
+  </script>
+</BaseLayout>
