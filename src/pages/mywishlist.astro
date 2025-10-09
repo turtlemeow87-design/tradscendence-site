@@ -1,39 +1,47 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-// 👇 Edit this list to your heart's content.
-// id must be unique strings; url is where to buy.
+// EDIT THIS: your Formspree endpoint (from the Contact page dashboard)
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/XXXXXXXX"; // ← replace me
+
+// Centralize your list so you can reorder easily.
+// item numbers are derived from array position (1-based).
 const WISHLIST = [
-  { id: "setar-strings", name: "Gawharet El Fan – Setar strings (light)", url: "https://example.com/setar-strings" },
-  { id: "oud-rosin",     name: "Premium oud rosin",                      url: "https://example.com/oud-rosin" },
-  { id: "zoom-h6-case",  name: "Zoom H6 padded case",                    url: "https://example.com/zoom-h6-case" },
+  { id: "setar-strings",  name: "Gawharet El Fan — Setar strings (light)", url: "https://example.com/setar-strings" },
+  { id: "oud-rosin",      name: "Premium oud rosin",                       url: "https://example.com/oud-rosin" },
+  { id: "zoom-h6-case",   name: "Zoom H6 padded case",                     url: "https://example.com/zoom-h6-case" },
+  // add more items here...
 ];
 ---
 
-<BaseLayout title="My Wish List — Tradscendence" description="Hunter’s wish list for gear and goodies.">
+<BaseLayout title="My Wish List — Tradscendence" description="A simple wishlist with one-click notifications.">
   <section class="mx-auto max-w-3xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">My Wish List</h1>
       <p class="opacity-80">
-        If you pick something up, tick its box so it won’t be purchased more than twice.
-        After the second purchase, the item will be crossed out.
+        Click a checkbox to let me know you bought the item.
+        I’ll get a Formspree message with the item number and details.
+        This page doesn’t prevent duplicates—it’s just a notification line.
       </p>
-
-      <!-- Prototype notice -->
-      <div class="text-sm italic opacity-70">
-        This private preview stores counts in your browser only (localStorage).
-        For a shared, multi-visitor counter, see the “Production” note in the code.
-      </div>
+      <p class="text-sm italic opacity-70">
+        Tip: each item shows a <span class="font-semibold">number</span> (1, 2, 3, …). That number is included in the message.
+      </p>
     </header>
 
     <ul id="wish-list" class="space-y-4">
-      {WISHLIST.map((item) => (
+      {WISHLIST.map((item, idx) => (
         <li
           class="frame rounded-xl border border-[var(--accent-bronze)]/70 p-4 flex items-start justify-between gap-4"
           data-item-id={item.id}
+          data-item-name={item.name}
+          data-item-url={item.url}
+          data-item-number={(idx + 1).toString()}
         >
           <div class="min-w-0">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[var(--accent-bronze)] text-xs">
+                {idx + 1}
+              </span>
               <span class="item-title font-medium">{item.name}</span>
             </div>
             <div class="text-sm opacity-80">
@@ -41,9 +49,10 @@ const WISHLIST = [
                 Where to buy →
               </a>
             </div>
+
+            <!-- status space -->
             <div class="mt-2 text-sm">
-              Purchased already:
-              <span class="purchase-count font-semibold">None</span>.
+              <span class="status opacity-70">Status: Ready</span>
             </div>
           </div>
 
@@ -52,7 +61,7 @@ const WISHLIST = [
               type="checkbox"
               class="h-5 w-5 rounded border-[var(--accent-bronze)]"
               data-checkbox
-              aria-label={`Mark ${item.name} as purchased`}
+              aria-label={`Notify purchase of ${item.name}`}
             />
             <span class="text-sm">I bought this</span>
           </label>
@@ -60,83 +69,108 @@ const WISHLIST = [
       ))}
     </ul>
 
-    <footer class="pt-4">
-      <button id="reset-demo"
-        class="text-xs opacity-60 hover:opacity-90 underline underline-offset-4"
-        type="button"
-        title="Reset counts in this browser only"
-      >
-        Reset local demo counts
-      </button>
-    </footer>
+    <!-- Noscript fallback: a tiny form so users without JS can still notify -->
+    <noscript>
+      <div class="mt-8 p-4 border rounded-xl border-[var(--accent-bronze)]/70">
+        <p class="text-sm mb-2">JavaScript is off. Use this fallback to notify me:</p>
+        <form action={FORMSPREE_ENDPOINT} method="POST" class="grid gap-2">
+          <label class="text-sm">
+            Which item?
+            <select name="item_number" class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]">
+              {WISHLIST.map((item, idx) => (
+                <option value={idx + 1}>{idx + 1} — {item.name}</option>
+              ))}
+            </select>
+          </label>
+          <input type="hidden" name="origin" value="wishlist-noscript" />
+          <!-- Honeypot -->
+          <input type="text" name="_gotcha" class="hidden" tabindex="-1" autocomplete="off" />
+          <button class="px-3 py-2 rounded-xl border border-[var(--accent-bronze)] hover:bg-white/5" type="submit">
+            Send notification
+          </button>
+        </form>
+      </div>
+    </noscript>
+
   </section>
 
   <script is:raw>
     (function () {
-      const KEY = "tradscendence:wishlist:v1"; // localStorage key
-      const listEl = document.getElementById("wish-list");
-      if (!listEl) return;
+      const ENDPOINT = { url: {FORMSPREE_ENDPOINT}.replaceAll("&amp;","&") }; // Astro escapes; normalize just in case
+      const list = document.getElementById("wish-list");
+      if (!list) return;
 
-      // Load counts object: { [id]: number(0..2) }
-      const load = () => {
-        try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
-        catch { return {}; }
-      };
-      const save = (data) => localStorage.setItem(KEY, JSON.stringify(data));
-
-      const counts = load();
-
-      // Helpers
-      const countLabel = (n) => (n <= 0 ? "None" : n === 1 ? "Once" : "Twice");
-      const applyState = (li, n) => {
-        const title = li.querySelector(".item-title");
-        const countEl = li.querySelector(".purchase-count");
-        const checkbox = li.querySelector("[data-checkbox]");
-
-        // Strike-through + fade once count >= 2
-        if (n >= 2) {
-          li.classList.add("opacity-60");
-          title.classList.add("line-through");
-          checkbox.disabled = true;
-          checkbox.checked = true; // show it's maxed
-        } else {
-          li.classList.remove("opacity-60");
-          title.classList.remove("line-through");
-          checkbox.disabled = false;
-          // Only pre-check if this browser has "contributed" one (optional UX).
-          checkbox.checked = false;
+      // Basic toast helper using inline status text
+      function setStatus(li, msg, isGood=false) {
+        const s = li.querySelector(".status");
+        if (s) {
+          s.textContent = msg;
+          s.classList.toggle("opacity-70", !isGood);
+          s.classList.toggle("text-green-500", isGood);
+          s.classList.toggle("text-red-400", !isGood && /sorry|error|fail/i.test(msg));
         }
-        countEl.textContent = countLabel(n);
-      };
+      }
 
-      // Init each row from counts
-      [...listEl.querySelectorAll("li[data-item-id]")].forEach((li) => {
-        const id = li.getAttribute("data-item-id");
-        const n = Math.max(0, Math.min(2, counts[id] ?? 0));
-        counts[id] = n;
-        applyState(li, n);
-
-        const cb = li.querySelector("[data-checkbox]");
-        cb?.addEventListener("change", (e) => {
-          // One-way increment UX: checking adds 1 if possible; unchecking does nothing.
-          // (Keeps things simpler in a local demo. In production, you'd use a server to gate increments.)
-          cb.checked = false; // reset visual; we reflect “contribution” in the counter instead
-          const current = Math.max(0, Math.min(2, counts[id] ?? 0));
-          if (current >= 2) return; // already maxed
-          const next = current + 1;
-          counts[id] = next;
-          save(counts);
-          applyState(li, next);
+      // Submit to Formspree as JSON (recommended). You’ll see fields in the dashboard/email.
+      async function notifyFormspree(payload) {
+        const res = await fetch(ENDPOINT.url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(payload),
         });
-      });
+        // Formspree returns 200/OK with a JSON body on success for JSON submissions.
+        if (!res.ok) throw new Error("Formspree request failed");
+        return res.json().catch(() => ({}));
+      }
 
-      // Reset button for local testing
-      document.getElementById("reset-demo")?.addEventListener("click", () => {
-        localStorage.removeItem(KEY);
-        [...listEl.querySelectorAll("li[data-item-id]")].forEach((li) => {
-          const id = li.getAttribute("data-item-id");
-          counts[id] = 0;
-          applyState(li, 0);
+      // Attach handlers
+      [...list.querySelectorAll("li[data-item-id]")].forEach((li) => {
+        const cb = li.querySelector("[data-checkbox]");
+        if (!cb) return;
+
+        cb.addEventListener("click", async (e) => {
+          // Don’t leave the box visually “checked”; we use it like a button.
+          e.preventDefault();
+
+          const item = {
+            id: li.getAttribute("data-item-id"),
+            name: li.getAttribute("data-item-name"),
+            url: li.getAttribute("data-item-url"),
+            number: li.getAttribute("data-item-number"),
+          };
+
+          // Disable during send to avoid double taps
+          cb.disabled = true;
+          setStatus(li, "Sending…");
+
+          // Construct payload with helpful metadata
+          const payload = {
+            _subject: `Wishlist: Item #${item.number} — ${item.name}`,
+            form_name: "wishlist-click",
+            item_number: item.number,
+            item_id: item.id,
+            item_name: item.name,
+            item_url: item.url,
+            page_path: location.pathname,
+            page_title: document.title,
+            tz: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
+            when_iso: new Date().toISOString(),
+            ua: navigator.userAgent,
+            // Honeypot (normally blank)
+            _gotcha: "",
+          };
+
+          try {
+            await notifyFormspree(payload);
+            setStatus(li, "Recorded — thanks!", true);
+            // Soft-lock the row so casual users don’t spam; remove if you prefer re-clickable
+            li.classList.add("opacity-60");
+          } catch (err) {
+            console.error(err);
+            setStatus(li, "Sorry, couldn’t send. Try again?");
+          } finally {
+            cb.disabled = false;
+          }
         });
       });
     })();
