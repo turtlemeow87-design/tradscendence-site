@@ -49,16 +49,23 @@ const WISHLIST = [
           </div>
 
           <div class="flex items-center gap-4 pl-10 sm:pl-12">
-            <input
-              type="checkbox"
-              class="h-7 w-7 rounded-md border-2 border-[var(--accent-bronze)] cursor-pointer accent-[var(--accent-gold)]"
-              data-checkbox
-              aria-label={`Notify purchase of ${item.name}`}
-            />
-            <span class="text-base font-medium text-ivory opacity-80">
-              ✅ Check this box once you’ve purchased this item
-            </span>
-          </div>
+  <input
+    type="checkbox"
+    class="appearance-none relative h-9 w-9 shrink-0 border-2 border-[var(--accent-bronze)] rounded-md cursor-pointer
+           transition-colors duration-200 ease-in-out
+           checked:bg-[var(--accent-gold)] checked:border-[var(--accent-gold)]
+           before:content-[''] before:absolute before:inset-0 before:flex before:items-center before:justify-center
+           before:scale-0 checked:before:scale-100
+           before:text-ebony before:font-bold before:text-lg
+           before:content-['✔']"
+    data-checkbox
+    aria-label={`Notify purchase of ${item.name}`}
+  />
+  <span class="text-base font-medium text-ivory opacity-80 leading-tight">
+    ✅ Check this box once you’ve purchased this item
+  </span>
+</div>
+
         </li>
       ))}
     </ul>
