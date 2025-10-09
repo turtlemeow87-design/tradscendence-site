@@ -42,11 +42,16 @@ const WISHLIST = [
               </span>
               <span class="item-title font-medium">{item.name}</span>
             </div>
-            <div class="text-sm opacity-80">
-              <a href={item.url} target="_blank" rel="noopener" class="gothic-link underline-offset-4 hover:underline">
-                Click here to purchase!! →
-              </a>
-            </div>
+            <div class="mt-2">
+  <a
+    href={item.url}
+    target="_blank"
+    rel="noopener"
+    class="inline-block px-3 py-1 rounded-lg border border-[var(--accent-gold)] text-[var(--accent-gold)] text-sm font-semibold tracking-wide hover:bg-[var(--accent-gold)] hover:text-ebony transition"
+  >
+    🛒 Click here to purchase!!
+  </a>
+</div>
             <div class="mt-2 text-sm">
               <span class="status opacity-70">Status: Ready</span>
             </div>
