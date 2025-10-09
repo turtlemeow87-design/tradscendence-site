@@ -6,9 +6,9 @@ const FORMSPREE_ENDPOINT = "https://formspree.io/f/mblzzrqb";
 
 // Edit this array to add/remove items.
 const WISHLIST = [
-  { id: "Acoustic Bass Strings",  name: "Acoustic Bass Strings", url: "https://www.amazon.com/DAddario-EPBB170-5-Phosphor-5-String-Acoustic/dp/B00373N0ZO/ref=asc_df_B00373N0ZO/?tag=hyprod-20&linkCode=df0&hvadid=693366139103&hvpos=&hvnetw=g&hvrand=4152059029923750231&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9008464&hvtargid=pla-525652260601&psc=1&mcid=f0b8557d4bb8301e8a66f3c4653a80a2" },
-  { id: "oud-rosin",      name: "Premium oud rosin",                       url: "https://example.com/oud-rosin" },
-  { id: "zoom-h6-case",   name: "Zoom H6 padded case",                     url: "https://example.com/zoom-h6-case" },
+  { id: "acoustic-bass-strings", name: "Acoustic Bass Strings", url: "https://www.amazon.com/DAddario-EPBB170-5-Phosphor-5-String-Acoustic/dp/B00373N0ZO/ref=asc_df_B00373N0ZO/?tag=hyprod-20&linkCode=df0&hvadid=693366139103&hvpos=&hvnetw=g&hvrand=4152059029923750231&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9008464&hvtargid=pla-525652260601&psc=1&mcid=f0b8557d4bb8301e8a66f3c4653a80a2" },
+  { id: "oud-rosin", name: "Premium Oud Rosin", url: "https://example.com/oud-rosin" },
+  { id: "zoom-h6-case", name: "Zoom H6 Padded Case", url: "https://example.com/zoom-h6-case" },
 ];
 ---
 
@@ -18,50 +18,47 @@ const WISHLIST = [
       <h1 class="font-display text-3xl md:text-4xl">My Wish List</h1>
       <p class="opacity-80 max-w-xl mx-auto">
         Browse the list below. Each item includes a direct purchase link.  
-        If you pick something up for me, simply check the box so that it can't be purchased again by somebody else!</em> — that’ll quietly send me a note.
+        Once you’ve bought something, check the box to let me know it’s been taken care of — easy as that!
       </p>
     </header>
 
-    <ul id="wish-list" data-endpoint={FORMSPREE_ENDPOINT} class="space-y-5">
+    <ul id="wish-list" data-endpoint={FORMSPREE_ENDPOINT} class="space-y-6">
       {WISHLIST.map((item, idx) => (
         <li
-          class="frame rounded-xl border border-[var(--accent-bronze)]/70 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          class="frame rounded-xl border border-[var(--accent-bronze)]/70 p-5 flex flex-col gap-5"
           data-item-id={item.id}
           data-item-name={item.name}
           data-item-url={item.url}
           data-item-number={(idx + 1).toString()}
         >
-          <div class="flex-1">
-            <div class="flex items-center gap-3 flex-wrap">
-              <span class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--accent-bronze)] text-xs">
-                {idx + 1}
-              </span>
-              <span class="item-title font-semibold text-lg">{item.name}</span>
-            </div>
-
-            <div class="mt-2">
+          <div class="flex items-start gap-3">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--accent-bronze)] text-xs mt-1">
+              {idx + 1}
+            </span>
+            <div>
+              <h2 class="item-title font-semibold text-lg mb-2">{item.name}</h2>
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener"
-                class="inline-block px-3 py-1 rounded-lg border border-[var(--accent-gold)] text-[var(--accent-gold)] text-sm font-semibold tracking-wide hover:bg-[var(--accent-gold)] hover:text-ebony transition"
+                class="inline-block px-4 py-2 rounded-lg border border-[var(--accent-gold)] text-[var(--accent-gold)] text-base font-semibold tracking-wide hover:bg-[var(--accent-gold)] hover:text-ebony transition"
               >
-                🛒 Click here to purchase!!
+                🛒 Click here to purchase
               </a>
             </div>
           </div>
 
-          <label class="select-none flex items-center gap-3 shrink-0">
+          <div class="flex items-center gap-4 pl-10 sm:pl-12">
             <input
               type="checkbox"
-              class="h-7 w-7 rounded-lg border-2 border-[var(--accent-bronze)] cursor-pointer accent-[var(--accent-gold)]"
+              class="h-7 w-7 rounded-md border-2 border-[var(--accent-bronze)] cursor-pointer accent-[var(--accent-gold)]"
               data-checkbox
               aria-label={`Notify purchase of ${item.name}`}
             />
-            <span class="text-sm font-medium text-[var(--accent-gold)] hover:text-[var(--accent-rosewood)] transition">
-             Purchased?  Click the box to check this off my List!
+            <span class="text-base font-medium text-ivory opacity-80">
+              ✅ Check this box once you’ve purchased this item
             </span>
-          </label>
+          </div>
         </li>
       ))}
     </ul>
@@ -148,10 +145,12 @@ const WISHLIST = [
           try {
             await notifyFormspree(payload);
             li.classList.add("opacity-60");
-            cb.nextElementSibling.textContent = "✅ Thanks for picking this up!";
+            cb.nextElementSibling.textContent = "🎉 Thank you! This item’s been marked purchased.";
+            cb.nextElementSibling.classList.add("text-[var(--accent-gold)]");
           } catch (err) {
             console.error(err);
             cb.nextElementSibling.textContent = "❌ Couldn’t send — please try again.";
+            cb.nextElementSibling.classList.add("text-red-400");
           } finally {
             cb.disabled = false;
           }
