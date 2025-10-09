@@ -44,7 +44,7 @@ const WISHLIST = [
             </div>
             <div class="text-sm opacity-80">
               <a href={item.url} target="_blank" rel="noopener" class="gothic-link underline-offset-4 hover:underline">
-                Where to buy →
+                Click here to purchase!! →
               </a>
             </div>
             <div class="mt-2 text-sm">
@@ -158,7 +158,7 @@ const WISHLIST = [
 
           try {
             await notifyFormspree(payload);
-            setStatus(li, "Recorded — thanks!", true);
+            setStatus(li, "Marked off — thanks!", true);
             li.classList.add("opacity-60"); // soft-dim to discourage repeat clicks
           } catch (err) {
             console.error(err);
