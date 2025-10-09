@@ -1,26 +1,24 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-// EDIT THIS: your Formspree endpoint (from the Contact page dashboard)
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/mblzzrqb"; // ← replace me
+// ✅ Your Formspree endpoint
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/mblzzrqb";
 
-// Centralize your list so you can reorder easily.
-// item numbers are derived from array position (1-based).
+// Edit this array to add/remove items.
+// Numbers (1, 2, 3, …) are derived from the order here.
 const WISHLIST = [
   { id: "setar-strings",  name: "Gawharet El Fan — Setar strings (light)", url: "https://example.com/setar-strings" },
   { id: "oud-rosin",      name: "Premium oud rosin",                       url: "https://example.com/oud-rosin" },
   { id: "zoom-h6-case",   name: "Zoom H6 padded case",                     url: "https://example.com/zoom-h6-case" },
-  // add more items here...
 ];
 ---
 
-<BaseLayout title="My Wish List — Tradscendence" description="A simple wishlist with one-click notifications.">
+<BaseLayout title="My Wish List — Tradscendence" description="A simple wishlist with one-click Formspree notifications.">
   <section class="mx-auto max-w-3xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">My Wish List</h1>
       <p class="opacity-80">
-        Click a checkbox to let me know you bought the item.
-        I’ll get a Formspree message with the item number and details.
+        Click a checkbox to let me know you bought the item. I’ll get a Formspree message with the item number and details.
         This page doesn’t prevent duplicates—it’s just a notification line.
       </p>
       <p class="text-sm italic opacity-70">
@@ -28,7 +26,7 @@ const WISHLIST = [
       </p>
     </header>
 
-    <ul id="wish-list" class="space-y-4">
+    <ul id="wish-list" data-endpoint={FORMSPREE_ENDPOINT} class="space-y-4">
       {WISHLIST.map((item, idx) => (
         <li
           class="frame rounded-xl border border-[var(--accent-bronze)]/70 p-4 flex items-start justify-between gap-4"
@@ -49,8 +47,6 @@ const WISHLIST = [
                 Where to buy →
               </a>
             </div>
-
-            <!-- status space -->
             <div class="mt-2 text-sm">
               <span class="status opacity-70">Status: Ready</span>
             </div>
@@ -69,7 +65,7 @@ const WISHLIST = [
       ))}
     </ul>
 
-    <!-- Noscript fallback: a tiny form so users without JS can still notify -->
+    <!-- No-JS fallback -->
     <noscript>
       <div class="mt-8 p-4 border rounded-xl border-[var(--accent-bronze)]/70">
         <p class="text-sm mb-2">JavaScript is off. Use this fallback to notify me:</p>
@@ -82,8 +78,8 @@ const WISHLIST = [
               ))}
             </select>
           </label>
-          <input type="hidden" name="origin" value="wishlist-noscript" />
-          <!-- Honeypot -->
+          <input type="hidden" name="_subject" value="Wishlist (noscript) submission" />
+          <input type="hidden" name="form_name" value="wishlist-click-noscript" />
           <input type="text" name="_gotcha" class="hidden" tabindex="-1" autocomplete="off" />
           <button class="px-3 py-2 rounded-xl border border-[var(--accent-bronze)] hover:bg-white/5" type="submit">
             Send notification
@@ -91,17 +87,21 @@ const WISHLIST = [
         </form>
       </div>
     </noscript>
-
   </section>
 
-  <script is:raw>
+  <!-- Plain script (not is:raw) so Astro can pass data- attributes -->
+  <script>
     (function () {
-      const ENDPOINT = { url: {FORMSPREE_ENDPOINT}.replaceAll("&amp;","&") }; // Astro escapes; normalize just in case
       const list = document.getElementById("wish-list");
       if (!list) return;
 
-      // Basic toast helper using inline status text
-      function setStatus(li, msg, isGood=false) {
+      const ENDPOINT = list.dataset.endpoint;
+      if (!ENDPOINT) {
+        console.error("Formspree endpoint missing. Set FORMSPREE_ENDPOINT in the page.");
+        return;
+      }
+
+      function setStatus(li, msg, isGood = false) {
         const s = li.querySelector(".status");
         if (s) {
           s.textContent = msg;
@@ -111,26 +111,25 @@ const WISHLIST = [
         }
       }
 
-      // Submit to Formspree as JSON (recommended). You’ll see fields in the dashboard/email.
       async function notifyFormspree(payload) {
-        const res = await fetch(ENDPOINT.url, {
+        const res = await fetch(ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify(payload),
         });
-        // Formspree returns 200/OK with a JSON body on success for JSON submissions.
-        if (!res.ok) throw new Error("Formspree request failed");
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(`Formspree ${res.status}: ${text || "request failed"}`);
+        }
         return res.json().catch(() => ({}));
       }
 
-      // Attach handlers
       [...list.querySelectorAll("li[data-item-id]")].forEach((li) => {
         const cb = li.querySelector("[data-checkbox]");
         if (!cb) return;
 
         cb.addEventListener("click", async (e) => {
-          // Don’t leave the box visually “checked”; we use it like a button.
-          e.preventDefault();
+          e.preventDefault(); // treat checkbox like a button
 
           const item = {
             id: li.getAttribute("data-item-id"),
@@ -139,11 +138,9 @@ const WISHLIST = [
             number: li.getAttribute("data-item-number"),
           };
 
-          // Disable during send to avoid double taps
           cb.disabled = true;
           setStatus(li, "Sending…");
 
-          // Construct payload with helpful metadata
           const payload = {
             _subject: `Wishlist: Item #${item.number} — ${item.name}`,
             form_name: "wishlist-click",
@@ -156,18 +153,16 @@ const WISHLIST = [
             tz: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
             when_iso: new Date().toISOString(),
             ua: navigator.userAgent,
-            // Honeypot (normally blank)
             _gotcha: "",
           };
 
           try {
             await notifyFormspree(payload);
             setStatus(li, "Recorded — thanks!", true);
-            // Soft-lock the row so casual users don’t spam; remove if you prefer re-clickable
-            li.classList.add("opacity-60");
+            li.classList.add("opacity-60"); // soft-dim to discourage repeat clicks
           } catch (err) {
             console.error(err);
-            setStatus(li, "Sorry, couldn’t send. Try again?");
+            setStatus(li, "Sorry, couldn’t send. Check domain allowlist & endpoint.");
           } finally {
             cb.disabled = false;
           }
