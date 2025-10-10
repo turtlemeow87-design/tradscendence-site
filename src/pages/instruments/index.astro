@@ -1,24 +1,36 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Divider from "../../components/Divider.astro";
+
+/** Latest YouTube embed (manual) */
+const LATEST_YT = {
+  id: "AgSGd3ur2mQ?si=FZBTfCBkOU211cSH",              // e.g. 'dQw4w9WgXcQ'
+  isShort: false,                        // true if the latest is a Short (9:16)
+  title: "My latest performance",        // caption + a11y title
+  instrumentLink: "/instruments/CumbusOud",  // point to the featured instrument (or '/instruments')
+};
+
+const embedUrl = `https://www.youtube.com/embed/${LATEST_YT.id}?rel=0`;
+const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
 
 const items = [
-  { name: "Indian Surbahar",        file: "/media/surbahar.m4a",      href: "/instruments/Surbahar" },
-  { name: "Indian Tanpura",         file: "/media/tanpura.m4a",       href: "/instruments/Tanpura"  },
-  { name: "Pakistani Rabab",        file: "/media/rabab.m4a",         href: "/instruments/Rabab" },
-  { name: "Indian Esraj",           file: "/media/esraj.m4a",         href: "/instruments/Esraj" },
-  { name: "Turkish Kabak Kemane",   file: "/media/kemane.m4a",        href: "/coming-soon" },
-  { name: "Turkish Baglama Saz",    file: "/media/baglamasaz1.m4a",   href: "/instruments/BaglamaSaz" },
-  { name: "Turkish Divan Saz",      file: "/media/divansaz.m4a",      href: "/instruments/DivanSaz" },
-  { name: "Turkish Cümbüş Tanbur",  file: "/media/tanbur.m4a",        href: "/instruments/Tanbur" },
-  { name: "Turkish Cümbüş Oud",  file: "/media/CumbusOud.m4a",        href: "/instruments/CumbusOud" },
-  { name: "Persian Setar",          file: "/media/setar.m4a",         href: "/instruments/Setar" },
-  { name: "Armenian Duduk",         file: "/media/duduk.m4a",         href: "/instruments/Duduk" },
-  { name: "Chinese Hulusi",         file: "/media/hulusi.m4a",        href: "/instruments/Hulusi" },
-  { name: "Chinese Pipa",           file: "/media/pipa.m4a",          href: "/coming-soon" },
-  { name: "Arabic Oud",             file: "/media/arabicoud.m4a",     href: "/instruments/ArabicOud" },
-  { name: "Turkish Oud",            file: "/media/turkishoud.m4a",    href: "/instruments/TOud" },
-  { name: "Azeri Tar",              file: "/media/tar.m4a",           href: "/instruments/AzeriTar" },
-  { name: "Octave Mandolin",        file: "/media/octavemandolin.m4a",href: "/instruments/OM" },
+  { name: "Indian Surbahar",        file: "/media/surbahar.m4a",       href: "/instruments/Surbahar" },
+  { name: "Indian Tanpura",         file: "/media/tanpura.m4a",        href: "/instruments/Tanpura"  },
+  { name: "Pakistani Rabab",        file: "/media/rabab.m4a",          href: "/instruments/Rabab" },
+  { name: "Indian Esraj",           file: "/media/esraj.m4a",          href: "/instruments/Esraj" },
+  { name: "Turkish Kabak Kemane",   file: "/media/kemane.m4a",         href: "/coming-soon" },
+  { name: "Turkish Baglama Saz",    file: "/media/baglamasaz1.m4a",    href: "/instruments/BaglamaSaz" },
+  { name: "Turkish Divan Saz",      file: "/media/divansaz.m4a",       href: "/instruments/DivanSaz" },
+  { name: "Turkish Cümbüş Tanbur",  file: "/media/tanbur.m4a",         href: "/instruments/Tanbur" },
+  { name: "Turkish Cümbüş Oud",     file: "/media/CumbusOud.m4a",      href: "/instruments/CumbusOud" },
+  { name: "Persian Setar",          file: "/media/setar.m4a",          href: "/instruments/Setar" },
+  { name: "Armenian Duduk",         file: "/media/duduk.m4a",          href: "/instruments/Duduk" },
+  { name: "Chinese Hulusi",         file: "/media/hulusi.m4a",         href: "/instruments/Hulusi" },
+  { name: "Chinese Pipa",           file: "/media/pipa.m4a",           href: "/coming-soon" },
+  { name: "Arabic Oud",             file: "/media/arabicoud.m4a",      href: "/instruments/ArabicOud" },
+  { name: "Turkish Oud",            file: "/media/turkishoud.m4a",     href: "/instruments/TOud" },
+  { name: "Azeri Tar",              file: "/media/tar.m4a",            href: "/instruments/AzeriTar" },
+  { name: "Octave Mandolin",        file: "/media/octavemandolin.m4a", href: "/instruments/OM" },
 ];
 ---
 
@@ -46,6 +58,47 @@ const items = [
         </li>
       ))}
     </ul>
+  </section>
+
+  <Divider />
+
+  <!-- Latest YouTube video (bottom of page, above footer) -->
+  <section id="latest-video" class="mx-auto max-w-6xl px-4 pb-10 scroll-mt-24">
+    <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">
+      My Latest Youtube Upload!
+    </h2>
+
+    <figure class="space-y-3">
+      <!-- Responsive frame that adapts to Shorts vs. regular -->
+      <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-2xl overflow-hidden frame shadow-soft`}>
+        <iframe
+          class="absolute inset-0 w-full h-full"
+          src={embedUrl}
+          title={LATEST_YT.title}
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <figcaption class="text-sm opacity-80 flex flex-col sm:flex-row sm:items-center sm:gap-3">
+        <span class="font-display">{LATEST_YT.title}</span>
+        <a href={watchUrl} target="_blank" rel="noopener" class="gothic-link font-bold">
+          Watch on YouTube →
+        </a>
+      </figcaption>
+    </figure>
+
+    <!-- “Explore this instrument” link, matching your CTA style -->
+    <div class="pt-4">
+      <a 
+        href={LATEST_YT.instrumentLink ?? '/instruments'} 
+        class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
+        <span>Explore this instrument</span>
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+      </a>
+    </div>
   </section>
 
   <script>
@@ -101,6 +154,12 @@ const items = [
       });
     });
   </script>
+
+  <!-- Smooth-scrolling + anchor offset in case you link here from elsewhere -->
+  <style is:global>
+    html { scroll-behavior: smooth; }
+    #latest-video { scroll-margin-top: 96px; }
+  </style>
 
   <style>
     .instruments-page ul li.frame {
