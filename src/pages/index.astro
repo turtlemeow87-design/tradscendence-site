@@ -2,8 +2,20 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Divider from "../components/Divider.astro";
 import FeaturedInstrumentCard from "../components/FeaturedInstrumentCard.astro";
+
 const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
+
+/** Latest YouTube embed (manual, simple) */
+const LATEST_YT = {
+  id: 'AgSGd3ur2mQ?si=FZBTfCBkOU211cSH',          // e.g. 'dQw4w9WgXcQ'
+  isShort: false,                    // set true for Shorts (9:16)
+  title: 'Instrument: Turkish Cümbüş Oud',    // used for a11y + caption
+};
+
+const embedUrl = `https://www.youtube.com/embed/${LATEST_YT.id}?rel=0`;
+const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
 ---
+
 <BaseLayout {title}>
 
   <!-- Header block with name, handle, catchphrase, logo placeholder -->
@@ -12,19 +24,19 @@ const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
     <div class="flex items-center justify-between gap-4 sm:gap-6">
       <div class="min-w-0">
         <h1 class="font-display text-[9vw] leading-[1.05] sm:text-4xl md:text-5xl opacity-75 bg-gradient-to-r from-black via-black/85 to-transparent rounded-md bg-clip-text text-transparent drop-shadow-[0_0_1px_ivory]">
-  ~<span class="font-extrabold text-[1.05em]">Sound</span> <span class="text-rosewood/70">Beyond</span> Borders~
-</h1>
+          ~<span class="font-extrabold text-[1.05em]">Sound</span> <span class="text-rosewood/70">Beyond</span> Borders~
+        </h1>
 
         <p class="mt-1 sm:mt-2 text-base sm:text-lg opacity-60 bg-gradient-to-r from-rosewood via-rosewood/10 to-transparent rounded-md max-w-[42ch]">
           Transcend the traditional.
         </p>
       </div>
+
       <!-- Logo stays on the right even on mobile, just smaller -->
-<div class="logo-fade shrink-0 w-[104px] h-[104px] sm:w-[160px] sm:h-[160px] md:max-w-[200px] aspect-square frame flex items-center justify-center opacity-70">
-  <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover" />
-</div>
-
-
+      <div class="logo-fade shrink-0 w-[104px] h-[104px] sm:w-[160px] sm:h-[160px] md:max-w-[200px] aspect-square frame flex items-center justify-center opacity-70">
+        <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover" />
+      </div>
+    </div>
   </section>
 
   <Divider />
@@ -75,7 +87,6 @@ const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
     }
   </style>
 
-
   <Divider />
 
   <!-- Two-column intro -->
@@ -86,9 +97,10 @@ const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
       <p>
         Every instrument has an origin story.  Sometimes these stories are pretty well-documented, and other times we are left to fill in the blanks for ourselves.  In fact, academic studies such as organology exist for that purpose.  The same is true for the sound that comes out of those instruments.  Ethnomusicology exists for that purpose.  And as beautiful as it is to be able to discover and study all of the ways in which a particular sound, or musical framework (theory) relate to their culture or country of origin: what is equally as beautiful, to me, is to be able to take a particular sound, and explore how it can relate to anybody from any culture. 
       </p>
-      <p class="opacity-90">Music is important for different people at different times in different ways.  I'm available for intimate events: private weddings, other ceremonies, small gatherings, and yes, even funerals.~  <p>I am based in Richmond, VA (US).</p></p>
+      <p class="opacity-90">Music is important for different people at different times in different ways.  I'm available for intimate events: private weddings, other ceremonies, small gatherings, and yes, even funerals.~</p>
+      <p>I am based in Richmond, VA (US).</p>
       <p class="opacity-90">Working on a song/album and you want something different that isn't digital?  I also take studio musician inquiries!</p>
-      <p class="opacity-90">(Note: <b>*All sound teasers and photos on this website are of my own making on my own instruments!!  No special effects.*)</b></p>
+      <p class="opacity-90"><b>*All sound teasers and photos on this website are of my own making on my own instruments!!  No special effects.*</b></p>
 
       <div class="flex flex-wrap gap-3 pt-1">
         <a 
@@ -103,6 +115,14 @@ const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
           class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
           <span>More about me and my approach</span>
           <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+        </a>
+
+        <!-- New jumper to latest YouTube embed -->
+        <a 
+          href="#latest-video"
+          class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory] scroll-smooth">
+          <span>See my latest YouTube video!</span>
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">↓</span>
         </a>
       </div>
     </div>
@@ -158,6 +178,50 @@ const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
     </div>
   </section>
 
+  <Divider />
+
+    <Divider />
+
+  <!-- Latest YouTube video (sits above the footer) -->
+  <section id="latest-video" class="mx-auto max-w-6xl px-4 pb-10 scroll-mt-24">
+    <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">
+      My Latest Youtube Upload!
+    </h2>
+
+    <figure class="space-y-3">
+      <!-- Responsive frame that adapts to Shorts vs. regular -->
+      <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-2xl overflow-hidden frame shadow-soft`}>
+        <iframe
+          class="absolute inset-0 w-full h-full"
+          src={embedUrl}
+          title={LATEST_YT.title}
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <figcaption class="text-sm opacity-80 flex flex-col sm:flex-row sm:items-center sm:gap-3">
+        <span class="font-display">{LATEST_YT.title}</span>
+        <a href={watchUrl} target="_blank" rel="noopener" class="gothic-link font-bold">
+          Watch on YouTube →
+        </a>
+      </figcaption>
+    </figure>
+
+    <!-- New “Explore this instrument” link -->
+    <div class="pt-4">
+      <a 
+        href="/instruments/CumbusOud" 
+        class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
+        <span>Explore this instrument</span>
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+      </a>
+    </div>
+  </section>
+
+
   <!-- Client-only audio logic (safe for SSR) -->
   <script is:inline>
     // Toggle play/pause on click of any teaser card.
@@ -196,5 +260,11 @@ const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
     };
     document.querySelectorAll('audio.teaser').forEach(attachIconSync);
   </script>
+
+  <!-- Smooth scrolling + anchor offset (keeps anchor content below any sticky header) -->
+  <style is:global>
+    html { scroll-behavior: smooth; }
+    #latest-video { scroll-margin-top: 96px; } /* adjust if your header height changes */
+  </style>
 
 </BaseLayout>
