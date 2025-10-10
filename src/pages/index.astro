@@ -8,12 +8,22 @@ const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
 /** Latest YouTube embed (manual, simple) */
 const LATEST_YT = {
   id: 'AgSGd3ur2mQ?si=FZBTfCBkOU211cSH',          // e.g. 'dQw4w9WgXcQ'
-  isShort: false,                    // set true for Shorts (9:16)
-  title: 'Instrument: Turkish Cümbüş Oud',    // used for a11y + caption
+  isShort: false,                                 // set true for Shorts (9:16)
+  title: 'Instrument: Turkish Cümbüş Oud',
 };
 
-const embedUrl = `https://www.youtube.com/embed/${LATEST_YT.id}?rel=0`;
-const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
+/** Second YouTube embed — the “Transcend the traditional” video */
+const SECOND_YT = {
+  id: '1p_zNEC1FY8?si=Tcx8T5XA-lamzTlU',                      // <-- put the real ID here
+  isShort: false,                                 // flip to true if it’s a Short
+  title: 'This is the first and only music video that I recorded and produced entirely by myself a couple years ago with the goal of composing the most "unlikely" instruments together in one place.  Trying my best to convey a message about relativity through sound, but only a very small portion of the internet noticed it.  Anyway, Enjoy!',
+};
+
+const embedUrl  = `https://www.youtube.com/embed/${LATEST_YT.id}?rel=0`;
+const watchUrl  = `https://youtu.be/${LATEST_YT.id}`;
+
+const embedUrl2 = `https://www.youtube.com/embed/${SECOND_YT.id}?rel=0`;
+const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 ---
 
 <BaseLayout {title}>
@@ -27,8 +37,16 @@ const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
           ~<span class="font-extrabold text-[1.05em]">Sound</span> <span class="text-rosewood/70">Beyond</span> Borders~
         </h1>
 
+        <!-- “Secret” jump link: visually identical text, no underline, same opacity.
+             Clicking it scrolls to the second video section. -->
         <p class="mt-1 sm:mt-2 text-base sm:text-lg opacity-60 bg-gradient-to-r from-rosewood via-rosewood/10 to-transparent rounded-md max-w-[42ch]">
-          Transcend the traditional.
+          <a
+            href="#transcend-video"
+            class="outline-none no-underline hover:opacity-80 focus:opacity-80"
+            title="Jump to the “Transcend the Traditional” video"
+          >
+            Transcend the traditional.
+          </a>
         </p>
       </div>
 
@@ -49,10 +67,7 @@ const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
         alt="Hunter with instruments" 
         class="w-full h-[42vh] sm:h-[56vh] object-cover" 
       />
-
-      <!-- Overlay with stronger bottom fade + lighter top/sides -->
       <div class="hero-fade-overlay"></div>
-
       <figcaption class="relative p-3 sm:p-4 text-xs sm:text-sm bg-gradient-to-r from-ebony via-ebony to-transparent">
         <div class="font-display">What is sound beyond borders?</div>
         <div class="opacity-80">Music as a bridge between cultures, not a separation.</div>
@@ -61,36 +76,21 @@ const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
   </section>
 
   <style>
-    /* Stronger at bottom, subtle on top/left/right */
     .hero-fade-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-
-      /* Use your charcoal (#111111). Tweak the opacities/stop positions to taste */
+      position: absolute; inset: 0; pointer-events: none;
       background:
-        /* Soft “bloom” near the bottom center */
         radial-gradient(ellipse at 50% 115%, rgba(17,17,17,0.85) 12%, rgba(17,17,17,0.0) 55%),
-
-        /* Strong bottom fade (dominant) */
         linear-gradient(to bottom, rgba(17,17,17,0.0) 72%, rgba(17,17,17,0.85) 98%),
-
-        /* Light top fade */
         linear-gradient(to top, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 22%),
-
-        /* Light left fade */
         linear-gradient(to right, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 20%),
-
-        /* Light right fade */
         linear-gradient(to left, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 20%);
-      mix-blend-mode: normal; /* keep it simple; can change to multiply if you want a darker feel */
+      mix-blend-mode: normal;
     }
   </style>
 
   <Divider />
 
   <!-- Two-column intro -->
-  <!-- CHANGES: start two columns earlier (sm) to mimic desktop; keep image height steady -->
   <section class="mx-auto max-w-6xl px-4 grid sm:grid-cols-2 gap-6 sm:gap-8 items-start">
     <div class="space-y-4">
       <h2 class="font-display text-xl sm:text-2xl">About my approach</h2>
@@ -103,24 +103,15 @@ const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
       <p class="opacity-90"><b>*All sound teasers and photos on this website are of my own making on my own instruments!!  No special effects.*</b></p>
 
       <div class="flex flex-wrap gap-3 pt-1">
-        <a 
-          href="/instruments"
-          class="group gothic-link mr-0 font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
+        <a href="/instruments" class="group gothic-link mr-0 font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
           <span>Explore the instruments</span>
           <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
         </a>
-
-        <a 
-          href="/about"
-          class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
+        <a href="/about" class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
           <span>More about me and my approach</span>
           <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
         </a>
-
-        <!-- New jumper to latest YouTube embed -->
-        <a 
-          href="#latest-video"
-          class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory] scroll-smooth">
+        <a href="#latest-video" class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory] scroll-smooth">
           <span>See my latest YouTube video!</span>
           <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">↓</span>
         </a>
@@ -135,121 +126,125 @@ const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
   <Divider />
 
   <!-- 3 featured instruments with audio teasers -->
-  <!-- CHANGES: show 2 columns on small screens, 3 on md+ to preserve grid feel -->
   <section class="mx-auto max-w-6xl px-4 pb-8">
     <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">Featured sounds</h2>
-
     <div class="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
-      <!-- Surbahar -->
       <div class="space-y-2">
-        <FeaturedInstrumentCard 
-          title="Surbahar" 
-          imgSrc="/media/inst-surbahar.jpg" 
-          audioSrc="/media/surbahar.m4a" 
-        />
-        <a href="/instruments/Surbahar" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">
-          Explore more Surbahar →
-        </a>
+        <FeaturedInstrumentCard title="Surbahar" imgSrc="/media/inst-surbahar.jpg" audioSrc="/media/surbahar.m4a" />
+        <a href="/instruments/Surbahar" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Surbahar →</a>
       </div>
-
-      <!-- Baglama Saz -->
       <div class="space-y-2">
-        <FeaturedInstrumentCard 
-          title="Baglama Saz" 
-          imgSrc="/media/inst-baglamasaz.jpg" 
-          audioSrc="/media/baglamasaz1.m4a" 
-        />
-        <a href="/instruments/BaglamaSaz" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">
-          Explore more Baglama Saz →
-        </a>
+        <FeaturedInstrumentCard title="Baglama Saz" imgSrc="/media/inst-baglamasaz.jpg" audioSrc="/media/baglamasaz1.m4a" />
+        <a href="/instruments/BaglamaSaz" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Baglama Saz →</a>
       </div>
-
-      <!-- Arabic Oud -->
       <div class="space-y-2">
-        <FeaturedInstrumentCard 
-          title="Arabic Oud" 
-          imgSrc="/media/inst-arabicoud.jpg" 
-          audioSrc="/media/arabicoud.m4a" 
-        />
-        <a href="/instruments/ArabicOud" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">
-          Explore more Arabic Oud →
-        </a>
+        <FeaturedInstrumentCard title="Arabic Oud" imgSrc="/media/inst-arabicoud.jpg" audioSrc="/media/arabicoud.m4a" />
+        <a href="/instruments/ArabicOud" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Arabic Oud →</a>
       </div>
     </div>
   </section>
 
   <Divider />
 
-    <Divider />
-
-  <!-- Latest YouTube video (sits above the footer) -->
-  <section id="latest-video" class="mx-auto max-w-6xl px-4 pb-10 scroll-mt-24">
-    <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">
-      My Latest Youtube Upload!
-    </h2>
+  <!-- First (existing) video -->
+  <section id="latest-video" class="mx-auto max-w-6xl px-4 pb-6 scroll-mt-24">
+    <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">My Latest Youtube Upload!</h2>
 
     <figure class="space-y-3">
-      <!-- Responsive frame that adapts to Shorts vs. regular -->
-      <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-2xl overflow-hidden frame shadow-soft`}>
-        <iframe
-          class="absolute inset-0 w-full h-full"
-          src={embedUrl}
-          title={LATEST_YT.title}
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-        ></iframe>
-      </div>
+      <!-- shared golden border frame -->
+<div class="relative rounded-2xl overflow-hidden frame shadow-soft p-[2px] bg-gradient-to-r from-[#C2A45F] via-[#A8743D] to-[#6E2A2A]">
+  <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[14px] overflow-hidden`}>
+    <iframe
+      class="absolute inset-0 w-full h-full rounded-[12px]"
+      src={embedUrl}
+      title={LATEST_YT.title}
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+  </div>
+</div>
+
+
 
       <figcaption class="text-sm opacity-80 flex flex-col sm:flex-row sm:items-center sm:gap-3">
         <span class="font-display">{LATEST_YT.title}</span>
-        <a href={watchUrl} target="_blank" rel="noopener" class="gothic-link font-bold">
-          Watch on YouTube →
-        </a>
+        <a href={watchUrl} target="_blank" rel="noopener" class="gothic-link font-bold">Watch on YouTube →</a>
       </figcaption>
     </figure>
 
-    <!-- New “Explore this instrument” link -->
     <div class="pt-4">
-      <a 
-        href="/instruments/CumbusOud" 
-        class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
+      <a href="/instruments/CumbusOud" class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
         <span>Explore this instrument</span>
         <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
       </a>
     </div>
   </section>
 
+  <!-- Single divider between the two videos -->
+  <Divider />
+
+  <!-- Second (new) video: the one named like the header phrase -->
+  <section id="transcend-video" class="mx-auto max-w-6xl px-4 pb-10 scroll-mt-24">
+    <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">Transcend The Traditional</h2>
+
+<figure class="space-y-3">
+  <!-- Add a wrapper div with golden gradient border -->
+  <!-- SECOND VIDEO WRAPPER -->
+<div class="relative rounded-[20px] overflow-hidden p-[5px] bg-gradient-to-r from-[#A07133] via-[#8D5A2C] to-[#6E2A2A] shadow-[0_0_28px_10px_rgba(141,90,44,0.22)]">
+  <!-- softly diffused bronze “cloud” glow -->
+  <div class="absolute -inset-[2px] bg-[radial-gradient(circle_at_center,rgba(141,90,44,0.35)_0%,transparent_70%)] blur-[30px] opacity-60 pointer-events-none"></div>
+
+  <!-- anti-gold tint so it never drifts yellow on bright displays -->
+  <div class="absolute inset-0 bg-rosewood/15 mix-blend-multiply pointer-events-none"></div>
+
+  <div class={`relative w-full ${SECOND_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[16px] overflow-hidden`}>
+    <iframe
+      class="absolute inset-0 w-full h-full rounded-[14px]"
+      src={embedUrl2}
+      title={SECOND_YT.title}
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+  </div>
+</div>
+
+
+
+      <figcaption class="text-sm opacity-80">
+  <span class="font-display block">{SECOND_YT.title}</span>
+  <a
+    href={watchUrl2}
+    target="_blank"
+    rel="noopener"
+    class="gothic-link font-bold inline-block mt-2"
+  >
+    Watch on YouTube →
+  </a>
+</figcaption>
+
+    </figure>
+  </section>
 
   <!-- Client-only audio logic (safe for SSR) -->
   <script is:inline>
-    // Toggle play/pause on click of any teaser card.
     document.addEventListener('click', (e) => {
       const card = e.target.closest('.js-teaser-card');
       if (!card) return;
-
       const audio = card.querySelector('audio.teaser');
       if (!audio) return;
-
-      // Pause & reset all *other* teasers
       document.querySelectorAll('audio.teaser').forEach((a) => {
-        if (a !== audio) {
-          try { a.pause(); a.currentTime = 0; } catch {}
-        }
+        if (a !== audio) { try { a.pause(); a.currentTime = 0; } catch {} }
       });
-
-      // Start/stop this one
       if (audio.paused) {
-        audio.muted = false;
-        audio.volume = 1;
+        audio.muted = false; audio.volume = 1;
         audio.play().catch((err) => console.warn('play failed:', err));
-      } else {
-        audio.pause();
-      }
+      } else { audio.pause(); }
     });
 
-    // Keep the icon in sync with the audio state
     const attachIconSync = (a) => {
       const card = a.closest('.js-teaser-card');
       const icon = card?.querySelector('.play-icon');
@@ -261,10 +256,10 @@ const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
     document.querySelectorAll('audio.teaser').forEach(attachIconSync);
   </script>
 
-  <!-- Smooth scrolling + anchor offset (keeps anchor content below any sticky header) -->
+  <!-- Smooth scrolling + anchor offset for both sections -->
   <style is:global>
     html { scroll-behavior: smooth; }
-    #latest-video { scroll-margin-top: 96px; } /* adjust if your header height changes */
+    #latest-video, #transcend-video { scroll-margin-top: 96px; } /* adjust if header height changes */
   </style>
 
 </BaseLayout>
