@@ -2,14 +2,18 @@
 // src/pages/memories.astro
 import BaseLayout from "../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Memories — Tradscendence | Sound Beyond Borders";
+const description =
+  "A living timeline of Hunter Eastland’s performances and reflections — from intimate world and folk instrument events to personal milestones in music and travel.";
+
 // Example data — replace with real events as you collect them.
-// You can use either `video.src` for a local file OR `video.youtubeId` for a YouTube embed.
 type Media = { src?: string; poster?: string; youtubeId?: string };
 type Photo = { src: string; alt?: string };
 
 type Memory = {
   title: string;
-  date: string;        // ISO date e.g. "2025-08-15" (used for sorting)
+  date: string;
   location?: string;
   reflection: string;
   video?: Media;
@@ -26,42 +30,15 @@ const memories: Memory[] = [
     video: { youtubeId: "dQw4w9WgXcQ" }, // or your real video src
     photos: [
       { src: "/media/BrideandGroom1.jpg", alt: "" },
-     // { src: "/media/memories/pal-wed-2.jpg", alt: "" },
     ],
   },
-
-  // {
-  //   title: "Sufi Night • Surbahar + Tanpura",
-  //   date: "2025-07-12",
-  //   location: "Queens, NY",
-  //   reflection:
-  //     "Slow-blooming alap on surbahar; you could feel the room exhale together. Later, we shifted into devotional call-and-response.",
-  //   video: { src: "/media/sufi-night.mp4", poster: "/media/sufi-night-cover.jpg" },
-  //   photos: [
-  //     { src: "/media/memories/sufi-1.jpg", alt: "Surbahar on stage" },
-  //     { src: "/media/memories/sufi-2.jpg", alt: "Audience with candles" },
-  //     { src: "/media/memories/sufi-3.jpg", alt: "Tanpura drone" },
-  //   ],
-  // },
-
-  // {
-  //   title: "Persian Tea House Set",
-  //   date: "2025-05-04",
-  //   location: "Jersey City, NJ",
-  //   reflection:
-  //     "Kept it intimate — setar miniatures between stories from the old masters. Perfectly paired with cardamom tea.",
-  //   photos: [
-  //     { src: "/media/memories/tea-1.jpg", alt: "Setar performance" },
-  //   ],
-  // },
 ];
-
 
 // Sort newest → oldest (so scrolling goes back in time)
 const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
 ---
 
-<BaseLayout title="Memories — Tradscendence">
+<BaseLayout {title} description={description}>
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8 text-ivory">
     <header class="space-y-2">
       <h1 class="font-display text-3xl">Memories</h1>
@@ -70,9 +47,7 @@ const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
       </p>
     </header>
 
-    <!-- Timeline -->
     <ol class="relative pl-6 sm:pl-8">
-      <!-- vertical line -->
       <div
         class="absolute left-2 sm:left-3 top-0 bottom-0"
         style="width:2px;background:var(--accent-gold);"
@@ -81,7 +56,6 @@ const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
 
       {sorted.map((m) => (
         <li class="relative mb-10 last:mb-0">
-          <!-- dot -->
           <span
             class="absolute -left-0.5 sm:-left-1 top-1.5 inline-block rounded-full ring-2"
             style="
@@ -106,10 +80,8 @@ const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
 
             <p class="opacity-90">{m.reflection}</p>
 
-            {/* media block */}
             {(m.video || (m.photos && m.photos.length)) && (
               <div class="grid gap-4 md:grid-cols-5">
-                {/* Video (if present) */}
                 {m.video && (
                   <div class="md:col-span-3 rounded-xl overflow-hidden frame bg-ebony/60">
                     {m.video.youtubeId ? (
@@ -137,7 +109,6 @@ const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
                   </div>
                 )}
 
-                {/* Photos */}
                 {m.photos && m.photos.length > 0 && (
                   <div class={`grid gap-3 ${m.video ? 'md:col-span-2' : 'md:col-span-5 md:grid-cols-2'}`}>
                     {m.photos.slice(0,4).map((p) => (

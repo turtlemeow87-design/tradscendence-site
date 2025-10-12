@@ -2,6 +2,11 @@
 // src/pages/instruments/OM.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Octave Mandolin — Tradscendence | Sound Beyond Borders";
+const description =
+  "Two contrasting performances on octave mandolin—one Celtic-bright, one Turkish-tinged. Warm, resonant tone for melodic lines and driving rhythm. Short videos, story, and links.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -21,7 +26,8 @@ const videos = [
 ];
 ---
 
-<BaseLayout title="Octave Mandolin — Tradscendence" description="Two contrasting performances on Octave Mandolin">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Octave Mandolin</h1>

@@ -2,18 +2,23 @@
 // src/pages/instruments/Duduk.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Duduk — Tradscendence | Sound Beyond Borders";
+const description =
+  "Two contrasting performances on Armenian duduk — A=440 and F at 432 Hz. Warm double-reed, apricot-wood tone for intimate ceremonies; short videos, story, and links.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
     id: "v1",
-    label: "Key of A 440",
+    label: "Key of A (A=440)",
     type: "video",
     src: "/media/Duduk1.mp4",
     poster: "",
   },
   {
     id: "v2",
-    label: "Key of F 432",
+    label: "Key of F (432 Hz)",
     type: "video",
     src: "/media/Duduk2.mp4",
     poster: "",
@@ -21,7 +26,8 @@ const videos = [
 ];
 ---
 
-<BaseLayout title="Duduk — Tradscendence" description="Two contrasting performances on Armenian Duduk">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Duduk</h1>
