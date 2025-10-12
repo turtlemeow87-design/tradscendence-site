@@ -2,6 +2,11 @@
 // src/pages/instruments/Surbahar.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Surbahar — Tradscendence | Sound Beyond Borders";
+const description =
+  "Two contrasting performances on surbahar (bass sitar)—upper and lower registers. Deep, resonant, meditative tone with expressive range. Short videos, story, and background.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -21,7 +26,8 @@ const videos = [
 ];
 ---
 
-<BaseLayout title="Surbahar — Tradscendence" description="Two contrasting performances on Surbahar (bass sitar): alap and gat.">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Surbahar</h1>

@@ -2,6 +2,11 @@
 // src/pages/instruments/Setar.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Setar — Tradscendence | Sound Beyond Borders";
+const description =
+  "Two contrasting performances on Persian setar—one contemplative, one rhythmic. Crisp, delicate, and expressive with ancient charm. Short videos, story, and insights.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -21,7 +26,8 @@ const videos = [
 ];
 ---
 
-<BaseLayout title="Setar — Tradscendence" description="Two contrasting performances on Setar">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Setar</h1>

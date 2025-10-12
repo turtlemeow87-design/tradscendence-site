@@ -2,6 +2,11 @@
 // src/pages/instruments/Tanbur.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Cümbüş Tanbur — Tradscendence | Long-necked, resonant Turkish lute";
+const description =
+  "Two short performances—slow, meditative and a faster Arabic-tinged piece—on the metal-bodied Cümbüş Tanbur. Watch videos and read the story behind the sound.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -21,7 +26,8 @@ const videos = [
 ];
 ---
 
-<BaseLayout title="Cumbus Tanbur — Tradscendence" description="Two contrasting performances on Cümbüş Tanbur">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Cümbüş Tanbur</h1>

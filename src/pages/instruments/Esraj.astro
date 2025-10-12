@@ -2,6 +2,11 @@
 // src/pages/instruments/Esraj.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Esraj — Tradscendence | Sound Beyond Borders";
+const description =
+  "Two contrasting performances on Indian esraj — bowed with sympathetic strings. Meditative and driving takes, short videos, and notes on where its voice fits best.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -21,7 +26,8 @@ const videos = [
 ];
 ---
 
-<BaseLayout title="Esraj — Tradscendence" description="Two contrasting performances on Esraj">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Esraj</h1>

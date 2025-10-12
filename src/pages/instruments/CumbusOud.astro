@@ -2,6 +2,11 @@
 // src/pages/instruments/CumbusOud.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Cümbüş Oud — Tradscendence | Sound Beyond Borders";
+const description =
+  "Two contrasting performances on Cümbüş oud — traditional and Western styles. Banjo-like resonance meets oud expressiveness; short videos, story, and links.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -21,7 +26,8 @@ const videos = [
 ];
 ---
 
-<BaseLayout title="Cümbüş Oud — Tradscendence" description="Two contrasting performances on Cümbüş">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Cümbüş Oud</h1>

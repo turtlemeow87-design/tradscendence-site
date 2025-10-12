@@ -3,20 +3,27 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Divider from "../components/Divider.astro";
 import FeaturedInstrumentCard from "../components/FeaturedInstrumentCard.astro";
 
-const title = 'Hunter Eastland / Tradscendence — Transcend the traditional';
+// ✅ SEO: clear, keyworded title (brand + what you do)
+const title =
+  "Hunter Eastland / Tradscendence — World & Folk Multi-Instrumentalist | Sound Beyond Borders";
+
+// ✅ SEO: unique, human description (kept concise for SERP snippets)
+const description =
+  "World/folk multi-instrumentalist in Richmond, VA. Book for private/intimate events, and studio sessions. Explore through videos and sound teasers. Surbahar, Arabic Oud, Esraj, Duduk, Azeri Tar, Turkish Baglama Saz, and more!";
 
 /** Latest YouTube embed (manual, simple) */
 const LATEST_YT = {
-  id: 'AgSGd3ur2mQ?si=FZBTfCBkOU211cSH',          // e.g. 'dQw4w9WgXcQ'
-  isShort: false,                                 // set true for Shorts (9:16)
+  id: 'AgSGd3ur2mQ?si=FZBTfCBkOU211cSH',
+  isShort: false,
   title: 'Instrument: Turkish Cümbüş Oud',
 };
 
 /** Second YouTube embed — the “Transcend the traditional” video */
 const SECOND_YT = {
-  id: '1p_zNEC1FY8?si=Tcx8T5XA-lamzTlU',                      // <-- put the real ID here
-  isShort: false,                                 // flip to true if it’s a Short
-  title: 'This is the first and only music video that I recorded and produced entirely by myself a couple years ago with the goal of composing the most "unlikely" instruments together in one place.  Trying my best to convey a message about relativity through sound, but only a very small portion of the internet noticed it.  Anyway, Enjoy!',
+  id: '1p_zNEC1FY8?si=Tcx8T5XA-lamzTlU',
+  isShort: false,
+  title:
+    'This is the first and only music video that I recorded and produced entirely by myself a couple years ago with the goal of composing the most "unlikely" instruments together in one place.  Trying my best to convey a message about relativity through sound, but only a very small portion of the internet noticed it.  Anyway, Enjoy!',
 };
 
 const embedUrl  = `https://www.youtube.com/embed/${LATEST_YT.id}?rel=0`;
@@ -26,10 +33,10 @@ const embedUrl2 = `https://www.youtube.com/embed/${SECOND_YT.id}?rel=0`;
 const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 ---
 
-<BaseLayout {title}>
+<!-- Pass title & description into the layout (this writes the actual <title> + <meta>) -->
+<BaseLayout {title} description={description}>
 
   <!-- Header block with name, handle, catchphrase, logo placeholder -->
-  <!-- CHANGES: keep row layout on mobile, shrink logo, limit text width for balance -->
   <section class="mx-auto max-w-6xl px-4 pt-6 sm:pt-10">
     <div class="flex items-center justify-between gap-4 sm:gap-6">
       <div class="min-w-0">
@@ -37,8 +44,6 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
           ~<span class="font-extrabold text-[1.05em]">Sound</span> <span class="text-rosewood/70">Beyond</span> Borders~
         </h1>
 
-        <!-- “Secret” jump link: visually identical text, no underline, same opacity.
-             Clicking it scrolls to the second video section. -->
         <p class="mt-1 sm:mt-2 text-base sm:text-lg opacity-60 bg-gradient-to-r from-rosewood via-rosewood/10 to-transparent rounded-md max-w-[42ch]">
           <a
             href="#transcend-video"
@@ -50,7 +55,6 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
         </p>
       </div>
 
-      <!-- Logo stays on the right even on mobile, just smaller -->
       <div class="logo-fade shrink-0 w-[104px] h-[104px] sm:w-[160px] sm:h-[160px] md:max-w-[200px] aspect-square frame flex items-center justify-center opacity-70">
         <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover" />
       </div>
@@ -62,10 +66,10 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
   <!-- Hero: wide image + caption -->
   <section class="mx-auto max-w-6xl px-4">
     <figure class="relative rounded-2xl overflow-hidden frame shadow-soft">
-      <img 
-        src="/media/hero-placeholder.jpg" 
-        alt="Hunter with instruments" 
-        class="w-full h-[42vh] sm:h-[56vh] object-cover" 
+      <img
+        src="/media/hero-placeholder.jpg"
+        alt="Hunter with instruments"
+        class="w-full h-[42vh] sm:h-[56vh] object-cover"
       />
       <div class="hero-fade-overlay"></div>
       <figcaption class="relative p-3 sm:p-4 text-xs sm:text-sm bg-gradient-to-r from-ebony via-ebony to-transparent">
@@ -151,22 +155,19 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
     <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">My Latest Youtube Upload!</h2>
 
     <figure class="space-y-3">
-      <!-- shared golden border frame -->
-<div class="relative rounded-2xl overflow-hidden frame shadow-soft p-[2px] bg-gradient-to-r from-[#C2A45F] via-[#A8743D] to-[#6E2A2A]">
-  <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[14px] overflow-hidden`}>
-    <iframe
-      class="absolute inset-0 w-full h-full rounded-[12px]"
-      src={embedUrl}
-      title={LATEST_YT.title}
-      loading="lazy"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen
-    ></iframe>
-  </div>
-</div>
-
-
+      <div class="relative rounded-2xl overflow-hidden frame shadow-soft p-[2px] bg-gradient-to-r from-[#C2A45F] via-[#A8743D] to-[#6E2A2A]">
+        <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[14px] overflow-hidden`}>
+          <iframe
+            class="absolute inset-0 w-full h-full rounded-[12px]"
+            src={embedUrl}
+            title={LATEST_YT.title}
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
 
       <figcaption class="text-sm opacity-80 flex flex-col sm:flex-row sm:items-center sm:gap-3">
         <span class="font-display">{LATEST_YT.title}</span>
@@ -182,54 +183,39 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
     </div>
   </section>
 
-  <!-- Single divider between the two videos -->
   <Divider />
 
-  <!-- Second (new) video: the one named like the header phrase -->
+  <!-- Second video -->
   <section id="transcend-video" class="mx-auto max-w-6xl px-4 pb-10 scroll-mt-24">
     <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">Transcend The Traditional</h2>
 
-<figure class="space-y-3">
-  <!-- Add a wrapper div with golden gradient border -->
-  <!-- SECOND VIDEO WRAPPER -->
-<div class="relative rounded-[20px] overflow-hidden p-[5px] bg-gradient-to-r from-[#A07133] via-[#8D5A2C] to-[#6E2A2A] shadow-[0_0_28px_10px_rgba(141,90,44,0.22)]">
-  <!-- softly diffused bronze “cloud” glow -->
-  <div class="absolute -inset-[2px] bg-[radial-gradient(circle_at_center,rgba(141,90,44,0.35)_0%,transparent_70%)] blur-[30px] opacity-60 pointer-events-none"></div>
+    <figure class="space-y-3">
+      <div class="relative rounded-[20px] overflow-hidden p-[5px] bg-gradient-to-r from-[#A07133] via-[#8D5A2C] to-[#6E2A2A] shadow-[0_0_28px_10px_rgba(141,90,44,0.22)]">
+        <div class="absolute -inset-[2px] bg-[radial-gradient(circle_at_center,rgba(141,90,44,0.35)_0%,transparent_70%)] blur-[30px] opacity-60 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-rosewood/15 mix-blend-multiply pointer-events-none"></div>
 
-  <!-- anti-gold tint so it never drifts yellow on bright displays -->
-  <div class="absolute inset-0 bg-rosewood/15 mix-blend-multiply pointer-events-none"></div>
-
-  <div class={`relative w-full ${SECOND_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[16px] overflow-hidden`}>
-    <iframe
-      class="absolute inset-0 w-full h-full rounded-[14px]"
-      src={embedUrl2}
-      title={SECOND_YT.title}
-      loading="lazy"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen
-    ></iframe>
-  </div>
-</div>
-
-
+        <div class={`relative w-full ${SECOND_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[16px] overflow-hidden`}>
+          <iframe
+            class="absolute inset-0 w-full h-full rounded-[14px]"
+            src={embedUrl2}
+            title={SECOND_YT.title}
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
 
       <figcaption class="text-sm opacity-80">
-  <span class="font-display block">{SECOND_YT.title}</span>
-  <a
-    href={watchUrl2}
-    target="_blank"
-    rel="noopener"
-    class="gothic-link font-bold inline-block mt-2"
-  >
-    Watch on YouTube →
-  </a>
-</figcaption>
-
+        <span class="font-display block">{SECOND_YT.title}</span>
+        <a href={watchUrl2} target="_blank" rel="noopener" class="gothic-link font-bold inline-block mt-2">
+          Watch on YouTube →
+        </a>
+      </figcaption>
     </figure>
   </section>
 
-  <!-- Client-only audio logic (safe for SSR) -->
   <script is:inline>
     document.addEventListener('click', (e) => {
       const card = e.target.closest('.js-teaser-card');
@@ -256,10 +242,9 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
     document.querySelectorAll('audio.teaser').forEach(attachIconSync);
   </script>
 
-  <!-- Smooth scrolling + anchor offset for both sections -->
   <style is:global>
     html { scroll-behavior: smooth; }
-    #latest-video, #transcend-video { scroll-margin-top: 96px; } /* adjust if header height changes */
+    #latest-video, #transcend-video { scroll-margin-top: 96px; }
   </style>
 
 </BaseLayout>

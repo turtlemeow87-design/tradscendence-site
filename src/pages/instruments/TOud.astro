@@ -2,26 +2,20 @@
 // src/pages/instruments/TOud.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// ✅ SEO
+const title = "Turkish Oud — Tradscendence | Bright, expressive Middle Eastern lute";
+const description =
+  "Two contrasting performances on Turkish Oud: a metallic edge and a more traditional voice. Hear how the Turkish setup cuts through while staying deeply emotive.";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
-  {
-    id: "v1",
-    label: "More Metallic",
-    type: "video",
-    src: "/media/TOud1.mp4",
-    poster: "",
-  },
-  {
-    id: "v2",
-    label: "More Traditional",
-    type: "video",
-    src: "/media/TOud2.mp4",
-    poster: "",
-  },
+  { id: "v1", label: "More Metallic", type: "video", src: "/media/TOud1.mp4", poster: "" },
+  { id: "v2", label: "More Traditional", type: "video", src: "/media/TOud2.mp4", poster: "" },
 ];
 ---
 
-<BaseLayout title="Turkish Oud — Tradscendence" description="Two contrasting performances on Turkish Oud">
+<BaseLayout {title} description={description}>
+
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
       <h1 class="font-display text-3xl md:text-4xl">Turkish Oud</h1>
