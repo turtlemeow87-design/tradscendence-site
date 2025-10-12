@@ -4,6 +4,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 // ✅ Your Formspree endpoint
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/mblzzrqb";
 
+/** Mark items that have already been purchased.
+ *  Keyed by item.id so the UI keeps working even if you reorder the list.
+ *  (Per your note: #15, #20, #23 were purchased once)
+ */
+const ORDERED_COUNTS: Record<string, number> = {
+  "erhu-strings": 1,             // #15 — Chinese Violin (Erhu) strings
+  "5-string-banjo-strings": 1,   // #20 — 5-String Banjo strings
+  "cura-saz-strings": 1,         // #23 — Cura Saz strings
+};
+
 // Edit this array to add/remove items.
 const WISHLIST = [
   { id: "acoustic-bass-strings", name: "Acoustic Bass Strings ($29.99)", url: "https://www.amazon.com/DAddario-EPBB170-5-Phosphor-5-String-Acoustic/dp/B00373N0ZO/ref=asc_df_B00373N0ZO/?tag=hyprod-20&linkCode=df0&hvadid=693366139103&hvpos=&hvnetw=g&hvrand=4152059029923750231&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9008464&hvtargid=pla-525652260601&psc=1&mcid=f0b8557d4bb8301e8a66f3c4653a80a2" },
@@ -27,10 +37,9 @@ const WISHLIST = [
   { id: "lap-steel-strings", name: "Lap Steel Strings ($8.89)", url: "https://www.amazon.com/Electric-Steel-Strings-Tuning-15-36/dp/B00AHL2X98/ref=sr_1_3?crid=29BUZJIQEQM2J&dib=eyJ2IjoiMSJ9.rFu1p9BcdSKsWdEuvuv4RxCmaCAo5QxtUDF8xz1TeaLVQrk3mRTkyHZ_sZ6j1SdCrarSBQ9XMh2WCmUqNtGWUoioaZtSACgAuTcslgQ6xKs01WD_cQu7Pxd_VExeHt3mRCqc3crjlRrW5U6ceW8qm4OXDAp1hC3off-RXSfKXutKZGv0_yKj0xPyua0ye4BPlQoegolPBiGn4D24QzTyWCzN1SUhPA2TKc48T1lRvxlY9Y9fOy59kT1x2iIead6TfOB6KRSfzK51RnQ-4I1eqRoym6X8UBnahz5qNw4oW-I.3LIrMh67_O8lvn8t6SMiqFOMMPMBAW_73mip_Y6VH1M&dib_tag=se&keywords=lap+steel+strings+c6&qid=1760067007&s=musical-instruments&sprefix=lap+steel+strings+c6%2Cmi%2C85&sr=1-3" },
   { id: "5-string-banjo-strings", name: "5-String Banjo Strings ($5.99)", url: "https://www.amazon.com/DAddario-EJ55-Phosphor-5-String-Strings/dp/B00RWCUF40/ref=sr_1_4?crid=2Z7CTZB770CVV&dib=eyJ2IjoiMSJ9.cagikoKV-uh6vBSIfP1OgFSI5wYCKrId5pOUx4XQ46HA-30DTnbpYspCpEWBRBTTevFnVU1Od99H9EcvCnmYPaXCct3riC85fv-rZGT13wlbnPkdixpjnmTojoH3242EzfJRhTXQb1FL2-LTZO3aerc5EQmSJq0AVA4FACWtlkDDYESKre70BEB_18izPs9NFUZKLxDrEP32H913HFuWLKRsOg-eJCe-PkmGNgu3m0RRdGx6KpoKfsY9nnBP_x0wpGS8J1RZ7zXXin2GAWAP_2LoT_xLhn4iS0zEO86jBuY.T3FkJMiPbyRaPXlZ29yiMSfsySWL-D7j6DUkNhsLkpk&dib_tag=se&keywords=5-string%2Bbanjo%2Bstrings%2Bmedium&qid=1760067154&s=musical-instruments&sprefix=5-string%2Bbanjo%2Bstrings%2Bmedium%2Cmi%2C110&sr=1-4&th=1" },
   { id: "tanpura-strings", name: "Tanpura Strings ($15.40)", url: "https://www.musiciansmallusa.com/tanpura-string-set/?srsltid=AfmBOor1M5FKgfjVWwMYJYQ1rRP_bBrylQcvVIr7Z1t3X-cnV6WOpi7f" },
-  { id: "zurna-reeds", name: "Zurna Reeds ($19.99)", url: "https://salamuzik.com/products/professional-pipe-reed-for-turkish-zurna-azb-404?variant=32741476623&country=US&currency=USD&utm_medium=product_sync&utm_source=google&utm_content=sag_organic&utm_campaign=sag_organic&utm_term=&utm_campaign=&utm_source=adwords&utm_medium=ppc&hsa_acc=4147239623&hsa_cam=18513796241&hsa_grp=&hsa_ad=&hsa_src=x&hsa_tgt=&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_ver=3&gad_source=1&gad_campaignid=18507717987&gbraid=0AAAAACxeuv6M2Wy7zqDmix63nF_z5hkRL&gclid=CjwKCAjwup3HBhAAEiwA7euZutsyHeyJkVyqDuKKRBOUZrtPezwqkte9YIYD0-dWogMtdyRMm1YXfhoC9EkQAvD_BwE" },
+  { id: "zurna-reeds", name: "Zurna Reeds ($19.99)", url: "https://salamuzik.com/products/professional-pipe-reed-for-turkish-zurna-azb-404?variant=32741476623&country=US&currency=USD&utm_medium=product_sync&utm_source=google&utm_content=sag_organic&utm_campaign=sag_organic&utm_term=&utm_campaign=&utm_source=adwords&utm_medium=ppc&hsa_acc=4147239623&hsa_cam=18513796241&hsa_grp=&hsa_ad=&hsa_src=x&hsa_tgt=&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_ver=3&gad_source=1&gad_campaignid=18513796241&gbraid=0AAAAACxeuv6M2Wy7zqDmix63nF_z5hkRL&gclid=CjwKCAjwup3HBhAAEiwA7euZutsyHeyJkVyqDuKKRBOUZrtPezwqkte9YIYD0-dWogMtdyRMm1YXfhoC9EkQAvD_BwE" },
   { id: "cura-saz-strings", name: "Cura Saz Strings ($19)", url: "https://salamuzik.com/collections/baglama-saz-accessories/products/strings-for-turkish-cura-saz" },
   { id: "setar-strings", name: "Persian Setar Strings ($19.99)", url: "https://salamuzik.com/products/persian-setar-strings?variant=32740692879&country=US&currency=USD&utm_medium=product_sync&utm_source=google&utm_content=sag_organic&utm_campaign=sag_organic&utm_term=&utm_campaign=&utm_source=adwords&utm_medium=ppc&hsa_acc=4147239623&hsa_cam=18370896642&hsa_grp=144261639769&hsa_ad=622775146546&hsa_src=g&hsa_tgt=pla-293946777986&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_ver=3&gad_source=1&gad_campaignid=18370896642&gbraid=0AAAAACxeuv6BNZHNAQcxggRDQ9bF8-tO6&gclid=CjwKCAjwup3HBhAAEiwA7euZusRMD6krjnomzT-CD1BKuqSa4VZn7OJ7oieNYwmdCSgeOp-w4s6hCBoC-0kQAvD_BwE" },
-
 ];
 ---
 
@@ -38,59 +47,83 @@ const WISHLIST = [
   <section class="mx-auto max-w-3xl px-4 py-10 space-y-8">
     <header class="space-y-3 text-center">
       <h1 class="font-display text-3xl md:text-4xl">My Wish List</h1>
-      <p class="opacity-80 max-w-xl mx-auto">
+      <div class="opacity-80 max-w-xl mx-auto text-sm leading-relaxed">
         <p>Welcome to the secret page on my website.</p>
-        <p>The best gift I can possibly get are accessories and strings!</p><br/>
-        Simply click the link under the list item where you can purchase it!  **Important : After you have purchased, if you can please check the big box so that I can get a notification that the item was purchased.**  I will never know who purchased it, only that the box was checked by somebody.  This way I can keep track, and remove items from the list as needed, and so that too many friends/family don't purchase the same item, which has happened before!  Thank you so much for your support!
-      </p>
+        <p>The best gift I can possibly get are accessories and strings!</p>
+        <p class="mt-3">Items may show a small badge like <span class="align-middle inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-[var(--accent-bronze)]/60 text-[12px]">● Somebody already ordered!! ×1</span>. That simply means someone has generously purchased this once already — duplicates are still useful.</p>
+        <p class="mt-3"><strong>Important:</strong> After you’ve purchased, please check the big box so I get a notification and can keep the list tidy. I don’t see who purchased it — just that it was marked.</p>
+      </div>
     </header>
 
     <ul id="wish-list" data-endpoint={FORMSPREE_ENDPOINT} class="space-y-6">
-      {WISHLIST.map((item, idx) => (
-        <li
-          class="frame rounded-xl border border-[var(--accent-bronze)]/70 p-5 flex flex-col gap-5"
-          data-item-id={item.id}
-          data-item-name={item.name}
-          data-item-url={item.url}
-          data-item-number={(idx + 1).toString()}
-        >
-          <div class="flex items-start gap-3">
-            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--accent-bronze)] text-xs mt-1">
-              {idx + 1}
-            </span>
-            <div>
-              <h2 class="item-title font-semibold text-lg mb-2">{item.name}</h2>
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener"
-                class="inline-block px-4 py-2 rounded-lg border border-[var(--accent-gold)] text-[var(--accent-gold)] text-base font-semibold tracking-wide hover:bg-[var(--accent-gold)] hover:text-ebony transition"
-              >
-                🛒 Click here to purchase
-              </a>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 pl-10 sm:pl-12">
-  <input
-    type="checkbox"
-    class="appearance-none relative h-9 w-9 shrink-0 border-2 border-[var(--accent-bronze)] rounded-md cursor-pointer
-           transition-colors duration-200 ease-in-out
-           checked:bg-[var(--accent-gold)] checked:border-[var(--accent-gold)]
-           before:content-[''] before:absolute before:inset-0 before:flex before:items-center before:justify-center
-           before:scale-0 checked:before:scale-100
-           before:text-ebony before:font-bold before:text-lg
-           before:content-['✔']"
-    data-checkbox
-    aria-label={`Notify purchase of ${item.name}`}
-  />
-  <span class="text-base font-medium text-ivory opacity-80 leading-tight">
-    ✅ Please check the box to the left once you’ve purchased this item
+      {WISHLIST.map((item, idx) => {
+        const orderedCount = ORDERED_COUNTS[item.id] ?? 0;
+        return (
+          <li
+            class="frame rounded-xl border border-[var(--accent-bronze)]/70 p-5 flex flex-col gap-5"
+            data-item-id={item.id}
+            data-item-name={item.name}
+            data-item-url={item.url}
+            data-item-number={(idx + 1).toString()}
+            data-ordered-count={orderedCount.toString()}
+          >
+            <div class="flex items-start gap-3">
+              <span class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--accent-bronze)] text-xs mt-1">
+                {idx + 1}
+              </span>
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h2 class="item-title font-semibold text-lg">{item.name}</h2>
+                  {orderedCount > 0 && (
+  <span
+    class="ordered-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+           bg-[#6E2A2A] text-[#F8F6F2] font-semibold text-[12px] tracking-tight
+           ring-1 ring-[rgba(194,164,95,0.55)] shadow-[0_4px_18px_rgba(110,42,42,0.45)]
+           transition-transform duration-150"
+  >
+    <span class="relative inline-block h-2.5 w-2.5">
+      <span class="absolute inset-0 rounded-full bg-[rgba(255,255,255,0.35)] animate-ping"></span>
+      <span class="absolute inset-[3px] rounded-full bg-[#F8F6F2]"></span>
+    </span>
+    Somebody already ordered ×<span class="ordered-count">{orderedCount}</span>
   </span>
-</div>
+)}
 
-        </li>
-      ))}
+
+
+                </div>
+
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener"
+                  class="mt-2 inline-block px-4 py-2 rounded-lg border border-[var(--accent-gold)] text-[var(--accent-gold)] text-base font-semibold tracking-wide hover:bg-[var(--accent-gold)] hover:text-ebony transition"
+                >
+                  🛒 Click here to purchase
+                </a>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 pl-10 sm:pl-12">
+              <input
+                type="checkbox"
+                class="appearance-none relative h-9 w-9 shrink-0 border-2 border-[var(--accent-bronze)] rounded-md cursor-pointer
+                      transition-colors duration-200 ease-in-out
+                      checked:bg-[var(--accent-gold)] checked:border-[var(--accent-gold)]
+                      before:content-[''] before:absolute before:inset-0 before:flex before:items-center before:justify-center
+                      before:scale-0 checked:before:scale-100
+                      before:text-ebony before:font-bold before:text-lg
+                      before:content-['✔']"
+                data-checkbox
+                aria-label={`Notify purchase of ${item.name}`}
+              />
+              <span class="text-base font-medium text-ivory opacity-80 leading-tight">
+                ✅ Please check the box to the left once you’ve purchased this item
+              </span>
+            </div>
+          </li>
+        );
+      })}
     </ul>
 
     <!-- No-JS fallback -->
@@ -128,6 +161,13 @@ const WISHLIST = [
         return;
       }
 
+      function findBadgeEls(li) {
+        return {
+          badge: li.querySelector(".ordered-badge"),
+          countEl: li.querySelector(".ordered-count"),
+        };
+      }
+
       async function notifyFormspree(payload) {
         const res = await fetch(ENDPOINT, {
           method: "POST",
@@ -146,7 +186,7 @@ const WISHLIST = [
         if (!cb) return;
 
         cb.addEventListener("click", async (e) => {
-          e.preventDefault(); // treat checkbox as button
+          e.preventDefault(); // treat checkbox as a button
 
           const item = {
             id: li.getAttribute("data-item-id"),
@@ -174,13 +214,49 @@ const WISHLIST = [
 
           try {
             await notifyFormspree(payload);
+
+            // Visually mark the item and bump the "Already ordered ×N" badge
             li.classList.add("opacity-60");
-            cb.nextElementSibling.textContent = "🎉 Thank you! This item’s been marked purchased.";
-            cb.nextElementSibling.classList.add("text-[var(--accent-gold)]");
+            const note = cb.nextElementSibling;
+            note.textContent = "🎉 Thank you! This item’s been marked purchased.";
+            note.classList.add("text-[var(--accent-gold)]");
+
+            // Update ordered count badge (create it if it doesn't exist yet)
+            const current = parseInt(li.dataset.orderedCount || "0", 10) || 0;
+            const next = current + 1;
+            li.dataset.orderedCount = String(next);
+
+            const { badge, countEl } = findBadgeEls(li);
+            if (badge && countEl) {
+              countEl.textContent = String(next);
+            } else {
+              // Insert a fresh badge next to the title
+              const titleRow = li.querySelector(".item-title")?.parentElement;
+              if (titleRow) {
+                const span = document.createElement("span");
+                span.className =
+  "ordered-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full " +
+  "bg-[#6E2A2A] text-[#F8F6F2] font-semibold text-[12px] tracking-tight " +
+  "ring-1 ring-[rgba(194,164,95,0.55)] shadow-[0_4px_18px_rgba(110,42,42,0.45)] " +
+  "transition-transform duration-150";
+
+span.innerHTML =
+  '<span class="relative inline-block h-2.5 w-2.5">' +
+    '<span class="absolute inset-0 rounded-full bg-[rgba(255,255,255,0.35)] animate-ping"></span>' +
+    '<span class="absolute inset-[3px] rounded-full bg-[#F8F6F2]"></span>' +
+  '</span> ' +
+  'Already ordered ×<span class="ordered-count"></span>';
+
+
+                titleRow.appendChild(span);
+                span.querySelector(".ordered-count").textContent = String(next);
+              }
+            }
           } catch (err) {
             console.error(err);
-            cb.nextElementSibling.textContent = "❌ Couldn’t send — please try again.";
-            cb.nextElementSibling.classList.add("text-red-400");
+            const note = cb.nextElementSibling;
+            note.textContent = "❌ Couldn’t send — please try again.";
+            note.classList.add("text-red-400");
           } finally {
             cb.disabled = false;
           }
