@@ -1,10 +1,15 @@
-<!-- src/layouts/BaseLayout.astro -->
 ---
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import StickyBookMe from "../components/StickyBookMe.astro";
-const { title = 'Tradscendence', description = 'Sound beyond borders', hideHeader = false } = Astro.props;
+
+const {
+  title = 'Tradscendence',
+  description = 'Sound beyond borders',
+  canonical,
+  hideHeader = false
+} = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -13,17 +18,17 @@ const { title = 'Tradscendence', description = 'Sound beyond borders', hideHeade
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-WKHBP3PKLL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-WKHBP3PKLL');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WKHBP3PKLL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-WKHBP3PKLL');
+    </script>
   </head>
-  <body class="min-h-screen flex flex-col">  <!-- remove bg/text here; set via CSS base layer -->
+  <body class="min-h-screen flex flex-col">
     <StickyBookMe />
     {!hideHeader && <Nav />}
     <main class="page-enter flex-1">

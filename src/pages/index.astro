@@ -34,7 +34,12 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 ---
 
 <!-- Pass title & description into the layout (this writes the actual <title> + <meta>) -->
-<BaseLayout {title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="https://www.soundbeyondborders.com/"
+>
+
 
   <!-- Header block with name, handle, catchphrase, logo placeholder -->
   <section class="mx-auto max-w-6xl px-4 pt-6 sm:pt-10">
