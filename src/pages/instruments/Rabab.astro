@@ -7,6 +7,9 @@ const title = "Rabab — Tradscendence | Sound Beyond Borders";
 const description =
   "Two contrasting performances on rabab—one melodic, one rhythmic. Hear its cavern-like resonance and drum-like attack. Short clips, background, and where it shines.";
 
+// ✅ Canonical URL
+const canonical = "https://www.soundbeyondborders.com/instruments/Rabab/";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -26,7 +29,7 @@ const videos = [
 ];
 ---
 
-<BaseLayout {title} description={description}>
+<BaseLayout {title} description={description} canonical={canonical}>
 
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
@@ -277,19 +280,19 @@ In Afghanistan, the Rabab is known as the “Lion of Instruments.” Tragically,
       return;
     }
 
-    const vid = pane.querySelector('video');
-    if (vid) {
-      const apply = () => {
-        const w = vid.videoWidth, h = vid.videoHeight;
-        if (w && h) ratioMap.set(pane.id, `${w} / ${h}`);
-      };
-      if (vid.readyState >= 1) {
-        apply();
-      } else {
-        vid.addEventListener('loadedmetadata', apply, { once: true });
-      }
-      return;
+  const vid = pane.querySelector('video');
+  if (vid) {
+    const apply = () => {
+      const w = vid.videoWidth, h = vid.videoHeight;
+      if (w && h) ratioMap.set(pane.id, `${w} / ${h}`);
+    };
+    if (vid.readyState >= 1) {
+      apply();
+    } else {
+      vid.addEventListener('loadedmetadata', apply, { once: true });
     }
+    return;
+  }
 
     // iframe fallback: if no manual ratio, assume 16/9
     const ifr = pane.querySelector('iframe');

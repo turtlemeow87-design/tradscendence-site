@@ -7,6 +7,9 @@ const title = "Duduk — Tradscendence | Sound Beyond Borders";
 const description =
   "Two contrasting performances on Armenian duduk — A=440 and F at 432 Hz. Warm double-reed, apricot-wood tone for intimate ceremonies; short videos, story, and links.";
 
+// ✅ Canonical
+const canonical = "https://www.soundbeyondborders.com/instruments/Duduk/";
+
 // Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
   {
@@ -26,7 +29,7 @@ const videos = [
 ];
 ---
 
-<BaseLayout {title} description={description}>
+<BaseLayout {title} description={description} canonical={canonical}>
 
   <section class="mx-auto max-w-6xl px-4 py-10 space-y-8">
     <header class="space-y-2">
