@@ -275,4 +275,50 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
     #latest-video, #transcend-video { scroll-margin-top: 96px; }
   </style>
 
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const scrollOffset = 80; // Adjust if your sticky header is taller
+
+    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+    function smoothScroll(targetY, duration = 900) {
+      const startY = window.scrollY;
+      const distance = targetY - startY;
+      let startTime = null;
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeOutCubic(progress);
+
+        window.scrollTo(0, startY + distance * eased);
+
+        if (elapsed < duration) {
+          requestAnimationFrame(step);
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    // Target ONLY anchor links that are internal and have a target
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      const href = link.getAttribute("href");
+      const targetEl = document.querySelector(href);
+
+      if (targetEl) {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - scrollOffset;
+          smoothScroll(targetTop, 1800); // adjust duration here
+        });
+      }
+    });
+  });
+</script>
+
+
+
+
 </BaseLayout>
