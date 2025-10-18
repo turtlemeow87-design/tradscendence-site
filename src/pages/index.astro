@@ -42,29 +42,27 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
 
   <!-- Header block with name, handle, catchphrase, logo placeholder -->
-  <section class="mx-auto max-w-6xl px-4 pt-6 sm:pt-10">
-    <div class="flex items-center justify-between gap-4 sm:gap-6">
-      <div class="min-w-0">
-        <h1 class="font-display text-[9vw] leading-[1.05] sm:text-4xl md:text-5xl opacity-75 bg-gradient-to-r from-black via-black/85 to-transparent rounded-md bg-clip-text text-transparent drop-shadow-[0_0_1px_ivory]">
-          ~<span class="font-extrabold text-[1.05em]">Sound</span> <span class="text-rosewood/70">Beyond</span> Borders~
-        </h1>
+  <!-- Header block with name, handle, catchphrase, logo placeholder -->
+<section class="mx-auto max-w-6xl px-4 pt-6 sm:pt-10">
+  <div class="flex flex-col sm:items-center sm:text-center">
+    <h1 class="font-display text-[9vw] sm:text-5xl md:text-6xl leading-[1.05] opacity-75 bg-gradient-to-r from-black via-black/85 to-transparent rounded-md bg-clip-text text-transparent drop-shadow-[0_0_1px_ivory]">
+      ~<span class="font-extrabold text-[1.05em]">Sound</span> <span class="text-rosewood/70">Beyond</span> Borders~
+    </h1>
 
-        <p class="mt-1 sm:mt-2 text-base sm:text-lg opacity-60 bg-gradient-to-r from-rosewood via-rosewood/10 to-transparent rounded-md max-w-[42ch]">
-          <a
-            href="#transcend-video"
-            class="outline-none no-underline hover:opacity-80 focus:opacity-80"
-            title="Jump to the “Transcend the Traditional” video"
-          >
-            Transcend the traditional.
-          </a>
-        </p>
-      </div>
+    <p class="mt-1 sm:mt-2 text-base sm:text-lg opacity-60 bg-gradient-to-r from-rosewood via-rosewood/10 to-transparent rounded-md max-w-[42ch]">
+      <a
+        href="#transcend-video"
+        class="outline-none no-underline hover:opacity-80 focus:opacity-80"
+        title="Jump to the “Transcend the Traditional” video"
+      >
+        Transcend the traditional.
+      </a>
+    </p>
+  </div>
+</section>
 
-      <div class="logo-fade shrink-0 w-[104px] h-[104px] sm:w-[160px] sm:h-[160px] md:max-w-[200px] aspect-square frame flex items-center justify-center opacity-70">
-        <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover" />
-      </div>
-    </div>
-  </section>
+
+
 
   <Divider />
 
@@ -99,38 +97,62 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
   <Divider />
 
-  <!-- Two-column intro -->
-  <section class="mx-auto max-w-6xl px-4 grid sm:grid-cols-2 gap-6 sm:gap-8 items-start">
+<!-- Two-column intro (text-only version) -->
+<section class="mx-auto max-w-6xl px-4 space-y-6 sm:space-y-8">
+  <!-- Full-width heading ABOVE grid -->
+  <h2 class="font-display text-xl sm:text-2xl">About my approach</h2>
+
+  <!-- Grid with two paragraphs columns -->
+  <div class="grid sm:grid-cols-2 gap-6 sm:gap-8 items-center">
+    <!-- Left Column -->
     <div class="space-y-4">
-      <h2 class="font-display text-xl sm:text-2xl">About my approach</h2>
       <p>
-        Every instrument has an origin story.  Sometimes these stories are pretty well-documented, and other times we are left to fill in the blanks for ourselves.  In fact, academic studies such as organology exist for that purpose.  The same is true for the sound that comes out of those instruments.  Ethnomusicology exists for that purpose.  And as beautiful as it is to be able to discover and study all of the ways in which a particular sound, or musical framework (theory) relate to their culture or country of origin: what is equally as beautiful, to me, is to be able to take a particular sound, and explore how it can relate to anybody from any culture. 
+        Every instrument has an origin story. Sometimes these stories are pretty well-documented, and other times we are left to fill in the blanks for ourselves. In fact, academic studies such as organology exist for that purpose. The same is true for the sound that comes out of those instruments. Ethnomusicology exists for that purpose. And as beautiful as it is to be able to discover and study all of the ways in which a particular sound, or musical framework (theory) relate to their culture or country of origin: what is equally as beautiful, to me, is to be able to take a particular sound, and explore how it can relate to anybody from any culture.
       </p>
-      <p class="opacity-90">Music is important for different people at different times in different ways.  I'm available for intimate events: private weddings, other ceremonies, small gatherings, and yes, even funerals.~</p>
-      <p>I am based in Richmond, VA (US).</p>
-      <p class="opacity-90">Working on a song/album and you want something different that isn't digital?  I also take studio musician inquiries!</p>
-      <p class="opacity-90"><b>*All sound teasers and photos on this website are of my own making on my own instruments!!  No special effects.*</b></p>
-
-      <div class="flex flex-wrap gap-3 pt-1">
-        <a href="/instruments" class="group gothic-link mr-0 font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
-          <span>Explore the instruments</span>
-          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
-        </a>
-        <a href="/about" class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
-          <span>More about me and my approach</span>
-          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
-        </a>
-        <a href="#latest-video" class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory] scroll-smooth">
-          <span>See my latest YouTube video!</span>
-          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">↓</span>
-        </a>
-      </div>
     </div>
 
-    <div class="rounded-2xl overflow-hidden frame">
-      <img src="/media/intro-placeholder.jpg" alt="Performance" class="w-full h-[280px] sm:h-[320px] object-cover" />
+    <!-- Right Column -->
+    <div class="space-y-4">
+      <p>
+        Music is important for different people at different times in different ways. I'm available for intimate events: <b>proposals, private weddings, other ceremonies, small gatherings, and yes, even funerals.</b>~
+      </p>
+      <p>I am based in <i>Richmond, VA</i> (US), but willing to travel if travel expenses are covered.</p>
+      <p>
+        Working on a song/album and you want something different that isn't digital? I also take studio musician inquiries!
+      </p>
     </div>
-  </section>
+  </div>
+
+  <!-- Full width bottom row -->
+<div class="space-y-4 pt-1">
+  <p class="opacity-90 font-semibold text-[0.92rem]">
+    *All sound teasers and photos on this website are of my own making on my own instruments!! No special effects.*
+  </p>
+
+  <!-- Vertical list of links -->
+  <div class="flex flex-col gap-2">
+    <a href="/instruments" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
+      <span class="inline-flex items-center gap-1">
+        Explore the instruments
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+      </span>
+    </a>
+
+    <a href="/about" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
+      <span class="inline-flex items-center gap-1">
+        More about me and my approach
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+      </span>
+    </a>
+
+    <a href="#latest-video" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
+      <span class="inline-flex items-center gap-1">
+        See my latest YouTube video!
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">↓</span>
+      </span>
+    </a>
+  </div>
+</div>
 
   <Divider />
 

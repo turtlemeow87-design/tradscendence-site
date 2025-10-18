@@ -5,38 +5,47 @@ const links = [
   { href: '/contact', label: 'Contact / Booking' },
   { href: '/instruments', label: 'My Instruments' },
   { href: '/memories', label: 'Memories' },
-  // Future (hidden in header, present in footer):
   { href: '/blog', label: 'Blog', future: true },
   { href: '/calendar', label: 'Calendar', future: true },
   { href: '/store', label: 'Store', future: true },
 ];
 ---
+
 <header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70 border-b border-black/40">
   <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip">
-    <div class="flex items-center justify-between py-3 min-w-0">
-      <!-- Left: brand + handle -->
-      <div class="flex flex-col leading-tight">
-        <a href="/" class="hover:underline decoration-rosewood">
-          <span class="font-display bg-gradient-to-r from-rosewood via-rosewood/50 to-transparent text-2xl tracking-wide">
-            HunterEastlandMusiq
-          </span>
-        </a>
-        <a href="/#footer" class="text-sm opacity-80 hover:underline decoration-rosewood">
+    <div class="flex justify-between min-w-0 py-3 sm:py-4">
+      <!-- Logo and handle stacked -->
+      <div class="flex flex-col items-end gap-1">
+        <a href="/" class="block h-[88px] sm:h-[96px] relative group">
+  <div class="absolute inset-0 rounded-[22%] blur-md bg-gradient-to-r from-charcoal via-transparent to-charcoal opacity-30 group-hover:opacity-40 transition-opacity duration-300 pointer-events-none"></div>
+  <img 
+    src="/media/logo2.png" 
+    alt="HE MUSIQ – HunterEastlandMusiq logo" 
+    class="relative h-full w-auto object-contain rounded-[22%] shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
+    loading="eager"
+  />
+</a>
+
+        <a
+          href="/#footer"
+          class="text-[0.83rem] sm:text-sm text-rosewood hover:text-gold font-medium italic tracking-wide pl-[2px]"
+
+        >
           @Tradscendence
         </a>
       </div>
 
       <!-- Desktop nav -->
-      <nav class="p-[6px] hidden md:flex gap-6 border bg-gradient-to-r from-rosewood via-gold/50 to-cedar border-ivory/50 rounded-md">
+      <nav class="self-start mt-[2px] p-[6px] hidden md:flex gap-6 border bg-gradient-to-r from-rosewood via-gold/50 to-cedar border-ivory/50 rounded-md">
         {links.filter(l => !l.future).map(l => (
           <a class="gothic-link text-ivory hover:text-rosewood" href={l.href}>{l.label}</a>
         ))}
       </nav>
 
-      <!-- Mobile menu button (embossed + three-side border) -->
+      <!-- Mobile menu button -->
       <button
         id="menuBtn"
-        class="md:hidden relative shrink-0 mr-4 size-12 grid place-items-center rounded-tr-2xl rounded-br-2xl rounded-tl-2xl 
+        class="md:hidden relative shrink-0 ml-2 mr-1 size-12 grid place-items-center rounded-tr-2xl rounded-br-2xl rounded-tl-2xl 
                border-t border-r border-b border-gold/60 
                bg-[linear-gradient(to_bottom,_rgba(255,255,255,.06),_rgba(0,0,0,.35))] 
                backdrop-blur-sm 
@@ -50,17 +59,12 @@ const links = [
         aria-controls="mobileMenu"
         title="Menu"
       >
-        <!-- subtle left-edge accent to hint the control without a full border-left -->
         <span class="pointer-events-none absolute left-0 top-1 bottom-1 w-px bg-gradient-to-b from-transparent via-gold/40 to-transparent"></span>
-
-        <!-- Icon: SVG with slight depth and glow when open -->
         <svg class="h-6 w-6 drop-shadow-sm transition-transform duration-200 ease-out data-[open=true]:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <path d="M4 7h16" class="opacity-95"/>
           <path d="M4 12h16" class="opacity-95"/>
           <path d="M8 17h12" class="opacity-95"/>
         </svg>
-
-        <!-- glow ring when open -->
         <span class="pointer-events-none absolute inset-0 rounded-tr-2xl rounded-br-2xl rounded-tl-2xl ring-2 ring-transparent data-[open=true]:ring-gold/40"></span>
       </button>
     </div>
@@ -82,7 +86,7 @@ const links = [
 
   btn?.addEventListener('click', (e) => {
     e.stopPropagation();
-    const open = menu?.classList.toggle('hidden') === false; // true if now visible
+    const open = menu?.classList.toggle('hidden') === false;
     if (btn) {
       btn.dataset.open = String(open);
       btn.setAttribute('aria-expanded', String(open));
@@ -90,7 +94,6 @@ const links = [
     }
   });
 
-  // Close menu if clicking outside
   document.addEventListener('click', (e) => {
     if (menu && !menu.classList.contains('hidden')) {
       const target = e.target;
@@ -105,7 +108,6 @@ const links = [
     }
   });
 
-  // Close on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) {
       menu.classList.add('hidden');
