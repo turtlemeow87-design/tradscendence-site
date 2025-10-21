@@ -1,6 +1,7 @@
 ---
 // src/pages/instruments/ArabicOud.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Divider from "../../components/Divider.astro";
 
 // ✅ SEO
 const title = "Arabic Oud — Tradscendence | Sound Beyond Borders";
@@ -105,8 +106,66 @@ const videos = [
     <section class="prose-block">
       <h2 class="font-display text-2xl md:text-3xl">About this instrument</h2>
       <p class="opacity-80">
-        The Arabic Oud is one of those instruments that immediately commands respect. It's rich, deep, and expressive—an ancestor to so many stringed instruments we know today. When I first began exploring it, I was captivated by how easily it could move between joy and sorrow within a single phrase. Although I was personally first introduced to the <a href="/instruments/TOud">Turkish</a> version.  Its fretless neck allows for those subtle slides and emotional inflections that make Middle Eastern music so moving and somehow familiar.  The versatility of this one can't be denied its place in any sort of event or ceremony. <p>In the first video I demonstrate a bit of its more contemplative side.  In the second video, more rhythmic and majestic. </p>
+        The Arabic Oud is one of those instruments that immediately commands respect. It's rich, deep, and expressive—an ancestor to so many stringed instruments we know today. When I first began exploring it, I was captivated by how easily it could move between joy and sorrow within a single phrase. Although I was personally first introduced to the <a href="/instruments/TOud">Turkish</a> version.  Its fretless neck allows for those subtle slides and emotional inflections that make Middle Eastern music so moving and somehow familiar.  The versatility of this one can't be denied its place in any sort of event or ceremony.
+        <p>In the first video I demonstrate a bit of its more contemplative side.  In the second video, more rhythmic and majestic.</p>
       </p>
+
+      <!-- Transition Divider -->
+      <Divider />
+
+      <!-- Recommended moods / genres -->
+      <section class="recommended-moods grid md:grid-cols-2 gap-6 items-center py-10">
+        <!-- Audio mood list -->
+        <div class="space-y-5 order-1 md:order-2">
+          <h2 class="font-display text-2xl md:text-3xl mb-2">
+            Recommended
+            <span class="moods-title">
+              <span class="m1">M</span>
+              <span class="m2">o</span>
+              <span class="m3">o</span>
+              <span class="m4">d</span>
+              <span class="m5">s</span>
+            </span>
+            for this instrument
+          </h2>
+
+          <p class="opacity-80 text-base mb-4">
+            The Arabic Oud’s voice moves fluidly between melancholy and grandeur. Try exploring these moods below:
+          </p>
+
+          <ul class="space-y-3">
+            {[
+              { label: "Coming Soon!", file: "/media/oud-mood1.m4a" },
+              { label: "Coming Soon!", file: "/media/oud-mood2.m4a" },
+              { label: "Coming Soon!", file: "/media/oud-mood3.m4a" },
+              { label: "Coming Soon!", file: "/media/oud-mood4.m4a" },
+              { label: "Coming Soon!", file: "/media/oud-mood5.m4a" },
+            ].map(({ label, file }) => (
+              <li class="flex items-center justify-between rounded-xl px-3 py-2 frame">
+                <span class="font-medium">{label}</span>
+                <button
+                  type="button"
+                  class="opacity-70 hover:opacity-100 transition"
+                  data-audio={file}
+                  aria-label={`Play ${label}`}
+                >
+                  ▶︎
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Image -->
+        <figure class="rounded-xl overflow-hidden frame border border-black/40 shadow-soft order-2 md:order-1">
+          <img
+            src="/media/inst-arabicoud.jpg"
+            alt="Close-up of Arabic Oud"
+            class="object-cover w-full h-full aspect-[4/3]"
+            loading="lazy"
+          />
+        </figure>
+      </section>
     </section>
 
     <!-- Keep Exploring link -->
@@ -115,7 +174,7 @@ const videos = [
         href="/instruments"
         class="inline-flex items-center gap-2 font-display text-lg text-[var(--accent-gold)] hover:text-[var(--accent-rosewood)] transition-colors duration-200 group"
       >
-        <span>Keep Exploring</span>
+        <span>Explore More Instruments</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -137,21 +196,21 @@ const videos = [
   /* ===== Tab strip: always single row; mobile scroll instead of wrapping ===== */
   .tab-strip {
     display: flex;
-    flex-wrap: nowrap;           /* do not stack vertically */
+    flex-wrap: nowrap;
     gap: 0.375rem;
-    overflow-x: auto;            /* horizontal scroll on small screens */
+    overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
-    scrollbar-width: none;       /* Firefox hide scrollbar */
+    scrollbar-width: none;
     mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
   }
-  .tab-strip::-webkit-scrollbar { display: none; } /* WebKit hide scrollbar */
+  .tab-strip::-webkit-scrollbar { display: none; }
 
-  /* ===== Tabs styling (restores the “gold underline” look) ===== */
+  /* ===== Tabs styling ===== */
   .tab-button {
     position: relative;
-    flex: 0 0 auto;              /* do not stretch */
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -161,8 +220,8 @@ const videos = [
     border-radius: 0.75rem;
     font-weight: 600;
     line-height: 1;
-    white-space: nowrap;         /* keep labels on one line */
-    min-width: max-content;      /* prevent squish */
+    white-space: nowrap;
+    min-width: max-content;
     background: transparent;
     color: var(--ivory);
     border: 1px solid transparent;
@@ -248,6 +307,80 @@ const videos = [
     color: var(--accent-gold);
     text-decoration: none;
     transition: color 0.25s ease;
+  }
+
+  /* ===== Recommended moods ===== */
+  .recommended-moods img {
+    object-position: center;
+    filter: brightness(0.95) contrast(1.05);
+  }
+  .recommended-moods li.frame {
+    background: linear-gradient(to right, rgba(205,127,50,0.15), transparent);
+    border-radius: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .recommended-moods li.frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(to right, rgba(205,127,50,0.8), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+  .recommended-moods button[data-audio] {
+    font-size: 1.5rem;
+    color: var(--accent-gold, #C2A45F);
+    text-shadow:
+      2px 0 var(--bronze, #CD7F32),
+     -2px 0 var(--bronze, #CD7F32),
+      0 2px var(--bronze, #CD7F32),
+      0 -2px var(--bronze, #CD7F32);
+  }
+  @media (max-width: 768px) {
+    .recommended-moods { text-align: center; }
+    .recommended-moods ul { max-width: 24rem; margin-inline: auto; }
+  }
+
+  /* ===== “Moods” stylization ===== */
+  .moods-title {
+    display: inline-flex;
+    gap: 0.05ch;
+    margin: 0 0.25ch;
+    letter-spacing: 0.015em;
+    line-height: 1;
+    font-family: var(--font-display, "Cinzel"), serif;
+    font-weight: 600;
+  }
+  .moods-title span {
+    text-shadow: 0 0 6px rgba(0,0,0,0.25);
+    mix-blend-mode: soft-light;
+    transition: transform 220ms ease, filter 220ms ease, text-shadow 220ms ease;
+    animation: shimmer 8s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 1s);
+  }
+  .moods-title span:hover {
+    transform: scale(1.07);
+    filter: brightness(1.1);
+    text-shadow: 0 0 10px rgba(255,255,255,0.25);
+  }
+
+  /* Rebalanced “Moods” palette — blue ➜ plum ➜ rosewood */
+  .m1 { color: #2C4C76; --i: 0; }  /* deep slate blue */
+  .m2 { color: #4F6C89; --i: 1; }  /* steel blue */
+  .m3 { color: #6B5A7A; --i: 2; }  /* muted purple / dusk violet */
+  .m4 { color: #7A4F4B; --i: 3; }  /* warm plum-brown */
+  .m5 { color: #6E2A2A; --i: 4; }  /* rosewood red */
+  .m3, .m4 { filter: saturate(0.85); }
+
+  @keyframes shimmer {
+    0%   { filter: brightness(1); }
+    50%  { filter: brightness(1.1) saturate(1.1); }
+    100% { filter: brightness(1); }
   }
 
   /* Optional: slightly tighter gold underline on very narrow phones */

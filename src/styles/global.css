@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -90,3 +91,33 @@ ul li.frame {
 @media (hover: none) { a:visited.gothic-link { color: var(--rosewood); } }
 .page-enter { @apply animate-fadeslide; }
 .frame { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.6); }
+
+/* ===== Graceful cursive "Moods" word ===== */
+.moods-title {
+  display: inline-flex;
+  gap: 0.05ch;
+  margin: 0 0.25ch;
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-size: 1.1em;
+  letter-spacing: 0.015em;
+  text-transform: none;
+  line-height: 1;
+}
+
+.moods-title span {
+  text-shadow: 0 0 4px rgba(0,0,0,0.25);
+  transition: transform 180ms ease, filter 200ms ease;
+}
+
+.moods-title span:hover {
+  transform: translateY(-1.5px);
+  filter: brightness(1.12);
+}
+
+/* Reversed earthy palette */
+.m1 { color: #6E2A2A; }  /* rosewood */
+.m2 { color: #4F6C89; }  /* slate blue */
+.m3 { color: #6B8E6F; }  /* sage green */
+.m4 { color: #C2A45F; }  /* gold */
+.m5 { color: #A86B39; }  /* bronze */
