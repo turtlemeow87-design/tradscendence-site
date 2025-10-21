@@ -1,28 +1,16 @@
 ---
 // src/pages/instruments/AzeriTar.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Divider from "../../components/Divider.astro";
 
 // ✅ SEO
 const title = "Azeri Tar — Tradscendence | Sound Beyond Borders";
 const description =
   "Two contrasting performances on Azeri Tar — melodic and rhythmic. Hear Hunter Eastland explore this rare, genre-bending instrument from Azerbaijan.";
 
-// Tip: for iframes, add `ratio: "16 / 9"` (or "4 / 3", etc.)
 const videos = [
-  {
-    id: "v1",
-    label: "Melodic",
-    type: "video",
-    src: "/media/Tar1.mp4",
-    poster: "",
-  },
-  {
-    id: "v2",
-    label: "Western-like/Rhythmic",
-    type: "video",
-    src: "/media/Tar2.mp4",
-    poster: "",
-  },
+  { id: "v1", label: "Melodic", type: "video", src: "/media/Tar1.mp4", poster: "" },
+  { id: "v2", label: "Western-like/Rhythmic", type: "video", src: "/media/Tar2.mp4", poster: "" },
 ];
 ---
 
@@ -38,12 +26,7 @@ const videos = [
 
     <!-- Tabbed Hero Video -->
     <section class="rounded-2xl overflow-hidden frame border border-black/40 bg-black/20">
-      <!-- Tabs -->
-      <div
-        class="tab-strip px-3 pt-3 sm:px-4 sm:pt-4"
-        role="tablist"
-        aria-label="Choose performance"
-      >
+      <div class="tab-strip px-3 pt-3 sm:px-4 sm:pt-4" role="tablist" aria-label="Choose performance">
         {videos.map((v, i) => (
           <button
             class="tab-button"
@@ -58,8 +41,7 @@ const videos = [
         ))}
       </div>
 
-      <!-- Adaptive ratio shell (aspect-ratio driven by --ar) -->
-      <div id="video-shell" class="relative w-full bg-black" style="aspect-ratio: var(--ar, 16 / 9);">
+      <div id="video-shell" class="relative w-full bg-black" style="aspect-ratio: var(--ar,16/9);">
         {videos.map((v, i) => (
           <div
             id={`pane-${v.id}`}
@@ -67,28 +49,11 @@ const videos = [
             role="tabpanel"
             aria-labelledby={`tab-${v.id}`}
             class={`video-pane ${i === 0 ? "is-active" : ""}`}
-            data-ratio={v.ratio || ""}
           >
-            {v.type === "video" && v.src ? (
-              <video
-                class="h-full w-full object-contain"
-                controls
-                playsinline
-                preload="metadata"
-                poster={v.poster || undefined}
-              >
+            {v.type === "video" ? (
+              <video class="h-full w-full object-contain" controls playsinline preload="metadata">
                 <source src={v.src} />
               </video>
-            ) : v.type === "iframe" && v.src ? (
-              <iframe
-                class="h-full w-full"
-                src={v.src}
-                title={v.label}
-                loading="lazy"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
-              ></iframe>
             ) : (
               <div class="placeholder">
                 <div class="placeholder-inner">
@@ -102,274 +67,94 @@ const videos = [
       </div>
     </section>
 
-    <!-- Story / description block -->
+    <!-- Story / description -->
     <section class="prose-block">
       <h2 class="font-display text-2xl md:text-3xl">About this instrument</h2>
       <p class="opacity-80">
-       The Azeri Tar immediately struck me with its intensity. It’s sharp, resonant, and deeply expressive—an instrument that demands both precision and emotion. When I first began playing it, I was amazed by how alive it felt under my fingers; each pluck seemed to speak its own language. The Tar’s bright, percussive attack and intricate ornamentation give it a dramatic voice, yet there’s a warmth beneath that brilliance that reveals itself the more you listen. It feels both ancient and electrifyingly present, like the echo of history still vibrating in real time.  This one, the Azeri version is very hard to obtain due to export limitations from Azerbaijan.  Although, ironically, this is also one of the couple of instruments that I don't play in the traditional manner.  I hold and play it more like its Persian cousin (Persian Tar), as it is more comfortable for me this way.  Aside from that, I will note that this is an oddly versatile instrument, in a way that you wouldn't expect. Very genre-bending. <p> In the first video, I demonstrate a more tradional-like melody with more tremolo and microtonal expression.  In the second video, I reveal a glimpse of its genre-bending versatility.</p>
+        The Azeri Tar immediately struck me with its intensity. It’s sharp, resonant, and deeply expressive—an instrument that demands both precision and emotion. When I first began playing it, I was amazed by how alive it felt under my fingers; each pluck seemed to speak its own language. The Tar’s bright, percussive attack and intricate ornamentation give it a dramatic voice, yet there’s a warmth beneath that brilliance that reveals itself the more you listen. It feels both ancient and electrifyingly present, like the echo of history still vibrating in real time. This one, the Azeri version, is very hard to obtain due to export limitations from Azerbaijan. Although, ironically, this is also one of the couple of instruments that I don't play in the traditional manner—I hold and play it more like its Persian cousin, as it’s more comfortable for me this way. Aside from that, I will note that this is an oddly versatile instrument in a way you wouldn’t expect—very genre-bending.
       </p>
+      <p>In the first video, I demonstrate a more traditional-like melody with tremolo and microtonal expression. In the second, I reveal a glimpse of its genre-bending versatility.</p>
+
+      <Divider />
+
+      <!-- Recommended moods -->
+      <section class="recommended-moods grid md:grid-cols-2 gap-6 items-center py-10">
+        <div class="space-y-5 order-1 md:order-2">
+          <h2 class="font-display text-2xl md:text-3xl mb-2">
+            Recommended
+            <span class="moods-title">
+              <span class="m1">M</span>
+              <span class="m2">o</span>
+              <span class="m3">o</span>
+              <span class="m4">d</span>
+              <span class="m5">s</span>
+            </span>
+            for this instrument
+          </h2>
+
+          <p class="opacity-80 text-base mb-4">
+            The Tar’s brightness can evoke everything from tension to trance—perfect for exploring unusual tonal moods.
+          </p>
+
+          <ul class="space-y-3">
+            {Array(5).fill(0).map((_, i) => (
+              <li class="flex items-center justify-between rounded-xl px-3 py-2 frame">
+                <span class="font-medium">Coming Soon!</span>
+                <button type="button" class="opacity-70 hover:opacity-100 transition" data-audio={`/media/tar-mood${i+1}.m4a`}>
+                  ▶︎
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <figure class="rounded-xl overflow-hidden frame border border-black/40 shadow-soft order-2 md:order-1">
+          <img
+            src="/media/inst-tar.jpg"
+            alt="Close-up of Azeri Tar"
+            class="object-cover w-full h-full aspect-[4/3]"
+            loading="lazy"
+          />
+        </figure>
+      </section>
     </section>
 
-    <!-- Keep Exploring link -->
+    <!-- Keep Exploring -->
     <div class="pt-8">
-      <a
-        href="/instruments"
-        class="inline-flex items-center gap-2 font-display text-lg text-[var(--accent-gold)] hover:text-[var(--accent-rosewood)] transition-colors duration-200 group"
-      >
+      <a href="/instruments" class="inline-flex items-center gap-2 font-display text-lg text-[var(--accent-gold)] hover:text-[var(--accent-rosewood)] transition-colors duration-200 group">
         <span>Keep Exploring</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1"
-        >
-          <path d="M5 12h14"></path>
-          <path d="M13 5l7 7-7 7"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1">
+          <path d="M5 12h14" /><path d="M13 5l7 7-7 7" />
         </svg>
       </a>
     </div>
   </section>
 
   <style lang="css">
-  /* ===== Tab strip: always single row; mobile scroll instead of wrapping ===== */
-  .tab-strip {
-    display: flex;
-    flex-wrap: nowrap;           /* do not stack vertically */
-    gap: 0.375rem;
-    overflow-x: auto;            /* horizontal scroll on small screens */
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;       /* Firefox hide scrollbar */
-    mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
-  }
-  .tab-strip::-webkit-scrollbar { display: none; } /* WebKit hide scrollbar */
+  /* Reuses Arabic Oud styling for tabs, shimmer, etc. */
 
-  /* ===== Tabs styling (restores the “gold underline” look) ===== */
-  .tab-button {
-    position: relative;
-    flex: 0 0 auto;              /* do not stretch */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4ch;
-    min-height: 2.2rem;
-    padding: 0.55rem 0.9rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    line-height: 1;
-    white-space: nowrap;         /* keep labels on one line */
-    min-width: max-content;      /* prevent squish */
-    background: transparent;
-    color: var(--ivory);
-    border: 1px solid transparent;
-    transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
-    outline: none;
-    scroll-snap-align: start;
-  }
-  .tab-button::after {
-    content: "";
-    position: absolute;
-    left: 0.9rem;
-    right: 0.9rem;
-    bottom: -2px;
-    height: 2px;
-    background: var(--accent-gold);
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 220ms ease;
-    opacity: 0.9;
-    filter: drop-shadow(0 0 6px rgba(194,164,95,0.65));
-  }
-  .tab-button:hover { transform: translateY(-1px); }
-  .tab-button:hover::after { transform: scaleX(1); }
-  .tab-button[aria-selected="true"] {
-    border-color: rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04);
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
-  }
-  .tab-button[aria-selected="true"]::after { transform: scaleX(1); }
-
-  /* ===== Crossfade panes ===== */
-  #video-shell { position: relative; }
-  .video-pane {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 320ms ease;
-    background: #000;
-    display: flex;
-  }
-  .video-pane.is-active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* ===== Placeholder ===== */
-  .placeholder {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background:
-      radial-gradient(1200px 500px at 10% 10%, rgba(194,164,95,0.08), transparent 60%),
-      radial-gradient(1000px 500px at 90% 30%, rgba(110,42,42,0.12), transparent 60%),
-      rgba(0,0,0,0.5);
-    display: grid;
-    place-items: center;
-  }
-  .placeholder-inner {
-    text-align: center;
-    padding: 1rem 1.25rem;
-    border-radius: 0.75rem;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
-  }
-  .placeholder-title {
-    display: block;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: var(--ivory);
-  }
-  .placeholder-sub {
-    display: block;
-    margin-top: 0.25rem;
-    opacity: 0.7;
-  }
-
-  /* ===== Prose block ===== */
-  .prose-block { display: grid; gap: 0.75rem; }
-
-  /* Optional: slightly tighter gold underline on very narrow phones */
-  @media (max-width: 360px) {
-    .tab-button { padding-inline: 0.7rem; }
-    .tab-button::after { left: 0.7rem; right: 0.7rem; }
-  }
+  .tab-strip{display:flex;flex-wrap:nowrap;gap:.375rem;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;mask-image:linear-gradient(to right,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%)}.tab-strip::-webkit-scrollbar{display:none}
+  .tab-button{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:.4ch;min-height:2.2rem;padding:.55rem .9rem;border-radius:.75rem;font-weight:600;line-height:1;white-space:nowrap;min-width:max-content;background:transparent;color:var(--ivory);border:1px solid transparent;transition:transform 160ms ease,background 160ms ease,border-color 160ms ease;outline:none;scroll-snap-align:start}
+  .tab-button::after{content:"";position:absolute;left:.9rem;right:.9rem;bottom:-2px;height:2px;background:var(--accent-gold);transform:scaleX(0);transform-origin:left center;transition:transform 220ms ease;opacity:.9;filter:drop-shadow(0 0 6px rgba(194,164,95,.65))}
+  .tab-button:hover{transform:translateY(-1px)}.tab-button:hover::after{transform:scaleX(1)}.tab-button[aria-selected="true"]{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}.tab-button[aria-selected="true"]::after{transform:scaleX(1)}
+  #video-shell{position:relative}.video-pane{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity 320ms ease;background:#000;display:flex}.video-pane.is-active{opacity:1;pointer-events:auto}
+  .prose-block{display:grid;gap:.75rem}.recommended-moods img{object-position:center;filter:brightness(.95) contrast(1.05)}
+  .recommended-moods li.frame{background:linear-gradient(to right,rgba(205,127,50,.15),transparent);border-radius:.75rem;position:relative;overflow:hidden}
+  .recommended-moods li.frame::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(to right,rgba(205,127,50,.8),transparent);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .recommended-moods button[data-audio]{font-size:1.5rem;color:var(--accent-gold,#C2A45F);text-shadow:2px 0 var(--bronze,#CD7F32),-2px 0 var(--bronze,#CD7F32),0 2px var(--bronze,#CD7F32),0 -2px var(--bronze,#CD7F32)}
+  @media(max-width:768px){.recommended-moods{text-align:center}.recommended-moods ul{max-width:24rem;margin-inline:auto}}
+  .moods-title{display:inline-flex;gap:.05ch;margin:0 .25ch;letter-spacing:.015em;line-height:1;font-family:var(--font-display,"Cinzel"),serif;font-weight:600}
+  .moods-title span{text-shadow:0 0 6px rgba(0,0,0,.25);mix-blend-mode:soft-light;transition:transform 220ms ease,filter 220ms ease,text-shadow 220ms ease;animation:shimmer 8s ease-in-out infinite}
+  .moods-title span:hover{transform:scale(1.07);filter:brightness(1.1);text-shadow:0 0 10px rgba(255,255,255,.25)}
+  .m1{color:#2C4C76;animation-delay:0s}.m2{color:#4F6C89;animation-delay:1s}.m3{color:#6B5A7A;animation-delay:2s}.m4{color:#7A4F4B;animation-delay:3s}.m5{color:#6E2A2A;animation-delay:4s}.m3,.m4{filter:saturate(.85)}
+  @keyframes shimmer{0%{filter:brightness(1)}50%{filter:brightness(1.1) saturate(1.1)}100%{filter:brightness(1)}}
   </style>
 
   <script type="module">
-  // Tab behavior + adaptive aspect ratio
-  const tablist = document.querySelector('[role="tablist"]');
-  const shell = document.getElementById('video-shell');
-  const buttons = tablist ? Array.from(tablist.querySelectorAll('.tab-button')) : [];
-  const panes = Array.from(document.querySelectorAll('.video-pane'));
-
-  // Cache of pane.id -> "w / h" string
-  const ratioMap = new Map();
-
-  // Helper: set shell aspect ratio
-  const setShellRatio = (ratioString) => {
-    if (!shell) return;
-    shell.style.setProperty('--ar', ratioString || '16 / 9');
-  };
-
-  // Measure videos once metadata is available
-  const measurePane = (pane) => {
-    // If author provided a ratio on the pane (or in data), prefer it
-    const manual = pane.getAttribute('data-ratio');
-    if (manual && manual.includes('/')) {
-      ratioMap.set(pane.id, manual);
-      return;
-    }
-
-    const vid = pane.querySelector('video');
-    if (vid) {
-      const apply = () => {
-        const w = vid.videoWidth, h = vid.videoHeight;
-        if (w && h) ratioMap.set(pane.id, `${w} / ${h}`);
-      };
-      if (vid.readyState >= 1) {
-        apply();
-      } else {
-        vid.addEventListener('loadedmetadata', apply, { once: true });
-      }
-      return;
-    }
-
-    // iframe fallback: if no manual ratio, assume 16/9
-    const ifr = pane.querySelector('iframe');
-    if (ifr) {
-      ratioMap.set(pane.id, manual || '16 / 9');
-    }
-  };
-
-  // Initialize measurements
-  panes.forEach(measurePane);
-
-  const activate = (id) => {
-    // Update buttons
-    for (const btn of buttons) {
-      const isSelected = btn.dataset.tab === id;
-      btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-      btn.tabIndex = isSelected ? 0 : -1;
-    }
-    // Update panes, pause hidden media
-    for (const pane of panes) {
-      const isActive = pane.dataset.pane === id;
-      pane.classList.toggle('is-active', isActive);
-
-      if (!isActive) {
-        const vid = pane.querySelector('video');
-        if (vid) vid.pause();
-        const ifr = pane.querySelector('iframe');
-        if (ifr) { const src = ifr.src; ifr.src = src; }
-      } else {
-        // Apply the measured ratio (or default)
-        const r = ratioMap.get(pane.id) || pane.getAttribute('data-ratio') || '16 / 9';
-        setShellRatio(r);
-      }
-    }
-  };
-
-  // Click handling
-  if (tablist) {
-    tablist.addEventListener('click', (e) => {
-      const btn = e.target.closest('.tab-button');
-      if (!btn) return;
-      activate(btn.dataset.tab);
-    });
-
-    // Keyboard support
-    tablist.addEventListener('keydown', (e) => {
-      const currentIndex = buttons.findIndex(b => b.getAttribute('aria-selected') === 'true');
-      if (e.key === 'ArrowRight' || e.key === 'Right') {
-        const next = buttons[(currentIndex + 1) % buttons.length];
-        next.focus(); activate(next.dataset.tab); e.preventDefault();
-      } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
-        const prev = buttons[(currentIndex - 1 + buttons.length) % buttons.length];
-        prev.focus(); activate(prev.dataset.tab); e.preventDefault();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        const btn = document.activeElement;
-        if (btn && btn.classList.contains('tab-button')) {
-          activate(btn.dataset.tab); e.preventDefault();
-        }
-      }
-    });
-  }
-
-  // On first paint: ensure initial ratio matches the initially active pane
-  const initiallyActive = panes.find(p => p.classList.contains('is-active')) || panes[0];
-  if (initiallyActive) {
-    const applyInitial = () => {
-      const r = ratioMap.get(initiallyActive.id) || initiallyActive.getAttribute('data-ratio') || '16 / 9';
-      setShellRatio(r);
-    };
-
-    const vid = initiallyActive.querySelector('video');
-    if (vid && !(vid.readyState >= 1)) {
-      vid.addEventListener('loadedmetadata', applyInitial, { once: true });
-    } else {
-      applyInitial();
-    }
-  }
-
-  // Make only the initially selected button focusable
-  const initiallySelected = buttons.find(b => b.getAttribute('aria-selected') === 'true') || buttons[0];
-  buttons.forEach(b => (b.tabIndex = b === initiallySelected ? 0 : -1));
+  // same working tab logic as Arabic Oud
+  const tablist=document.querySelector('[role="tablist"]');const shell=document.getElementById('video-shell');const buttons=tablist?Array.from(tablist.querySelectorAll('.tab-button')):[];const panes=Array.from(document.querySelectorAll('.video-pane'));const ratioMap=new Map();const setShellRatio=r=>{if(shell)shell.style.setProperty('--ar',r||'16 / 9')};const measurePane=p=>{const m=p.getAttribute('data-ratio');if(m&&m.includes('/')){ratioMap.set(p.id,m);return}const v=p.querySelector('video');if(v){const a=()=>{const w=v.videoWidth,h=v.videoHeight;if(w&&h)ratioMap.set(p.id,`${w} / ${h}`)};v.readyState>=1?a():v.addEventListener('loadedmetadata',a,{once:!0});return}const i=p.querySelector('iframe');if(i)ratioMap.set(p.id,m||'16 / 9')};panes.forEach(measurePane);
+  const activate=id=>{for(const b of buttons){const s=b.dataset.tab===id;b.setAttribute('aria-selected',s?'true':'false');b.tabIndex=s?0:-1}for(const p of panes){const a=p.dataset.pane===id;p.classList.toggle('is-active',a);if(!a){const v=p.querySelector('video');if(v)v.pause();const i=p.querySelector('iframe');if(i){const s=i.src;i.src=s}}else{const r=ratioMap.get(p.id)||p.getAttribute('data-ratio')||'16 / 9';setShellRatio(r)}}};
+  if(tablist){tablist.addEventListener('click',e=>{const b=e.target.closest('.tab-button');if(!b)return;activate(b.dataset.tab)});tablist.addEventListener('keydown',e=>{const i=buttons.findIndex(b=>b.getAttribute('aria-selected')==='true');if(e.key==='ArrowRight'){const n=buttons[(i+1)%buttons.length];n.focus();activate(n.dataset.tab);e.preventDefault()}else if(e.key==='ArrowLeft'){const p=buttons[(i-1+buttons.length)%buttons.length];p.focus();activate(p.dataset.tab);e.preventDefault()}else if(e.key==='Enter'||e.key===' '){const b=document.activeElement;if(b&&b.classList.contains('tab-button')){activate(b.dataset.tab);e.preventDefault()}}})}
+  const init=panes.find(p=>p.classList.contains('is-active'))||panes[0];if(init){const a=()=>{const r=ratioMap.get(init.id)||init.getAttribute('data-ratio')||'16 / 9';setShellRatio(r)};const v=init.querySelector('video');v&&!(v.readyState>=1)?v.addEventListener('loadedmetadata',a,{once:!0}):a()}const first=buttons.find(b=>b.getAttribute('aria-selected')==='true')||buttons[0];buttons.forEach(b=>b.tabIndex=b===first?0:-1);
   </script>
 </BaseLayout>

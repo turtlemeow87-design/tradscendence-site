@@ -1,6 +1,7 @@
 ---
 // src/pages/instruments/Surbahar.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Divider from "../../components/Divider.astro";
 
 // ✅ SEO
 const title = "Surbahar — Tradscendence | Sound Beyond Borders";
@@ -106,9 +107,67 @@ const videos = [
     <section class="prose-block">
       <h2 class="font-display text-2xl md:text-3xl">About this instrument</h2>
       <p class="opacity-80">
-Many people mistake it for a sitar, but the Surbahar stands apart — larger in size, deeper in tone, and resonating with a rich, bass-like depth. I fell in love with its sustain and expressive range; it invites you to play slowly, to linger on every note, to let silence breathe between phrases. Instruments of this quality are rare, especially given how ornate their designs can be compared to the far more common sitar. The Surbahar feels at home in romantic, meditative, or even mournful settings, yet it’s remarkably versatile — capable of carrying the soul of Indian classical music as easily as a slow blues riff or even something with a metallic edge. You have to see and hear one in person to truly understand its power.  <p>In the videos above, I’m playing within a blues pentatonic scale, adding a diminished second to give it that subtle, mysterious edge. The first video highlights the bright, sitar-like timbre of the highest string, while the second explores the instrument’s lower register — the deep, resonant voice the Surbahar is most celebrated for.   </p>
+Many people mistake it for a sitar, but the Surbahar stands apart — larger in size, deeper in tone, and resonating with a rich, bass-like depth. I fell in love with its sustain and expressive range; it invites you to play slowly, to linger on every note, to let silence breathe between phrases. Instruments of this quality are rare, especially given how ornate their designs can be compared to the far more common sitar. The Surbahar feels at home in romantic, meditative, or even mournful settings, yet it’s remarkably versatile — capable of carrying the soul of Indian classical music as easily as a slow blues riff or even something with a metallic edge. You have to see and hear one in person to truly understand its power.  
+<p>In the videos above, I’m playing within a blues pentatonic scale, adding a diminished second to give it that subtle, mysterious edge. The first video highlights the bright, sitar-like timbre of the highest string, while the second explores the instrument’s lower register — the deep, resonant voice the Surbahar is most celebrated for.</p>
       </p>
-    </section>
+
+      <!-- Transition Divider -->
+      <Divider />
+
+      <!-- Recommended moods / genres -->
+<section class="recommended-moods grid md:grid-cols-2 gap-6 items-center py-10">
+  <!-- Audio mood list -->
+  <div class="space-y-5 order-1 md:order-2">
+    <h2 class="font-display text-2xl md:text-3xl mb-2">
+  Recommended
+  <span class="moods-title">
+    <span class="m1">M</span>
+    <span class="m2">o</span>
+    <span class="m3">o</span>
+    <span class="m4">d</span>
+    <span class="m5">s</span>
+  </span>
+  for this instrument
+</h2>
+
+    <p class="opacity-80 text-base mb-4">
+      The Surbahar’s range makes it ideal for a wide spectrum of feelings — from deep introspection to cinematic grandeur. Try exploring these moods below:
+    </p>
+
+    <ul class="space-y-3">
+      {[
+        { label: "Coming Soon!", file: "/media/surbahar-mood1.m4a" },
+        { label: "Coming Soon!", file: "/media/surbahar-mood2.m4a" },
+        { label: "Coming Soon!", file: "/media/surbahar-mood3.m4a" },
+        { label: "Coming Soon!", file: "/media/surbahar-mood4.m4a" },
+        { label: "Coming Soon!", file: "/media/surbahar-mood5.m4a" },
+      ].map(({ label, file }) => (
+        <li class="flex items-center justify-between rounded-xl px-3 py-2 frame">
+          <span class="font-medium">{label}</span>
+          <button
+            type="button"
+            class="opacity-70 hover:opacity-100 transition"
+            data-audio={file}
+            aria-label={`Play ${label}`}
+          >
+            ▶︎
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <!-- Placeholder image -->
+  <figure class="rounded-xl overflow-hidden frame border border-black/40 shadow-soft order-2 md:order-1">
+    <img
+      src="/media/inst-surbahar.jpg"
+      alt="Close-up of Surbahar"
+      class="object-cover w-full h-full aspect-[4/3]"
+      loading="lazy"
+    />
+  </figure>
+</section>
+
 
     <!-- Keep Exploring link -->
     <div class="pt-8">
@@ -116,7 +175,7 @@ Many people mistake it for a sitar, but the Surbahar stands apart — larger in 
         href="/instruments"
         class="inline-flex items-center gap-2 font-display text-lg text-[var(--accent-gold)] hover:text-[var(--accent-rosewood)] transition-colors duration-200 group"
       >
-        <span>Keep Exploring</span>
+        <span>Explore More Instruments</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -135,24 +194,23 @@ Many people mistake it for a sitar, but the Surbahar stands apart — larger in 
   </section>
 
   <style lang="css">
-  /* ===== Tab strip: always single row; mobile scroll instead of wrapping ===== */
+  /* ===== Tab strip ===== */
   .tab-strip {
     display: flex;
-    flex-wrap: nowrap;           /* do not stack vertically */
+    flex-wrap: nowrap;
     gap: 0.375rem;
-    overflow-x: auto;            /* horizontal scroll on small screens */
+    overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
-    scrollbar-width: none;       /* Firefox hide scrollbar */
+    scrollbar-width: none;
     mask-image: linear-gradient(to right, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
   }
-  .tab-strip::-webkit-scrollbar { display: none; } /* WebKit hide scrollbar */
+  .tab-strip::-webkit-scrollbar { display: none; }
 
-  /* ===== Tabs styling (restores the “gold underline” look) ===== */
   .tab-button {
     position: relative;
-    flex: 0 0 auto;              /* do not stretch */
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -162,8 +220,8 @@ Many people mistake it for a sitar, but the Surbahar stands apart — larger in 
     border-radius: 0.75rem;
     font-weight: 600;
     line-height: 1;
-    white-space: nowrap;         /* keep labels on one line */
-    min-width: max-content;      /* prevent squish */
+    white-space: nowrap;
+    min-width: max-content;
     background: transparent;
     color: var(--ivory);
     border: 1px solid transparent;
@@ -242,10 +300,100 @@ Many people mistake it for a sitar, but the Surbahar stands apart — larger in 
     opacity: 0.7;
   }
 
-  /* ===== Prose block ===== */
   .prose-block { display: grid; gap: 0.75rem; }
 
-  /* Optional: slightly tighter gold underline on very narrow phones */
+  /* ===== Recommended moods ===== */
+  .recommended-moods img {
+    object-position: center;
+    filter: brightness(0.95) contrast(1.05);
+  }
+
+  .recommended-moods li.frame {
+    background: linear-gradient(to right, rgba(205,127,50,0.15), transparent);
+    border-radius: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .recommended-moods li.frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(to right, rgba(205,127,50,0.8), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .recommended-moods button[data-audio] {
+    font-size: 1.5rem;
+    color: var(--accent-gold, #C2A45F);
+    text-shadow:
+      2px 0 var(--bronze, #CD7F32),
+     -2px 0 var(--bronze, #CD7F32),
+      0 2px var(--bronze, #CD7F32),
+      0 -2px var(--bronze, #CD7F32);
+  }
+
+  @media (max-width: 768px) {
+    .recommended-moods { text-align: center; }
+    .recommended-moods ul { max-width: 24rem; margin-inline: auto; }
+  }
+  /* ===== Refined "Moods" color sequence and styling ===== */
+.moods-title {
+  display: inline-flex;
+  gap: 0.05ch;
+  margin: 0 0.25ch;
+  letter-spacing: 0.015em;
+  line-height: 1;
+  font-family: var(--font-display, "Cinzel"), serif;
+  font-weight: 600;
+}
+
+.moods-title span {
+  text-shadow: 0 0 6px rgba(0,0,0,0.25);
+  mix-blend-mode: soft-light;
+  transition: transform 220ms ease, filter 220ms ease, text-shadow 220ms ease;
+}
+
+.moods-title span:hover {
+  transform: scale(1.07);
+  filter: brightness(1.1);
+  text-shadow: 0 0 10px rgba(255,255,255,0.25);
+}
+
+/* Rebalanced “Moods” palette — blue ➜ plum ➜ rosewood */
+.m1 { color: #2C4C76; }  /* deep slate blue */
+.m2 { color: #4F6C89; }  /* steel blue */
+.m3 { color: #6B5A7A; }  /* muted purple / dusk violet */
+.m4 { color: #7A4F4B; }  /* warm plum-brown */
+.m5 { color: #6E2A2A; }  /* rosewood red */
+.m3, .m4 { filter: saturate(0.85); }
+
+
+/* Optional subtle shimmer (breathing gradient) */
+@keyframes shimmer {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.1) saturate(1.1); }
+  100% { filter: brightness(1); }
+}
+
+.moods-title span {
+  animation: shimmer 8s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 1s);
+}
+
+/* Individual delays for more organic movement */
+.m1 { --i: 0; }
+.m2 { --i: 1; }
+.m3 { --i: 2; }
+.m4 { --i: 3; }
+.m5 { --i: 4; }
+
+
   @media (max-width: 360px) {
     .tab-button { padding-inline: 0.7rem; }
     .tab-button::after { left: 0.7rem; right: 0.7rem; }
@@ -253,123 +401,105 @@ Many people mistake it for a sitar, but the Surbahar stands apart — larger in 
   </style>
 
   <script type="module">
-  // Tab behavior + adaptive aspect ratio
+  // Tab behavior (existing)
   const tablist = document.querySelector('[role="tablist"]');
   const shell = document.getElementById('video-shell');
   const buttons = tablist ? Array.from(tablist.querySelectorAll('.tab-button')) : [];
   const panes = Array.from(document.querySelectorAll('.video-pane'));
-
-  // Cache of pane.id -> "w / h" string
   const ratioMap = new Map();
 
-  // Helper: set shell aspect ratio
-  const setShellRatio = (ratioString) => {
-    if (!shell) return;
-    shell.style.setProperty('--ar', ratioString || '16 / 9');
-  };
+  const setShellRatio = (r) => shell?.style.setProperty('--ar', r || '16 / 9');
 
-  // Measure videos once metadata is available
   const measurePane = (pane) => {
-    // If author provided a ratio on the pane (or in data), prefer it
     const manual = pane.getAttribute('data-ratio');
-    if (manual && manual.includes('/')) {
-      ratioMap.set(pane.id, manual);
-      return;
-    }
-
+    if (manual && manual.includes('/')) { ratioMap.set(pane.id, manual); return; }
     const vid = pane.querySelector('video');
     if (vid) {
-      const apply = () => {
-        const w = vid.videoWidth, h = vid.videoHeight;
-        if (w && h) ratioMap.set(pane.id, `${w} / ${h}`);
-      };
-      if (vid.readyState >= 1) {
-        apply();
-      } else {
-        vid.addEventListener('loadedmetadata', apply, { once: true });
-      }
+      const apply = () => { const w = vid.videoWidth, h = vid.videoHeight; if (w && h) ratioMap.set(pane.id, `${w} / ${h}`); };
+      vid.readyState >= 1 ? apply() : vid.addEventListener('loadedmetadata', apply, { once: true });
       return;
     }
-
-    // iframe fallback: if no manual ratio, assume 16/9
     const ifr = pane.querySelector('iframe');
-    if (ifr) {
-      ratioMap.set(pane.id, manual || '16 / 9');
-    }
+    if (ifr) ratioMap.set(pane.id, manual || '16 / 9');
   };
-
-  // Initialize measurements
   panes.forEach(measurePane);
 
   const activate = (id) => {
-    // Update buttons
-    for (const btn of buttons) {
-      const isSelected = btn.dataset.tab === id;
-      btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-      btn.tabIndex = isSelected ? 0 : -1;
-    }
-    // Update panes, pause hidden media
-    for (const pane of panes) {
-      const isActive = pane.dataset.pane === id;
-      pane.classList.toggle('is-active', isActive);
-
-      if (!isActive) {
-        const vid = pane.querySelector('video');
-        if (vid) vid.pause();
+    buttons.forEach(btn => {
+      const sel = btn.dataset.tab === id;
+      btn.setAttribute('aria-selected', sel ? 'true' : 'false');
+      btn.tabIndex = sel ? 0 : -1;
+    });
+    panes.forEach(pane => {
+      const active = pane.dataset.pane === id;
+      pane.classList.toggle('is-active', active);
+      if (!active) {
+        pane.querySelector('video')?.pause();
         const ifr = pane.querySelector('iframe');
         if (ifr) { const src = ifr.src; ifr.src = src; }
       } else {
-        // Apply the measured ratio (or default)
         const r = ratioMap.get(pane.id) || pane.getAttribute('data-ratio') || '16 / 9';
         setShellRatio(r);
       }
-    }
+    });
   };
 
-  // Click handling
   if (tablist) {
-    tablist.addEventListener('click', (e) => {
+    tablist.addEventListener('click', e => {
       const btn = e.target.closest('.tab-button');
-      if (!btn) return;
-      activate(btn.dataset.tab);
-    });
-
-    // Keyboard support
-    tablist.addEventListener('keydown', (e) => {
-      const currentIndex = buttons.findIndex(b => b.getAttribute('aria-selected') === 'true');
-      if (e.key === 'ArrowRight' || e.key === 'Right') {
-        const next = buttons[(currentIndex + 1) % buttons.length];
-        next.focus(); activate(next.dataset.tab); e.preventDefault();
-      } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
-        const prev = buttons[(currentIndex - 1 + buttons.length) % buttons.length];
-        prev.focus(); activate(prev.dataset.tab); e.preventDefault();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        const btn = document.activeElement;
-        if (btn && btn.classList.contains('tab-button')) {
-          activate(btn.dataset.tab); e.preventDefault();
-        }
-      }
+      if (btn) activate(btn.dataset.tab);
     });
   }
 
-  // On first paint: ensure initial ratio matches the initially active pane
   const initiallyActive = panes.find(p => p.classList.contains('is-active')) || panes[0];
   if (initiallyActive) {
-    const applyInitial = () => {
-      const r = ratioMap.get(initiallyActive.id) || initiallyActive.getAttribute('data-ratio') || '16 / 9';
-      setShellRatio(r);
-    };
-
+    const applyInitial = () => setShellRatio(ratioMap.get(initiallyActive.id) || initiallyActive.getAttribute('data-ratio') || '16 / 9');
     const vid = initiallyActive.querySelector('video');
-    if (vid && !(vid.readyState >= 1)) {
-      vid.addEventListener('loadedmetadata', applyInitial, { once: true });
-    } else {
-      applyInitial();
-    }
+    vid && !(vid.readyState >= 1)
+      ? vid.addEventListener('loadedmetadata', applyInitial, { once: true })
+      : applyInitial();
   }
 
-  // Make only the initially selected button focusable
   const initiallySelected = buttons.find(b => b.getAttribute('aria-selected') === 'true') || buttons[0];
   buttons.forEach(b => (b.tabIndex = b === initiallySelected ? 0 : -1));
+
+  // Audio play behavior (reused from instruments page)
+  document.addEventListener('DOMContentLoaded', () => {
+    const supportsHover = window.matchMedia('(hover: hover)').matches;
+    const players = new Map();
+    let current = null;
+
+    const getPlayer = (src) => {
+      if (!players.has(src)) players.set(src, new Audio(src));
+      return players.get(src);
+    };
+
+    const stopCurrent = () => {
+      if (current && !current.paused) {
+        current.pause();
+        current.currentTime = 0;
+      }
+    };
+
+    const play = async (src) => {
+      stopCurrent();
+      const a = getPlayer(src);
+      current = a;
+      a.currentTime = 0;
+      a.volume = 0.9;
+      try { await a.play(); } catch {}
+    };
+
+    document.querySelectorAll('[data-audio]').forEach(btn => {
+      const src = btn.getAttribute('data-audio');
+      btn.addEventListener('click', () => play(src));
+      if (supportsHover) {
+        btn.addEventListener('mouseenter', () => play(src));
+        btn.addEventListener('mouseleave', stopCurrent);
+        btn.addEventListener('blur', stopCurrent);
+      }
+    });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopCurrent(); });
+  });
   </script>
 </BaseLayout>
