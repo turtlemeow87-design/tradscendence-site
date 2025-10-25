@@ -5,12 +5,12 @@ import Divider from "../../components/Divider.astro";
 
 const title = "Tanpura — Tradscendence | Meditative Indian drone instrument";
 const description =
-  "Hear the Tanpura’s entrancing overtones: one performance tuned to C, with a second coming soon. Learn how this drone frames Hindustani music, worship, and meditation.";
+  "Hear the Tanpura’s entrancing overtones in two tunings — one in C and one in B. Learn how this resonant drone frames Hindustani music, worship, and meditation.";
 const canonical = "https://www.soundbeyondborders.com/instruments/Tanpura";
 
 const videos = [
   { id: "v1", label: "Key of C", type: "video", src: "/media/Tanpura1.mp4" },
-  { id: "v2", label: "Coming Soon", type: "video", src: "" },
+  { id: "v2", label: "Key of B", type: "video", src: "/media/Tanpura2.mp4" },
 ];
 ---
 
@@ -42,19 +42,15 @@ const videos = [
 
       <div id="video-shell" class="relative w-full bg-black" style="aspect-ratio: var(--ar,16/9);">
         {videos.map((v, i) => (
-          <div id={`pane-${v.id}`} data-pane={v.id} class={`video-pane ${i === 0 ? "is-active" : ""}`}>
-            {v.src ? (
-              <video class="h-full w-full object-contain" controls playsinline preload="metadata">
-                <source src={v.src} />
-              </video>
-            ) : (
-              <div class="placeholder">
-                <div class="placeholder-inner">
-                  <span class="placeholder-title">Video coming soon</span>
-                  <span class="placeholder-sub">Upload your source in this file’s <code>videos[]</code> config.</span>
-                </div>
-              </div>
-            )}
+          <div
+            id={`pane-${v.id}`}
+            data-pane={v.id}
+            data-ratio="16 / 9"            /* ✅ lock a consistent height for every tab */
+            class={`video-pane ${i === 0 ? "is-active" : ""}`}
+          >
+            <video class="h-full w-full object-contain" controls playsinline preload="metadata">
+              <source src={v.src} />
+            </video>
           </div>
         ))}
       </div>
@@ -71,8 +67,7 @@ const videos = [
         the Tanpura is a beautiful choice.
       </p>
       <p class="opacity-80">
-        In the first video, she is tuned to C. There is no second video yet, as this will require retuning—which is more
-        involved than just turning pegs. Will update when I have done so!
+        In the first video, she is tuned to C. In the second, she’s tuned to B — each offering its own harmonic color and depth.
       </p>
 
       <Divider />
