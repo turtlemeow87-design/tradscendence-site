@@ -1,0 +1,365 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Update these if you want:
+const PAGE_TITLE = "QA Portfolio | SoundBeyondBorders";
+const PAGE_DESC =
+  "Manual QA portfolio for SoundBeyondBorders: test strategy, sample test cases, bug reports, and QA workflow artifacts.";
+const CANONICAL_URL = "https://soundbeyondborders.com/qa-portfolio";
+
+// Optional: keep this page out of Google search results.
+// Set to false if you want it indexable.
+const NO_INDEX = true;
+
+// Optional: customize these:
+const YOUR_NAME = "Hunter Eastland";
+const YOUR_ROLE = "QA Tester (Manual) • Web Testing • Bug Reporting";
+const CONTACT_EMAIL = "your-email@example.com"; // replace
+const LINKEDIN_URL = "https://www.linkedin.com/in/your-handle"; // replace if you want
+const GITHUB_URL = "https://github.com/your-handle"; // replace if you want
+
+const PROJECT_NAME = "SoundBeyondBorders";
+const PROJECT_URL = "https://soundbeyondborders.com";
+---
+
+<BaseLayout
+  title={PAGE_TITLE}
+  description={PAGE_DESC}
+  canonical={CANONICAL_URL}
+>
+  <head>
+    {NO_INDEX && <meta name="robots" content="noindex, nofollow" />}
+  </head>
+
+  <main class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+    <!-- HERO -->
+    <section class="rounded-2xl border border-white/10 bg-black/20 p-6 sm:p-10 shadow-lg">
+      <div class="flex flex-col gap-4">
+        <p class="text-sm uppercase tracking-widest text-white/60">QA Portfolio</p>
+        <h1 class="font-cinzel text-3xl sm:text-4xl text-ivory leading-tight">
+          {YOUR_NAME}
+        </h1>
+        <p class="text-lg text-white/80 max-w-3xl">
+          {YOUR_ROLE}
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3 sm:items-center text-white/70">
+          <a class="underline hover:text-white" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          <span class="hidden sm:inline text-white/30">•</span>
+          <a class="underline hover:text-white" href={PROJECT_URL} target="_blank" rel="noreferrer">
+            {PROJECT_NAME} (Project Under Test)
+          </a>
+        </div>
+
+        <div class="flex flex-wrap gap-2 pt-2">
+          <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/80">
+            Test Cases
+          </span>
+          <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/80">
+            Bug Reports
+          </span>
+          <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/80">
+            Regression / Smoke
+          </span>
+          <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/80">
+            UX + Edge Cases
+          </span>
+          <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/80">
+            Accessibility Basics
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK SUMMARY -->
+    <section class="mt-10 grid gap-6 lg:grid-cols-3">
+      <div class="lg:col-span-2 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+        <h2 class="font-cinzel text-2xl text-ivory">Summary</h2>
+        <p class="mt-3 text-white/80 leading-relaxed">
+          I’m transitioning into QA with a strong focus on careful, structured testing and clear reporting.
+          I’ve built and iterated on a production website (SoundBeyondBorders), which gives me hands-on practice
+          with real-world release cycles: verifying fixes, preventing regressions, and catching UX breakpoints
+          before users do.
+        </p>
+        <p class="mt-3 text-white/80 leading-relaxed">
+          My QA style: reproduce reliably, document cleanly, prioritize impact, and communicate like a teammate.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+        <h2 class="font-cinzel text-2xl text-ivory">Core Skills</h2>
+        <ul class="mt-3 space-y-2 text-white/80">
+          <li>• Manual web testing (desktop + mobile)</li>
+          <li>• Writing test cases + checklists</li>
+          <li>• Bug reporting: steps, expected vs actual, evidence</li>
+          <li>• Smoke / sanity / regression passes</li>
+          <li>• Exploratory testing (risk-based)</li>
+          <li>• Basic DevTools (console, network, responsive)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="mt-10 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+      <h2 class="font-cinzel text-2xl text-ivory">Tools & Methods</h2>
+      <div class="mt-4 grid gap-6 md:grid-cols-3 text-white/80">
+        <div>
+          <h3 class="text-white font-semibold">Workflow</h3>
+          <ul class="mt-2 space-y-1">
+            <li>• Jira / ticketing concepts</li>
+            <li>• Severity vs priority thinking</li>
+            <li>• Clear acceptance criteria</li>
+            <li>• Release notes mindset</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold">Testing</h3>
+          <ul class="mt-2 space-y-1">
+            <li>• Smoke + regression checklists</li>
+            <li>• Cross-browser checks</li>
+            <li>• Responsive + layout breakpoints</li>
+            <li>• Form validation + edge cases</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold">Evidence</h3>
+          <ul class="mt-2 space-y-1">
+            <li>• Screenshots + screen recordings</li>
+            <li>• Console logs</li>
+            <li>• HAR/network inspection (basic)</li>
+            <li>• Repro steps written for devs</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECT UNDER TEST -->
+    <section class="mt-10 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+      <h2 class="font-cinzel text-2xl text-ivory">Project Under Test</h2>
+      <div class="mt-4 grid gap-6 md:grid-cols-3 text-white/80">
+        <div class="md:col-span-2">
+          <p class="leading-relaxed">
+            <span class="text-white font-semibold">{PROJECT_NAME}</span> is a booking-focused website for live music services.
+            It includes marketing pages, media content, navigation flows, and a booking/contact experience.
+          </p>
+          <ul class="mt-3 space-y-2">
+            <li>• Primary user goals: learn offering → browse instruments/media → contact/book</li>
+            <li>• Risk areas: forms, mobile nav, embedded media, performance, accessibility basics</li>
+            <li>• Success criteria: reliable booking flow, clear UX, no broken links/media</li>
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+          <p class="text-white font-semibold">Environment</p>
+          <ul class="mt-2 space-y-1">
+            <li>• Site: Astro + Tailwind</li>
+            <li>• Hosting: (your setup)</li>
+            <li>• Browsers: Chrome / Firefox / Safari</li>
+            <li>• Mobile: iOS/Android checks</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTIFACTS -->
+    <section class="mt-10">
+      <h2 class="font-cinzel text-2xl text-ivory">QA Artifacts</h2>
+      <p class="mt-2 text-white/80 max-w-3xl">
+        Below are sample artifacts demonstrating how I plan tests, execute them, and report issues.
+        (These are written as portfolio examples — in a real team, these would live in the team’s tracker/TestRail/etc.)
+      </p>
+
+      <!-- TEST PLAN -->
+      <div class="mt-6 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+        <h3 class="text-white font-semibold text-xl">1) Mini Test Plan (Web Release Pass)</h3>
+        <div class="mt-3 grid gap-6 lg:grid-cols-3 text-white/80">
+          <div class="lg:col-span-2">
+            <p class="leading-relaxed">
+              <span class="text-white font-semibold">Goal:</span> confirm key user flows work after changes and that no critical regressions exist.
+            </p>
+            <p class="mt-2 leading-relaxed">
+              <span class="text-white font-semibold">Scope:</span> navigation, key pages, media embeds, booking/contact, responsive layout, basic accessibility.
+            </p>
+            <p class="mt-2 leading-relaxed">
+              <span class="text-white font-semibold">Out of scope:</span> backend load testing, deep security testing, automation suite (for now).
+            </p>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <p class="text-white font-semibold">Entry / Exit</p>
+            <ul class="mt-2 space-y-1">
+              <li>• Entry: build deployed</li>
+              <li>• Entry: change list known</li>
+              <li>• Exit: no Sev-1 open</li>
+              <li>• Exit: booking flow passes</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-xl border border-white/10 bg-white/5 p-4 text-white/80">
+          <p class="text-white font-semibold">Risk-based focus</p>
+          <ul class="mt-2 grid gap-2 md:grid-cols-2">
+            <li>• Forms: validation, error states, spam handling, success confirmations</li>
+            <li>• Mobile nav: menu open/close, focus trapping, scroll locking</li>
+            <li>• Media: autoplay policies, broken links, loading failures</li>
+            <li>• Layout: long text, small screens, weird aspect ratios</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SAMPLE TEST CASES -->
+      <div class="mt-6 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+        <h3 class="text-white font-semibold text-xl">2) Sample Test Cases</h3>
+
+        <div class="mt-4 overflow-x-auto rounded-xl border border-white/10">
+          <table class="min-w-full text-left text-sm text-white/80">
+            <thead class="bg-white/5 text-white">
+              <tr>
+                <th class="px-4 py-3">ID</th>
+                <th class="px-4 py-3">Test</th>
+                <th class="px-4 py-3">Steps</th>
+                <th class="px-4 py-3">Expected</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+              <tr>
+                <td class="px-4 py-3 whitespace-nowrap">TC-001</td>
+                <td class="px-4 py-3">Booking form submits successfully</td>
+                <td class="px-4 py-3">
+                  Go to Contact/Booking → fill required fields → submit
+                </td>
+                <td class="px-4 py-3">
+                  Success message shown; no console errors; user receives confirmation (if configured)
+                </td>
+              </tr>
+
+              <tr>
+                <td class="px-4 py-3 whitespace-nowrap">TC-002</td>
+                <td class="px-4 py-3">Required field validation</td>
+                <td class="px-4 py-3">
+                  Leave required field blank → submit
+                </td>
+                <td class="px-4 py-3">
+                  Clear inline error; focus moves to invalid field; submission blocked
+                </td>
+              </tr>
+
+              <tr>
+                <td class="px-4 py-3 whitespace-nowrap">TC-003</td>
+                <td class="px-4 py-3">Mobile nav works (small screen)</td>
+                <td class="px-4 py-3">
+                  Set viewport ~390×844 → open menu → tap links
+                </td>
+                <td class="px-4 py-3">
+                  Menu opens/closes reliably; no content overlap; correct page loads
+                </td>
+              </tr>
+
+              <tr>
+                <td class="px-4 py-3 whitespace-nowrap">TC-004</td>
+                <td class="px-4 py-3">Media embed loads</td>
+                <td class="px-4 py-3">
+                  Visit instrument page → play video/audio
+                </td>
+                <td class="px-4 py-3">
+                  Media loads within reasonable time; controls usable; graceful failure messaging if blocked
+                </td>
+              </tr>
+
+              <tr>
+                <td class="px-4 py-3 whitespace-nowrap">TC-005</td>
+                <td class="px-4 py-3">Basic accessibility sweep</td>
+                <td class="px-4 py-3">
+                  Keyboard tab through header + CTA + form
+                </td>
+                <td class="px-4 py-3">
+                  Visible focus states; logical tab order; buttons/inputs accessible by keyboard
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="mt-3 text-white/60">
+          Note: In a full suite, I’d expand this into coverage for edge cases (slow network, blocked third-party embeds, very long inputs, etc.).
+        </p>
+      </div>
+
+      <!-- SAMPLE BUG REPORTS -->
+      <div class="mt-6 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+        <h3 class="text-white font-semibold text-xl">3) Sample Bug Reports</h3>
+
+        <div class="mt-4 grid gap-6 lg:grid-cols-2">
+          <article class="rounded-xl border border-white/10 bg-white/5 p-5 text-white/80">
+            <header class="flex items-start justify-between gap-4">
+              <div>
+                <h4 class="text-white font-semibold">BR-001 — Mobile menu blocks page scroll after closing</h4>
+                <p class="text-white/60 text-sm mt-1">Severity: Major • Priority: High</p>
+              </div>
+            </header>
+
+            <div class="mt-3 space-y-2">
+              <p><span class="text-white font-semibold">Steps:</span> On mobile → open nav menu → close menu → attempt to scroll page</p>
+              <p><span class="text-white font-semibold">Expected:</span> Page scroll works normally after menu closes</p>
+              <p><span class="text-white font-semibold">Actual:</span> Scroll remains locked until refresh</p>
+              <p><span class="text-white font-semibold">Notes:</span> Likely body overflow style not reset on close</p>
+            </div>
+          </article>
+
+          <article class="rounded-xl border border-white/10 bg-white/5 p-5 text-white/80">
+            <header class="flex items-start justify-between gap-4">
+              <div>
+                <h4 class="text-white font-semibold">BR-002 — Booking form allows submit with whitespace-only name</h4>
+                <p class="text-white/60 text-sm mt-1">Severity: Medium • Priority: Medium</p>
+              </div>
+            </header>
+
+            <div class="mt-3 space-y-2">
+              <p><span class="text-white font-semibold">Steps:</span> Enter spaces in Name → fill others → submit</p>
+              <p><span class="text-white font-semibold">Expected:</span> Treat whitespace-only as invalid</p>
+              <p><span class="text-white font-semibold">Actual:</span> Submits successfully</p>
+              <p><span class="text-white font-semibold">Notes:</span> Trim input before validate; add test for this</p>
+            </div>
+          </article>
+        </div>
+
+        <p class="mt-3 text-white/60">
+          These are example write-ups in portfolio format. In practice I attach screenshots, console logs, and environment details.
+        </p>
+      </div>
+
+      <!-- PROCESS -->
+      <div class="mt-6 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+        <h3 class="text-white font-semibold text-xl">4) How I Work (Simple, Effective QA Loop)</h3>
+        <ol class="mt-3 space-y-2 text-white/80 list-decimal list-inside">
+          <li>Identify scope + risks (what can break, what matters most)</li>
+          <li>Run a smoke pass (does anything obvious fail?)</li>
+          <li>Run focused regression (high-risk areas)</li>
+          <li>Exploratory testing (try to break it like a curious user)</li>
+          <li>Log bugs clearly and prioritize by impact</li>
+          <li>Verify fixes and watch for regressions</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- LINKS -->
+    <section class="mt-10 rounded-2xl border border-white/10 bg-black/10 p-6 shadow">
+      <h2 class="font-cinzel text-2xl text-ivory">Links</h2>
+      <div class="mt-3 flex flex-col sm:flex-row gap-3 text-white/80">
+        <a class="underline hover:text-white" href={LINKEDIN_URL} target="_blank" rel="noreferrer">LinkedIn</a>
+        <span class="hidden sm:inline text-white/30">•</span>
+        <a class="underline hover:text-white" href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a>
+        <span class="hidden sm:inline text-white/30">•</span>
+        <a class="underline hover:text-white" href={PROJECT_URL} target="_blank" rel="noreferrer">{PROJECT_NAME}</a>
+      </div>
+
+      <p class="mt-4 text-white/60 text-sm">
+        Tip: If you prefer, you can also host a PDF resume and link it here (e.g., /resume.pdf).
+      </p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="mt-10 text-center text-white/50 text-sm">
+      <p>© {new Date().getFullYear()} {YOUR_NAME}. QA portfolio page for hiring review.</p>
+    </footer>
+  </main>
+</BaseLayout>
