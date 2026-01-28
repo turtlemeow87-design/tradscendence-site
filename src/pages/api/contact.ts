@@ -46,7 +46,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(null, {
       status: 303,
       headers: {
-        'Location': '/Contact/?error=true'
+        'Location': '/contact/?error=true'
       }
     });
   }
