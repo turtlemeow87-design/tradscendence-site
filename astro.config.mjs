@@ -1,13 +1,17 @@
 import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap'; // 👈 added import
+import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel/serverless'; // 👈 added for API routes
 
 export default defineConfig({
   // The canonical site URL (required for sitemap generation)
   site: 'https://soundbeyondborders.com',
 
-  // fully static export; no adapter needed
-  output: 'static',
+  // changed to 'server' to enable API routes
+  output: 'server',
+
+  // Vercel adapter for deployment
+  adapter: vercel(),
 
   // Integrations
-  integrations: [sitemap()], // 👈 added sitemap integration
+  integrations: [sitemap()], // 👈 your sitemap still works!
 });
