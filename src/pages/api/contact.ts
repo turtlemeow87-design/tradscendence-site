@@ -169,7 +169,7 @@ try {
   const genreList = genres.length > 0 ? genres.join(", ") : "Not specified";
 
   const emailBody = `
-New Booking Inquiry from ${name}
+New Inquiry from ${name}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -199,7 +199,7 @@ Timestamp: ${new Date().toISOString()}
       from: 'Tradscendence Booking <bookings@soundbeyondborders.com>',
       to: [contactEmail],
       replyTo: email,
-      subject: `🎵 New Booking Inquiry from ${name}`,
+      subject: `🎵 SoundBeyondBorders Booking Inquiries and Questions`,
       text: emailBody,
     });
 
