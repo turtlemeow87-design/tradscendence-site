@@ -198,6 +198,7 @@ Timestamp: ${new Date().toISOString()}
     const { data, error } = await resend.emails.send({
       from: 'Tradscendence Booking <bookings@soundbeyondborders.com>',
       to: [contactEmail],
+      replyTo: email,
       subject: `🎵 New Booking Inquiry from ${name}`,
       text: emailBody,
     });
