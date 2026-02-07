@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 const email = 'HunterEast.Musiq@gmail.com';
 
-// ✅ SEO
 const title = "Contact / Booking — Tradscendence | Sound Beyond Borders";
 const description =
   "Contact Hunter Eastland (Tradscendence), world & folk multi-instrumentalist in Richmond, VA. Book for weddings, ceremonies, funerals, small gatherings, or studio sessions.";
@@ -10,34 +9,43 @@ const description =
 <BaseLayout {title} description={description} canonical="https://www.soundbeyondborders.com/Contact/">
   <section class="mx-auto max-w-3xl px-4 py-10 space-y-6">
     <h1 class="font-display text-3xl">Contact / Booking</h1>
-    <p class="opacity-80">Please share details about your event; I’ll reply promptly.  I will be coming from Richmond, VA.</p>
+    
+    <!-- Error message container -->
+    <div id="error-message" class="hidden rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-red-200">
+      <strong>Oops!</strong> <span id="error-text"></span>
+    </div>
+    
+    <p class="opacity-80">Please share details about your event; I'll reply promptly. I will be coming from Richmond, VA.</p>
 
-    <!-- Notes above the form -->
     <div class="rounded-xl border border-gold/40 bg-gold/10 p-3 text-sm leading-relaxed frame">
       <p><strong>I require booking inquiries to be at minimum one month out from the date of your event!</strong></p>
       <p class="mt-1"><strong>I'm available for intimate events: proposals, private weddings, other ceremonies, small gatherings, funerals, and studio sessions.</strong></p>
-      <p class="mt-1"><strong>*Any particular dress code requests for an event will be taken into account once an official date/set of dates is established.  Whether any dollar amount for attire is included in the customer fee, provided by the customer with no fee, or fully provided by me will be determined on a case-by-case basis.  I am open-minded*</strong></p>
+      <p class="mt-1"><strong>*Any particular dress code requests for an event will be taken into account once an official date/set of dates is established. Whether any dollar amount for attire is included in the customer fee, provided by the customer with no fee, or fully provided by me will be determined on a case-by-case basis. I am open-minded*</strong></p>
     </div>
 
-    <form action="/api/contact" method="POST" id="contact-form" class="grid gap-4">
+    <form id="contact-form" class="grid gap-4">
       <!-- Required: Name -->
       <label class="grid gap-1">
-        <span class="text-sm font-semibold">Your name</span>
+        <span class="text-sm font-semibold">Your name *</span>
         <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
                name="name" required />
       </label>
 
       <!-- Required: Email -->
       <label class="grid gap-1">
-        <span class="text-sm font-semibold">Email</span>
+        <span class="text-sm font-semibold">Email *</span>
         <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
                type="email" name="email" required />
       </label>
 
-      <!-- Optional: Phone -->
+      <!-- Optional: Phone (auto-formatting) -->
       <label class="grid gap-1">
         <span class="text-sm">Phone (optional)</span>
-        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" name="phone" />
+        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]" 
+               id="phone-input"
+               name="phone"
+               type="tel"
+               placeholder="(804) 555-1234" />
       </label>
 
       <!-- Optional: Event date -->
@@ -49,68 +57,124 @@ const description =
 
       <!-- Required: Location -->
       <label class="grid gap-1">
-        <span class="text-sm font-semibold">Location (city/venue)</span>
-        <span class="text-sm font-semibold">*Keep in mind : I will be coming from Richmond, VA.  Transportation fees will be adjusted acoordingly!*</span>
+        <span class="text-sm font-semibold">Location (city/venue) *</span>
+        <span class="text-sm font-semibold">*Keep in mind: I will be coming from Richmond, VA. Transportation fees will be adjusted accordingly!*</span>
         <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
                name="location" required />
       </label>
 
-      <!-- Optional: Instrument(s) -->
-      <label class="grid gap-1">
+      <!-- Multi-select Instruments with Pills -->
+      <div class="grid gap-2">
         <span class="text-sm">Instrument(s) (optional)</span>
-        <select id="instrument-select"
-                name="instrument"
-                class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]">
-          <option value="">— Select an instrument —</option>
-          <option>Surbahar</option>
-          <option>Tanpura</option>
-          <option>Rabab</option>
-          <option>Esraj</option>
-          <option>Kabak Kemane</option>
-          <option>Bağlama Saz</option>
-          <option>Divan Saz</option>
-          <option>Cümbüş Oud</option>
-          <option>Cümbüş Tanbur</option>
-          <option>Setar</option>
-          <option>Duduk</option>
-          <option>Hulusi</option>
-          <option>Pipa</option>
-          <option>Arabic Oud</option>
-          <option>Turkish Oud</option>
-          <option>Azeri Tar</option>
-          <option>Octave Mandolin</option>
-          <option value="multi">More than one?</option>
-        </select>
-      </label>
+        <div class="relative">
+          <button type="button" id="instrument-dropdown-btn" 
+                  class="w-full bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-left flex justify-between items-center">
+            <span id="instrument-placeholder">Select instruments...</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="instrument-dropdown" class="hidden absolute z-10 w-full mt-1 bg-[#181818] border border-gold/40 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Surbahar" class="instrument-checkbox mr-2"> Surbahar
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Tanpura" class="instrument-checkbox mr-2"> Tanpura
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Rabab" class="instrument-checkbox mr-2"> Rabab
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Esraj" class="instrument-checkbox mr-2"> Esraj
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Kabak Kemane" class="instrument-checkbox mr-2"> Kabak Kemane
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Bağlama Saz" class="instrument-checkbox mr-2"> Bağlama Saz
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Divan Saz" class="instrument-checkbox mr-2"> Divan Saz
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Cümbüş Oud" class="instrument-checkbox mr-2"> Cümbüş Oud
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Cümbüş Tanbur" class="instrument-checkbox mr-2"> Cümbüş Tanbur
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Setar" class="instrument-checkbox mr-2"> Setar
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Duduk" class="instrument-checkbox mr-2"> Duduk
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Hulusi" class="instrument-checkbox mr-2"> Hulusi
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Pipa" class="instrument-checkbox mr-2"> Pipa
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Arabic Oud" class="instrument-checkbox mr-2"> Arabic Oud
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Turkish Oud" class="instrument-checkbox mr-2"> Turkish Oud
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Azeri Tar" class="instrument-checkbox mr-2"> Azeri Tar
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Octave Mandolin" class="instrument-checkbox mr-2"> Octave Mandolin
+            </label>
+          </div>
+        </div>
+        <!-- Pills display -->
+        <div id="instrument-pills" class="flex flex-wrap gap-2"></div>
+      </div>
 
-      <!-- Revealed when "More than one?" is chosen -->
-      <label id="instrument-list-wrap" class="grid gap-1 hidden">
-        <span class="text-sm">List them here</span>
-        <textarea name="instrument_list"
-                  rows="3"
-                  class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
-                  placeholder="e.g., Arabic Oud, Tanpura, Duduk"></textarea>
-      </label>
-
-      <!-- Optional: Genre(s) -->
-      <label class="grid gap-1">
+      <!-- Multi-select Genres with Pills -->
+      <div class="grid gap-2">
         <span class="text-sm">Genre(s) (optional)</span>
-        <select id="genre-select"
-                name="genre"
-                class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]">
-          <option value="">— Select a genre —</option>
-          <option>Classical</option>
-          <option>Blues</option>
-          <option>Traditional/Folk</option>
-          <option>Metal/Alternative</option>
-          <option>Pop</option>
-          <option>Rock</option>
-          <option>Oldies</option>
-          <option value="other">Other</option>
-        </select>
-      </label>
+        <div class="relative">
+          <button type="button" id="genre-dropdown-btn" 
+                  class="w-full bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-left flex justify-between items-center">
+            <span id="genre-placeholder">Select genres...</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="genre-dropdown" class="hidden absolute z-10 w-full mt-1 bg-[#181818] border border-gold/40 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Classical" class="genre-checkbox mr-2"> Classical
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Blues" class="genre-checkbox mr-2"> Blues
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Traditional/Folk" class="genre-checkbox mr-2"> Traditional/Folk
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Metal/Alternative" class="genre-checkbox mr-2"> Metal/Alternative
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Pop" class="genre-checkbox mr-2"> Pop
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Rock" class="genre-checkbox mr-2"> Rock
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Oldies" class="genre-checkbox mr-2"> Oldies
+            </label>
+            <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
+              <input type="checkbox" value="Other" class="genre-checkbox mr-2"> Other
+            </label>
+          </div>
+        </div>
+        <!-- Pills display -->
+        <div id="genre-pills" class="flex flex-wrap gap-2"></div>
+      </div>
 
-      <!-- Revealed when "Other" is chosen -->
+      <!-- Custom genre text (shown when "Other" is selected) -->
       <label id="genre-other-wrap" class="grid gap-1 hidden">
         <span class="text-sm">Describe the genre(s) / vibe</span>
         <textarea name="genre_other"
@@ -121,17 +185,22 @@ const description =
 
       <!-- Required: Message -->
       <label class="grid gap-1">
-        <span class="text-sm font-semibold">Message</span>
+        <span class="text-sm font-semibold">Message *</span>
         <textarea class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
                   rows="6" name="message" required></textarea>
       </label>
 
+      <!-- Honeypot (hidden spam trap) -->
+      <input type="text" name="honeypot" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px" />
+
+      <!-- Hidden form identifier -->
       <input type="hidden" name="formName" value="Contact Page" />
 
       <div class="flex flex-wrap items-center gap-6 mt-2">
         <button
           class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame"
-          type="submit">
+          type="submit"
+          id="submit-btn">
           Send
         </button>
         <a class="gothic-link" href={`mailto:${email}`}>
@@ -142,45 +211,220 @@ const description =
   </section>
 
   <style is:global>
-  select {
-    background-color: rgba(24, 24, 24, 0.6); /* same as bg-ebony/60 */
-    color: var(--ivory, #fdfbf5);
-  }
-  select option {
-    background-color: rgba(24, 24, 24, 0.95); /* darker for clarity */
-    color: var(--ivory, #fdfbf5);
-  }
-</style>
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      background: var(--accent-bronze);
+      color: var(--ivory);
+      border-radius: 9999px;
+      font-size: 0.875rem;
+    }
+    .pill button {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 0;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+    .pill button:hover {
+      color: var(--rosewood);
+    }
+  </style>
 
-  <!-- Tiny progressive-enhancement script for conditional fields -->
-  <script is:raw>
-    (function () {
-      const instrumentSelect = document.getElementById('instrument-select');
-      const instrumentWrap = document.getElementById('instrument-list-wrap');
-      const genreSelect = document.getElementById('genre-select');
-      const genreWrap = document.getElementById('genre-other-wrap');
-
-      function toggleInstrument() {
-        const multi = instrumentSelect && instrumentSelect.value === 'multi';
-        if (instrumentWrap) {
-          instrumentWrap.classList.toggle('hidden', !multi);
-          instrumentWrap.querySelector('textarea')?.setAttribute('aria-hidden', String(!multi));
+  <script>
+    // Phone auto-formatting
+    const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+    if (phoneInput) {
+      phoneInput.addEventListener('input', (e) => {
+        const input = e.target as HTMLInputElement;
+        let value = input.value.replace(/\D/g, ''); // Remove non-digits
+        
+        if (value.length > 10) value = value.slice(0, 10);
+        
+        if (value.length >= 6) {
+          value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+        } else if (value.length >= 3) {
+          value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
         }
+        
+        input.value = value;
+      });
+    }
+
+    // Multi-select dropdown functionality
+    function setupMultiSelect(
+      btnId: string,
+      dropdownId: string,
+      checkboxClass: string,
+      pillsId: string,
+      placeholderId: string
+    ) {
+      const btn = document.getElementById(btnId);
+      const dropdown = document.getElementById(dropdownId);
+      const checkboxes = document.querySelectorAll(`.${checkboxClass}`) as NodeListOf<HTMLInputElement>;
+      const pillsContainer = document.getElementById(pillsId);
+      const placeholder = document.getElementById(placeholderId);
+
+      if (!btn || !dropdown || !pillsContainer || !placeholder) return;
+
+      const selected = new Set<string>();
+
+      // Toggle dropdown
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', () => {
+        dropdown.classList.add('hidden');
+      });
+
+      dropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // Handle checkbox changes
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            selected.add(checkbox.value);
+          } else {
+            selected.delete(checkbox.value);
+          }
+          updatePills();
+        });
+      });
+
+      function updatePills() {
+  if (!pillsContainer || !placeholder) return; // Add this null check
+  
+  pillsContainer.innerHTML = '';
+  
+  if (selected.size === 0) {
+    placeholder.textContent = btnId.includes('instrument') 
+      ? 'Select instruments...' 
+      : 'Select genres...';
+    return;
+  }
+
+  placeholder.textContent = `${selected.size} selected`;
+
+        selected.forEach(value => {
+          const pill = document.createElement('div');
+          pill.className = 'pill';
+          pill.innerHTML = `
+            ${value}
+            <button type="button" data-value="${value}">&times;</button>
+          `;
+          
+          const removeBtn = pill.querySelector('button');
+          removeBtn?.addEventListener('click', () => {
+            selected.delete(value);
+            const checkbox = Array.from(checkboxes).find(cb => cb.value === value);
+            if (checkbox) checkbox.checked = false;
+            updatePills();
+          });
+          
+          pillsContainer.appendChild(pill);
+        });
       }
-      function toggleGenre() {
-        const other = genreSelect && genreSelect.value === 'other';
-        if (genreWrap) {
-          genreWrap.classList.toggle('hidden', !other);
-          genreWrap.querySelector('textarea')?.setAttribute('aria-hidden', String(!other));
+
+      // Return selected values for form submission
+      return () => Array.from(selected);
+    }
+
+    const getInstruments = setupMultiSelect(
+      'instrument-dropdown-btn',
+      'instrument-dropdown',
+      'instrument-checkbox',
+      'instrument-pills',
+      'instrument-placeholder'
+    );
+
+    const getGenres = setupMultiSelect(
+      'genre-dropdown-btn',
+      'genre-dropdown',
+      'genre-checkbox',
+      'genre-pills',
+      'genre-placeholder'
+    );
+
+    // Show/hide "Other" genre text field
+    const genreCheckboxes = document.querySelectorAll('.genre-checkbox') as NodeListOf<HTMLInputElement>;
+    const genreOtherWrap = document.getElementById('genre-other-wrap');
+    
+    genreCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const otherSelected = Array.from(genreCheckboxes).some(cb => cb.value === 'Other' && cb.checked);
+        genreOtherWrap?.classList.toggle('hidden', !otherSelected);
+      });
+    });
+
+    // Form submission
+    const form = document.getElementById('contact-form') as HTMLFormElement;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Disable submit button
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      errorMessage?.classList.add('hidden');
+
+      const formData = new FormData(form);
+      const payload: any = {};
+
+      // Get all form fields
+      formData.forEach((value, key) => {
+        payload[key] = value;
+      });
+
+      // Add multi-select arrays
+      payload.instruments = getInstruments ? getInstruments() : [];
+      payload.genres = getGenres ? getGenres() : [];
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          // Show validation errors
+          if (data.errors) {
+            const errorList = Object.values(data.errors).join(' ');
+            errorText!.textContent = errorList;
+          } else {
+            errorText!.textContent = data.error || 'Something went wrong. Please try again.';
+          }
+          errorMessage?.classList.remove('hidden');
+          
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send';
+          return;
         }
+
+        // Success! Redirect to thanks page
+        window.location.href = '/thanks';
+        
+      } catch (err) {
+        errorText!.textContent = 'Network error. Please check your connection and try again.';
+        errorMessage?.classList.remove('hidden');
+        
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send';
       }
-
-      instrumentSelect?.addEventListener('change', toggleInstrument);
-      genreSelect?.addEventListener('change', toggleGenre);
-
-      // Initialize on page load (handles back/forward cache)
-      toggleInstrument();
-      toggleGenre();
-    })();
+    });
   </script>
 </BaseLayout>
