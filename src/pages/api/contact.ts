@@ -1,4 +1,6 @@
 import type { APIRoute } from "astro";
+import { Resend } from "resend";
+import { neon } from "@neondatabase/serverless";
 
 // Field length limits
 const MAX_NAME = 80;
@@ -37,23 +39,19 @@ function isValidISODate(dateStr: string) {
 }
 
 function isValidPhone(phone: string) {
-  // Remove all non-digits
   const digits = phone.replace(/\D/g, "");
-  // Accept 10 digits (US) or 11 digits (with country code)
   return digits.length === 10 || digits.length === 11;
 }
 
 function normalizePhone(phone: string) {
-  // Extract just the digits
   const digits = phone.replace(/\D/g, "");
-  // Format as (XXX) XXX-XXXX
   if (digits.length === 10) {
     return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
   if (digits.length === 11 && digits[0] === "1") {
     return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
   }
-  return phone; // Return as-is if weird format
+  return phone;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -73,32 +71,27 @@ export const POST: APIRoute = async ({ request }) => {
     return json(400, { error: "Invalid JSON." });
   }
 
-  // 3) Honeypot check (spam bots fill hidden fields)
+  // 3) Honeypot check
   const honeypot = typeof payload?.honeypot === "string" ? payload.honeypot : "";
   if (honeypot.trim().length > 0) {
-    // Return fake success to avoid teaching bots
     return json(200, { ok: true });
   }
 
   // 4) Normalize & validate fields
   const errors: Record<string, string> = {};
 
-  // Required fields
   const name = isNonEmptyString(payload?.name) ? clampTrim(payload.name, MAX_NAME) : "";
   const emailRaw = isNonEmptyString(payload?.email) ? clampTrim(payload.email, MAX_EMAIL) : "";
   const email = emailRaw.toLowerCase();
   const location = isNonEmptyString(payload?.location) ? clampTrim(payload.location, MAX_LOCATION) : "";
   const message = isNonEmptyString(payload?.message) ? clampTrim(payload.message, MAX_MESSAGE) : "";
 
-  // Optional fields
   const phone = isNonEmptyString(payload?.phone) ? clampTrim(payload.phone, MAX_PHONE) : "";
   const date = isNonEmptyString(payload?.date) ? payload.date.trim() : "";
   
-  // Multi-select arrays
   const instruments = Array.isArray(payload?.instruments) ? payload.instruments : [];
   const genres = Array.isArray(payload?.genres) ? payload.genres : [];
   
-  // Custom text fields
   const genreOther = isNonEmptyString(payload?.genre_other) 
     ? clampTrim(payload.genre_other, MAX_CUSTOM_TEXT) 
     : "";
@@ -112,7 +105,6 @@ export const POST: APIRoute = async ({ request }) => {
   if (!location) errors.location = "Location is required.";
   if (!message) errors.message = "Message is required.";
 
-  // Validate optional fields if provided
   if (date && !isValidISODate(date)) {
     errors.date = "Event date must be YYYY-MM-DD format.";
   }
@@ -121,62 +113,109 @@ export const POST: APIRoute = async ({ request }) => {
     errors.phone = "Phone number looks invalid. Use format: (804) 555-1234";
   }
 
-  // If validation failed, return errors
   if (Object.keys(errors).length > 0) {
     return json(400, { error: "Validation failed.", errors });
   }
 
-  // 5) Format phone nicely if provided
+  // 5) Format phone nicely
   const formattedPhone = phone ? normalizePhone(phone) : "";
 
-  // 6) Build readable message for Formspree
-  const instrumentList = instruments.length > 0 ? instruments.join(", ") : "Not specified";
-  const genreList = genres.length > 0 ? genres.join(", ") : "Not specified";
-  
-  const composedMessage = [
-    `Name: ${name}`,
-    `Email: ${email}`,
-    formattedPhone ? `Phone: ${formattedPhone}` : null,
-    date ? `Event Date: ${date}` : null,
-    `Location: ${location}`,
-    `Instruments: ${instrumentList}`,
-    `Genres: ${genreList}`,
-    genreOther ? `Custom Genre(s): ${genreOther}` : null,
-    "",
-    "Message:",
-    message,
-    "",
-    `Form: ${formName}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  // 6) Get request metadata
+  const ipAddress = request.headers.get("x-forwarded-for") || 
+                    request.headers.get("x-real-ip") || 
+                    "unknown";
+  const userAgent = request.headers.get("user-agent") || "unknown";
 
-  // 7) Forward to Formspree
-  const endpoint = import.meta.env.FORMSPREE_ENDPOINT;
-  if (!endpoint) {
-    return json(500, { error: "Server misconfigured. Missing FORMSPREE_ENDPOINT." });
+  // 7) Save to database
+try {
+  // console.log("Attempting database insert...");
+  // console.log("DATABASE_URL exists:", !!import.meta.env.DATABASE_URL);
+  
+  const sql = neon(import.meta.env.DATABASE_URL);
+  const result = await sql`
+    INSERT INTO contact_submissions (
+      name, email, phone, event_date, location, 
+      instruments, genres, genre_other, message, 
+      form_name, ip_address, user_agent
+    )
+    VALUES (
+      ${name}, ${email}, ${formattedPhone}, ${date || null}, ${location},
+      ${instruments}, ${genres}, ${genreOther}, ${message},
+      ${formName}, ${ipAddress}, ${userAgent}
+    )
+    RETURNING id
+  `;
+  
+  // console.log("Database insert successful! ID:", result[0]?.id);
+} catch (dbError) {
+  console.error("Database error:", dbError);
+  // Continue even if database fails - still send email
+}
+
+  // 8) Send email via Resend
+  const resendApiKey = import.meta.env.RESEND_API_KEY;
+  const contactEmail = import.meta.env.CONTACT_EMAIL;
+
+  if (!resendApiKey || !contactEmail) {
+    return json(500, { 
+      error: "Server misconfigured. Missing email configuration." 
+    });
   }
 
+  const resend = new Resend(resendApiKey);
+
+  // Build email content
+  const instrumentList = instruments.length > 0 ? instruments.join(", ") : "Not specified";
+  const genreList = genres.length > 0 ? genres.join(", ") : "Not specified";
+
+  const emailBody = `
+New Booking Inquiry from ${name}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📧 Email: ${email}
+${formattedPhone ? `📱 Phone: ${formattedPhone}` : ''}
+${date ? `📅 Event Date: ${date}` : ''}
+📍 Location: ${location}
+
+🎵 Instruments: ${instrumentList}
+🎶 Genres: ${genreList}
+${genreOther ? `🎨 Custom Genre: ${genreOther}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Message:
+${message}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Submitted from: ${formName}
+IP: ${ipAddress}
+Timestamp: ${new Date().toISOString()}
+  `.trim();
+
   try {
-    const resp = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        email,
-        message: composedMessage,
-        _subject: `Booking Request from ${name}`,
-      }),
+    const { data, error } = await resend.emails.send({
+      from: 'Tradscendence Booking <bookings@soundbeyondborders.com>',
+      to: [contactEmail],
+      subject: `🎵 New Booking Inquiry from ${name}`,
+      text: emailBody,
     });
 
-    if (!resp.ok) {
-      console.error("Formspree error:", resp.status);
-      return json(502, { error: "Upstream form service error." });
+    if (error) {
+      console.error("Resend error:", error);
+      return json(502, { 
+        error: "Failed to send email notification." 
+      });
     }
 
+    console.log("Email sent successfully:", data);
     return json(200, { ok: true });
-  } catch (err) {
-    console.error("Network error:", err);
-    return json(502, { error: "Network error contacting form service." });
+
+  } catch (emailError) {
+    console.error("Email error:", emailError);
+    return json(502, { 
+      error: "Failed to send email notification." 
+    });
   }
 };
