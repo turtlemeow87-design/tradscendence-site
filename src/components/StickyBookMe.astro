@@ -1,7 +1,7 @@
 ---
 /* no frontmatter needed */
 ---
-<!-- Floating “Book me” button -->
+<!-- Floating "Book me" button -->
 <div class="fixed right-4 bottom-4 md:bottom-auto md:top-4 z-50">
   <button
     id="open-book"
@@ -14,8 +14,7 @@
 <!-- Quick-book dialog -->
 <dialog id="quick-book" class="rounded-2xl p-0 backdrop:bg-black/60">
   <form
-    action="https://formspree.io/f/mldwoalq"
-    method="POST"
+    id="quick-book-form"
     class="relative p-5 space-y-4 bg-neutral-900 text-neutral-100 rounded-2xl"
   >
     <!-- Top-right X close -->
@@ -37,13 +36,18 @@
     </div>
 
     <label class="block">
-      <span class="text-sm">Your name</span>
+      <span class="text-sm">Your name *</span>
       <input name="name" required class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" />
     </label>
 
     <label class="block">
-      <span class="text-sm">Email</span>
+      <span class="text-sm">Email *</span>
       <input name="email" type="email" required class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" />
+    </label>
+
+    <label class="block">
+      <span class="text-sm">Location (city/venue) *</span>
+      <input name="location" required class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" placeholder="Richmond, VA" />
     </label>
 
     <label class="block">
@@ -52,16 +56,20 @@
     </label>
 
     <label class="block">
-      <span class="text-sm">Message</span>
-      <textarea name="message" rows="4" class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]"></textarea>
+      <span class="text-sm">Message *</span>
+      <textarea name="message" required rows="4" class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]"></textarea>
     </label>
 
     <input type="hidden" name="formName" value="Quick booking" />
+
+    <!-- Status message -->
+    <div id="quick-status" class="hidden rounded-xl p-3 text-sm"></div>
 
     <div class="flex items-center justify-between gap-3">
       <a href="/contact" class="rounded-xl px-4 py-2 bg-neutral-700 text-neutral-100 frame">Full Contact Page</a>
       <button
         type="submit"
+        id="quick-submit-btn"
         class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame"
       >
         Send
@@ -70,15 +78,18 @@
   </form>
 </dialog>
 
-<script is:raw>
+<script>
   const openBtn = document.getElementById('open-book');
   const closeBtn = document.getElementById('close-book');
-  const dialog  = document.getElementById('quick-book');
+  const dialog = document.getElementById('quick-book') as HTMLDialogElement;
+  const form = document.getElementById('quick-book-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('quick-submit-btn') as HTMLButtonElement;
+  const statusDiv = document.getElementById('quick-status') as HTMLDivElement;
 
   openBtn?.addEventListener('click', () => dialog?.showModal());
   closeBtn?.addEventListener('click', () => dialog?.close());
 
-  // Optional: close on backdrop click
+  // Close on backdrop click
   dialog?.addEventListener('click', (e) => {
     const rect = dialog.getBoundingClientRect();
     const clickedInside = (
@@ -86,5 +97,50 @@
       e.clientY >= rect.top && e.clientY <= rect.bottom
     );
     if (!clickedInside) dialog.close();
+  });
+
+  // Handle form submission
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+
+    // Update button state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    statusDiv.classList.add('hidden');
+
+    try {
+      const response = await fetch('/api/contact.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        statusDiv.textContent = 'Message sent successfully!';
+        statusDiv.className = 'rounded-xl p-3 text-sm bg-green-900/50 border border-green-500 text-green-100';
+        statusDiv.classList.remove('hidden');
+        form.reset();
+        
+        // Close dialog after short delay
+        setTimeout(() => {
+          dialog.close();
+          statusDiv.classList.add('hidden');
+        }, 2000);
+      } else {
+        throw new Error(result.error || 'Failed to send message');
+      }
+    } catch (error) {
+      statusDiv.textContent = error instanceof Error ? error.message : 'Failed to send message. Please try again.';
+      statusDiv.className = 'rounded-xl p-3 text-sm bg-red-900/50 border border-red-500 text-red-100';
+      statusDiv.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send';
+    }
   });
 </script>
