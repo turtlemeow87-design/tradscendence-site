@@ -219,7 +219,7 @@ const title = "Admin — Manage Instruments";
 
       try {
         // Test the key by fetching instruments with admin header
-        await fetch(API + '/api/instruments/index.json', {
+        await fetch(API, {
           headers: { 'x-admin-key': ADMIN_KEY },
         });
         // If we get here, key format is ok. We'll validate on first write.
@@ -239,7 +239,7 @@ const title = "Admin — Manage Instruments";
     // ── Load & Render List ──
     async function loadInstruments() {
       try {
-        const res = await fetch(API + '/api/instruments/index.json');
+        const res = await fetch(API);
         const instruments = await res.json();
 
         if (instruments.length === 0) {
@@ -354,7 +354,7 @@ const title = "Admin — Manage Instruments";
 
       try {
         if (mode === 'add') {
-          await apiFetch(API + '/api/instruments/index.json', { method: 'POST', body: JSON.stringify(body) });
+          await apiFetch(API, { method: 'POST', body: JSON.stringify(body) });
           showStatus(`✅ "${body.name}" added successfully!`);
         } else {
           await apiFetch(`${API}/${originalSlug}.json`, { method: 'PUT', body: JSON.stringify(body) });
