@@ -1,0 +1,384 @@
+---
+// src/pages/admin/instruments.astro
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const title = "Admin — Manage Instruments";
+---
+
+<BaseLayout {title} description="Admin panel for managing instruments.">
+  <section class="mx-auto max-w-5xl px-4 py-10 space-y-8" id="admin-app">
+
+    <!-- Login Gate -->
+    <div id="login-gate" class="space-y-4">
+      <h1 class="font-display text-3xl">🔒 Instruments Admin</h1>
+      <p class="opacity-80">Enter your admin key to continue.</p>
+      <div class="flex gap-3 items-center">
+        <input
+          id="admin-key-input"
+          type="password"
+          placeholder="Admin API Key"
+          class="px-4 py-2 rounded-lg bg-black/30 border border-white/10 text-white w-80"
+        />
+        <button
+          id="login-btn"
+          class="px-5 py-2 rounded-lg bg-[var(--accent-gold,#C2A45F)] text-black font-bold hover:brightness-110 transition"
+        >
+          Unlock
+        </button>
+      </div>
+      <p id="login-error" class="text-red-400 text-sm hidden">Invalid key. Try again.</p>
+    </div>
+
+    <!-- Admin Panel (hidden until authenticated) -->
+    <div id="admin-panel" class="hidden space-y-8">
+      <div class="flex items-center justify-between">
+        <h1 class="font-display text-3xl">🎵 Instruments Admin</h1>
+        <button
+          id="add-new-btn"
+          class="px-5 py-2 rounded-lg bg-green-700 text-white font-bold hover:bg-green-600 transition"
+        >
+          + Add New Instrument
+        </button>
+      </div>
+
+      <!-- Status messages -->
+      <div id="status-msg" class="hidden rounded-lg px-4 py-3 text-sm font-medium"></div>
+
+      <!-- Instruments List -->
+      <div id="instruments-list" class="space-y-3">
+        <p class="opacity-60">Loading instruments...</p>
+      </div>
+
+      <!-- ═══ Add/Edit Modal ═══ -->
+      <div id="modal-overlay" class="hidden fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-10 overflow-y-auto">
+        <div class="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 w-full max-w-2xl mb-10 space-y-5">
+          <div class="flex justify-between items-center">
+            <h2 id="modal-title" class="font-display text-2xl">Add Instrument</h2>
+            <button id="modal-close" class="text-2xl opacity-60 hover:opacity-100">✕</button>
+          </div>
+
+          <form id="instrument-form" class="space-y-4">
+            <input type="hidden" id="form-mode" value="add" />
+            <input type="hidden" id="form-original-slug" value="" />
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Slug (URL path) *</label>
+                <input id="f-slug" type="text" required placeholder="ArabicOud"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+                <span class="text-xs opacity-50">PascalCase, no spaces. e.g. BaglamaSaz</span>
+              </div>
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Display Name *</label>
+                <input id="f-name" type="text" required placeholder="Arabic Oud"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Origin Prefix</label>
+                <input id="f-origin" type="text" placeholder="Arabic, Turkish, Indian..."
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Tagline</label>
+                <input id="f-tagline" type="text" placeholder="Short subtitle under the name"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm opacity-70 mb-1">SEO Title</label>
+                <input id="f-seo-title" type="text" placeholder="Arabic Oud — Tradscendence | Sound Beyond Borders"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Audio Teaser Path</label>
+                <input id="f-audio" type="text" placeholder="/media/arabicoud.m4a"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm opacity-70 mb-1">SEO Description</label>
+              <textarea id="f-seo-desc" rows="2" placeholder="Meta description for search engines"
+                class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm opacity-70 mb-1">About (HTML)</label>
+              <textarea id="f-about" rows="5" placeholder="<p>Write about this instrument here...</p>"
+                class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white font-mono text-sm"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm opacity-70 mb-1">Moods Intro Text</label>
+              <input id="f-moods-intro" type="text" placeholder="The Arabic Oud's voice moves fluidly between..."
+                class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Image URL</label>
+                <input id="f-image" type="text" placeholder="/media/inst-arabicoud.jpg"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Image Alt Text</label>
+                <input id="f-image-alt" type="text" placeholder="Close-up of Arabic Oud"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Display Order</label>
+                <input id="f-order" type="number" value="0"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+              <div class="flex items-end gap-4 pb-1">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input id="f-featured" type="checkbox" class="w-4 h-4" />
+                  <span class="text-sm">Featured</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input id="f-ready" type="checkbox" checked class="w-4 h-4" />
+                  <span class="text-sm">Page Ready</span>
+                </label>
+              </div>
+              <div>
+                <label class="block text-sm opacity-70 mb-1">Featured Image</label>
+                <input id="f-featured-img" type="text" placeholder="/media/inst-arabicoud.jpg"
+                  class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
+              </div>
+            </div>
+
+            <div class="pt-3 flex gap-3">
+              <button type="submit"
+                class="px-6 py-2 rounded-lg bg-[var(--accent-gold,#C2A45F)] text-black font-bold hover:brightness-110 transition">
+                Save Instrument
+              </button>
+              <button type="button" id="modal-cancel"
+                class="px-6 py-2 rounded-lg border border-white/20 opacity-70 hover:opacity-100 transition">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    let ADMIN_KEY = '';
+    const API = '/api/instruments';
+
+    // ── DOM refs ──
+    const loginGate     = document.getElementById('login-gate');
+    const adminPanel    = document.getElementById('admin-panel');
+    const keyInput      = document.getElementById('admin-key-input');
+    const loginBtn      = document.getElementById('login-btn');
+    const loginError    = document.getElementById('login-error');
+    const listContainer = document.getElementById('instruments-list');
+    const statusMsg     = document.getElementById('status-msg');
+    const addNewBtn     = document.getElementById('add-new-btn');
+    const modalOverlay  = document.getElementById('modal-overlay');
+    const modalTitle    = document.getElementById('modal-title');
+    const modalClose    = document.getElementById('modal-close');
+    const modalCancel   = document.getElementById('modal-cancel');
+    const form          = document.getElementById('instrument-form');
+
+    // ── Helpers ──
+    function showStatus(msg, isError = false) {
+      statusMsg.textContent = msg;
+      statusMsg.className = `rounded-lg px-4 py-3 text-sm font-medium ${isError ? 'bg-red-900/50 text-red-300' : 'bg-green-900/50 text-green-300'}`;
+      statusMsg.classList.remove('hidden');
+      setTimeout(() => statusMsg.classList.add('hidden'), 4000);
+    }
+
+    async function apiFetch(url, options = {}) {
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': ADMIN_KEY,
+          ...options.headers,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
+    }
+
+    // ── Login ──
+    loginBtn.addEventListener('click', async () => {
+      ADMIN_KEY = keyInput.value.trim();
+      if (!ADMIN_KEY) return;
+
+      try {
+        // Test the key by fetching instruments with admin header
+        await fetch(API + '.json', {
+          headers: { 'x-admin-key': ADMIN_KEY },
+        });
+        // If we get here, key format is ok. We'll validate on first write.
+        loginGate.classList.add('hidden');
+        adminPanel.classList.remove('hidden');
+        loginError.classList.add('hidden');
+        loadInstruments();
+      } catch {
+        loginError.classList.remove('hidden');
+      }
+    });
+
+    keyInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    // ── Load & Render List ──
+    async function loadInstruments() {
+      try {
+        const res = await fetch(API + '.json');
+        const instruments = await res.json();
+
+        if (instruments.length === 0) {
+          listContainer.innerHTML = '<p class="opacity-60">No instruments yet. Click "+ Add New Instrument" to start.</p>';
+          return;
+        }
+
+        listContainer.innerHTML = instruments.map(inst => `
+          <div class="flex items-center justify-between rounded-xl px-4 py-3 border border-white/10 bg-white/5">
+            <div class="flex items-center gap-3">
+              <span class="text-sm opacity-50 w-6 text-right">${inst.display_order}</span>
+              <span class="font-medium">${inst.name}</span>
+              <span class="text-xs opacity-40">${inst.slug}</span>
+              ${inst.featured ? '<span class="text-xs bg-yellow-700/40 text-yellow-300 px-2 py-0.5 rounded-full">Featured</span>' : ''}
+              ${!inst.page_ready ? '<span class="text-xs bg-red-700/40 text-red-300 px-2 py-0.5 rounded-full">Coming Soon</span>' : ''}
+            </div>
+            <div class="flex gap-2">
+              <button data-edit="${inst.slug}" class="text-sm px-3 py-1 rounded bg-blue-700/40 hover:bg-blue-600/60 transition">Edit</button>
+              <button data-delete="${inst.slug}" class="text-sm px-3 py-1 rounded bg-red-700/40 hover:bg-red-600/60 transition">Delete</button>
+            </div>
+          </div>
+        `).join('');
+
+        // Attach edit handlers
+        listContainer.querySelectorAll('[data-edit]').forEach(btn => {
+          btn.addEventListener('click', () => openEditModal(btn.dataset.edit));
+        });
+
+        // Attach delete handlers
+        listContainer.querySelectorAll('[data-delete]').forEach(btn => {
+          btn.addEventListener('click', () => deleteInstrument(btn.dataset.delete));
+        });
+
+      } catch (err) {
+        listContainer.innerHTML = `<p class="text-red-400">Error loading instruments: ${err.message}</p>`;
+      }
+    }
+
+    // ── Modal: Add New ──
+    addNewBtn.addEventListener('click', () => {
+      document.getElementById('form-mode').value = 'add';
+      document.getElementById('form-original-slug').value = '';
+      modalTitle.textContent = 'Add New Instrument';
+      form.reset();
+      document.getElementById('f-ready').checked = true;
+      modalOverlay.classList.remove('hidden');
+    });
+
+    // ── Modal: Edit Existing ──
+    async function openEditModal(slug) {
+      try {
+        const res = await fetch(`${API}/${slug}.json`);
+        const inst = await res.json();
+
+        document.getElementById('form-mode').value = 'edit';
+        document.getElementById('form-original-slug').value = slug;
+        modalTitle.textContent = `Edit: ${inst.name}`;
+
+        document.getElementById('f-slug').value = inst.slug || '';
+        document.getElementById('f-name').value = inst.name || '';
+        document.getElementById('f-origin').value = inst.origin_prefix || '';
+        document.getElementById('f-tagline').value = inst.tagline || '';
+        document.getElementById('f-seo-title').value = inst.seo_title || '';
+        document.getElementById('f-seo-desc').value = inst.seo_description || '';
+        document.getElementById('f-about').value = inst.about_html || '';
+        document.getElementById('f-moods-intro').value = inst.moods_intro || '';
+        document.getElementById('f-image').value = inst.image_url || '';
+        document.getElementById('f-image-alt').value = inst.image_alt || '';
+        document.getElementById('f-audio').value = inst.audio_teaser || '';
+        document.getElementById('f-order').value = inst.display_order || 0;
+        document.getElementById('f-featured').checked = inst.featured;
+        document.getElementById('f-ready').checked = inst.page_ready;
+        document.getElementById('f-featured-img').value = inst.featured_image || '';
+
+        modalOverlay.classList.remove('hidden');
+      } catch (err) {
+        showStatus(`Failed to load instrument: ${err.message}`, true);
+      }
+    }
+
+    // ── Modal: Close ──
+    modalClose.addEventListener('click', () => modalOverlay.classList.add('hidden'));
+    modalCancel.addEventListener('click', () => modalOverlay.classList.add('hidden'));
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.add('hidden');
+    });
+
+    // ── Form Submit ──
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const mode = document.getElementById('form-mode').value;
+      const originalSlug = document.getElementById('form-original-slug').value;
+
+      const body = {
+        slug:            document.getElementById('f-slug').value.trim(),
+        name:            document.getElementById('f-name').value.trim(),
+        origin_prefix:   document.getElementById('f-origin').value.trim(),
+        tagline:         document.getElementById('f-tagline').value.trim(),
+        seo_title:       document.getElementById('f-seo-title').value.trim(),
+        seo_description: document.getElementById('f-seo-desc').value.trim(),
+        about_html:      document.getElementById('f-about').value.trim(),
+        moods_intro:     document.getElementById('f-moods-intro').value.trim(),
+        image_url:       document.getElementById('f-image').value.trim(),
+        image_alt:       document.getElementById('f-image-alt').value.trim(),
+        audio_teaser:    document.getElementById('f-audio').value.trim(),
+        display_order:   parseInt(document.getElementById('f-order').value) || 0,
+        featured:        document.getElementById('f-featured').checked,
+        page_ready:      document.getElementById('f-ready').checked,
+        featured_image:  document.getElementById('f-featured-img').value.trim(),
+      };
+
+      try {
+        if (mode === 'add') {
+          await apiFetch(API + '.json', { method: 'POST', body: JSON.stringify(body) });
+          showStatus(`✅ "${body.name}" added successfully!`);
+        } else {
+          await apiFetch(`${API}/${originalSlug}.json`, { method: 'PUT', body: JSON.stringify(body) });
+          showStatus(`✅ "${body.name}" updated successfully!`);
+        }
+
+        modalOverlay.classList.add('hidden');
+        loadInstruments();
+      } catch (err) {
+        showStatus(`❌ Error: ${err.message}`, true);
+      }
+    });
+
+    // ── Delete ──
+    async function deleteInstrument(slug) {
+      if (!confirm(`Are you sure you want to delete "${slug}"? This cannot be undone.`)) return;
+
+      try {
+        await apiFetch(`${API}/${slug}.json`, { method: 'DELETE' });
+        showStatus(`✅ "${slug}" deleted.`);
+        loadInstruments();
+      } catch (err) {
+        showStatus(`❌ Error: ${err.message}`, true);
+      }
+    }
+  </script>
+</BaseLayout>
