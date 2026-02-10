@@ -18,25 +18,21 @@ const LATEST_YT = {
 const embedUrl = `https://www.youtube.com/embed/${LATEST_YT.id}?rel=0`;
 const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
 
-const items = [
-  { name: "Indian Surbahar",        file: "/media/surbahar.m4a",       href: "/instruments/Surbahar" },
-  { name: "Indian Tanpura",         file: "/media/tanpura.m4a",        href: "/instruments/Tanpura"  },
-  { name: "Pakistani Rabab",        file: "/media/rabab.m4a",          href: "/instruments/Rabab" },
-  { name: "Indian Esraj",           file: "/media/esraj.m4a",          href: "/instruments/Esraj" },
-  { name: "Turkish Kabak Kemane",   file: "/media/kemane.m4a",         href: "/coming-soon" },
-  { name: "Turkish Baglama Saz",    file: "/media/baglamasaz1.m4a",    href: "/instruments/BaglamaSaz" },
-  { name: "Turkish Divan Saz",      file: "/media/divansaz.m4a",       href: "/instruments/DivanSaz" },
-  { name: "Turkish Cümbüş Tanbur",  file: "/media/tanbur.m4a",         href: "/instruments/Tanbur" },
-  { name: "Turkish Cümbüş Oud",     file: "/media/CumbusOud.m4a",      href: "/instruments/CumbusOud" },
-  { name: "Persian Setar",          file: "/media/setar.m4a",          href: "/instruments/Setar" },
-  { name: "Armenian Duduk",         file: "/media/duduk.m4a",          href: "/instruments/Duduk" },
-  { name: "Chinese Hulusi",         file: "/media/hulusi.m4a",         href: "/instruments/Hulusi" },
-  { name: "Chinese Pipa",           file: "/media/pipa.m4a",           href: "/coming-soon" },
-  { name: "Arabic Oud",             file: "/media/arabicoud.m4a",      href: "/instruments/ArabicOud" },
-  { name: "Turkish Oud",            file: "/media/turkishoud.m4a",     href: "/instruments/TOud" }, // ← verify this path
-  { name: "Azeri Tar",              file: "/media/tar.m4a",            href: "/instruments/AzeriTar" },
-  { name: "Octave Mandolin",        file: "/media/octavemandolin.m4a", href: "/instruments/OM" },
-];
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon(import.meta.env.DATABASE_URL);
+const dbItems = await sql`
+  SELECT slug, name, audio_teaser, page_ready
+  FROM instruments
+  ORDER BY display_order ASC
+`;
+
+// Map to the shape your template already expects
+const items = dbItems.map((row) => ({
+  name: row.name,
+  file: row.audio_teaser,
+  href: row.page_ready ? `/instruments/${row.slug}` : "/coming-soon",
+}));
 ---
 
 <BaseLayout {title} description={description} canonical="https://www.soundbeyondborders.com/instruments/">
