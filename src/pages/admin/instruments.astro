@@ -174,7 +174,7 @@ const title = "Admin — Manage Instruments";
   <script type="module">
     let ADMIN_KEY = '';
     const API_LIST = '/api/instruments/index.json';
-const API_DETAIL = '/api/instruments';
+    const API_DETAIL = '/api/instruments';
     // ── DOM refs ──
     const loginGate     = document.getElementById('login-gate');
     const adminPanel    = document.getElementById('admin-panel');
@@ -218,11 +218,9 @@ const API_DETAIL = '/api/instruments';
       if (!ADMIN_KEY) return;
 
       try {
-        // Test the key by fetching instruments with admin header
-        await fetch(API, {
+        await fetch(API_LIST, {
           headers: { 'x-admin-key': ADMIN_KEY },
         });
-        // If we get here, key format is ok. We'll validate on first write.
         loginGate.classList.add('hidden');
         adminPanel.classList.remove('hidden');
         loginError.classList.add('hidden');
@@ -239,7 +237,7 @@ const API_DETAIL = '/api/instruments';
     // ── Load & Render List ──
     async function loadInstruments() {
       try {
-        const res = await fetch(API);
+        const res = await fetch(API_LIST);
         const instruments = await res.json();
 
         if (instruments.length === 0) {
@@ -263,12 +261,10 @@ const API_DETAIL = '/api/instruments';
           </div>
         `).join('');
 
-        // Attach edit handlers
         listContainer.querySelectorAll('[data-edit]').forEach(btn => {
           btn.addEventListener('click', () => openEditModal(btn.dataset.edit));
         });
 
-        // Attach delete handlers
         listContainer.querySelectorAll('[data-delete]').forEach(btn => {
           btn.addEventListener('click', () => deleteInstrument(btn.dataset.delete));
         });
@@ -291,7 +287,7 @@ const API_DETAIL = '/api/instruments';
     // ── Modal: Edit Existing ──
     async function openEditModal(slug) {
       try {
-        const res = await fetch(`${API}/${slug}.json`);
+        const res = await fetch(`${API_DETAIL}/${slug}.json`);
         const inst = await res.json();
 
         document.getElementById('form-mode').value = 'edit';
@@ -354,10 +350,10 @@ const API_DETAIL = '/api/instruments';
 
       try {
         if (mode === 'add') {
-          await apiFetch(API, { method: 'POST', body: JSON.stringify(body) });
+          await apiFetch(API_LIST, { method: 'POST', body: JSON.stringify(body) });
           showStatus(`✅ "${body.name}" added successfully!`);
         } else {
-          await apiFetch(`${API}/${originalSlug}.json`, { method: 'PUT', body: JSON.stringify(body) });
+          await apiFetch(`${API_DETAIL}/${originalSlug}.json`, { method: 'PUT', body: JSON.stringify(body) });
           showStatus(`✅ "${body.name}" updated successfully!`);
         }
 
@@ -373,7 +369,7 @@ const API_DETAIL = '/api/instruments';
       if (!confirm(`Are you sure you want to delete "${slug}"? This cannot be undone.`)) return;
 
       try {
-        await apiFetch(`${API}/${slug}.json`, { method: 'DELETE' });
+        await apiFetch(`${API_DETAIL}/${slug}.json`, { method: 'DELETE' });
         showStatus(`✅ "${slug}" deleted.`);
         loadInstruments();
       } catch (err) {
