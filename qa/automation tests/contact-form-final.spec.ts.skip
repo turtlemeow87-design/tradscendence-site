@@ -1,0 +1,85 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Sound Beyond Borders Contact Form', () => {
+  test('should fill out and submit the main contact form', async ({ page }) => {
+    // Navigate to the contact page
+    await page.goto('https://www.soundbeyondborders.com/contact');
+    
+    // Wait for the form to be visible (more reliable than networkidle)
+    await page.waitForSelector('#contact-form', { state: 'visible' });
+    
+    // Fill in Name - use .last() because it exists in both forms
+    await page.locator('input[name="name"]').last().fill('John Doe');
+    
+    // Fill in Email - use .last() because it exists in both forms
+    await page.locator('input[name="email"]').last().fill('john.doe@example.com');
+    
+    // Fill in Phone - ONLY in main form, no index needed
+    await page.locator('input[name="phone"]').fill('8045551234');
+    
+    // Fill in Event Date - use .last() because it exists in both forms
+    await page.locator('input[name="date"]').last().fill('2025-03-15');
+    
+    // Fill in Location - use .last() because it exists in both forms
+    await page.locator('input[name="location"]').last().fill('Washington, DC');
+    
+    // Handle Instruments multi-select dropdown
+    // Click the button to open dropdown
+    await page.click('#instrument-dropdown-btn');
+    await page.waitForTimeout(300);
+    
+    // Click checkboxes for instruments
+    await page.locator('.instrument-checkbox[value="Arabic Oud"]').click();
+    await page.waitForTimeout(100);
+    await page.locator('.instrument-checkbox[value="Duduk"]').click();
+    
+    // Close dropdown by clicking outside
+    await page.click('h1');
+    await page.waitForTimeout(300);
+    
+    // Handle Genres multi-select dropdown
+    await page.click('#genre-dropdown-btn');
+    await page.waitForTimeout(300);
+    
+    // Click checkbox for genre
+    await page.locator('.genre-checkbox[value="Traditional/Folk"]').click();
+    
+    // Also select "Other" to make the genre_other field appear
+    await page.locator('.genre-checkbox[value="Other"]').click();
+    
+    // Close dropdown
+    await page.click('h1');
+    await page.waitForTimeout(300);
+    
+    // Fill in Genre Description (only appears when "Other" is selected)
+    await page.locator('textarea[name="genre_other"]').fill('Looking for a blend of traditional Middle Eastern and folk music.');
+    
+    // Fill in Message - use .last() because it exists in both forms
+    await page.locator('textarea[name="message"]').last().fill('We are planning a wedding ceremony in Washington DC on March 15, 2025. We would love to have live traditional music performed during the ceremony and reception. Please let us know your availability and rates. Thank you!');
+    
+    // Submit the form - use #submit-btn which is the main form's button
+    await page.click('#submit-btn');
+    
+    // Wait for redirect to /thanks page
+    await page.waitForURL('**/thanks', { timeout: 10000 });
+    
+    // Verify we're on the thanks page
+    await expect(page).toHaveURL(/\/thanks/);
+  });
+  
+  test('should validate required fields on main form', async ({ page }) => {
+    await page.goto('https://www.soundbeyondborders.com/contact');
+    
+    // Wait for form to be visible
+    await page.waitForSelector('#contact-form', { state: 'visible' });
+    
+    // Try to submit without filling required fields
+    await page.click('#submit-btn');
+    
+    // Wait a moment
+    await page.waitForTimeout(500);
+    
+    // Should still be on contact page (HTML5 validation prevents submission)
+    await expect(page).toHaveURL(/.*contact/);
+  });
+});
