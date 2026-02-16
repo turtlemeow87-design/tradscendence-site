@@ -5,6 +5,9 @@ const email = 'HunterEast.Musiq@gmail.com';
 const title = "Contact / Booking — Tradscendence | Sound Beyond Borders";
 const description =
   "Contact Hunter Eastland (Tradscendence), world & folk multi-instrumentalist in Richmond, VA. Book for weddings, ceremonies, funerals, small gatherings, or studio sessions.";
+
+// Get API base URL from environment (defaults to current origin in production)
+const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
 ---
 <BaseLayout {title} description={description} canonical="https://www.soundbeyondborders.com/Contact/">
   <section class="mx-auto max-w-3xl px-4 py-10 space-y-6">
@@ -235,12 +238,12 @@ const description =
     }
   </style>
 
-  <script>
+  <script define:vars={{ apiBaseUrl }}>
     // Phone auto-formatting
-    const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+    const phoneInput = document.getElementById('phone-input');
     if (phoneInput) {
       phoneInput.addEventListener('input', (e) => {
-        const input = e.target as HTMLInputElement;
+        const input = e.target;
         let value = input.value.replace(/\D/g, ''); // Remove non-digits
         
         if (value.length > 10) value = value.slice(0, 10);
@@ -257,21 +260,21 @@ const description =
 
     // Multi-select dropdown functionality
     function setupMultiSelect(
-      btnId: string,
-      dropdownId: string,
-      checkboxClass: string,
-      pillsId: string,
-      placeholderId: string
+      btnId,
+      dropdownId,
+      checkboxClass,
+      pillsId,
+      placeholderId
     ) {
       const btn = document.getElementById(btnId);
       const dropdown = document.getElementById(dropdownId);
-      const checkboxes = document.querySelectorAll(`.${checkboxClass}`) as NodeListOf<HTMLInputElement>;
+      const checkboxes = document.querySelectorAll(`.${checkboxClass}`);
       const pillsContainer = document.getElementById(pillsId);
       const placeholder = document.getElementById(placeholderId);
 
       if (!btn || !dropdown || !pillsContainer || !placeholder) return;
 
-      const selected = new Set<string>();
+      const selected = new Set();
 
       // Toggle dropdown
       btn.addEventListener('click', (e) => {
@@ -301,18 +304,18 @@ const description =
       });
 
       function updatePills() {
-  if (!pillsContainer || !placeholder) return; // Add this null check
-  
-  pillsContainer.innerHTML = '';
-  
-  if (selected.size === 0) {
-    placeholder.textContent = btnId.includes('instrument') 
-      ? 'Select instruments...' 
-      : 'Select genres...';
-    return;
-  }
+        if (!pillsContainer || !placeholder) return;
+        
+        pillsContainer.innerHTML = '';
+        
+        if (selected.size === 0) {
+          placeholder.textContent = btnId.includes('instrument') 
+            ? 'Select instruments...' 
+            : 'Select genres...';
+          return;
+        }
 
-  placeholder.textContent = `${selected.size} selected`;
+        placeholder.textContent = `${selected.size} selected`;
 
         selected.forEach(value => {
           const pill = document.createElement('div');
@@ -355,7 +358,7 @@ const description =
     );
 
     // Show/hide "Other" genre text field
-    const genreCheckboxes = document.querySelectorAll('.genre-checkbox') as NodeListOf<HTMLInputElement>;
+    const genreCheckboxes = document.querySelectorAll('.genre-checkbox');
     const genreOtherWrap = document.getElementById('genre-other-wrap');
     
     genreCheckboxes.forEach(checkbox => {
@@ -366,8 +369,8 @@ const description =
     });
 
     // Form submission
-    const form = document.getElementById('contact-form') as HTMLFormElement;
-    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
     const errorMessage = document.getElementById('error-message');
     const errorText = document.getElementById('error-text');
 
@@ -380,7 +383,7 @@ const description =
       errorMessage?.classList.add('hidden');
 
       const formData = new FormData(form);
-      const payload: any = {};
+      const payload = {};
 
       // Get all form fields
       formData.forEach((value, key) => {
@@ -391,8 +394,13 @@ const description =
       payload.instruments = getInstruments ? getInstruments() : [];
       payload.genres = getGenres ? getGenres() : [];
 
+      // Build API URL (use apiBaseUrl if set, otherwise relative path)
+      const apiUrl = apiBaseUrl ? `${apiBaseUrl}/api/contact.json` : '/api/contact.json';
+      
+      console.log('Submitting to:', apiUrl);
+
       try {
-        const res = await fetch('/api/contact.json', {
+        const res = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -404,9 +412,9 @@ const description =
           // Show validation errors
           if (data.errors) {
             const errorList = Object.values(data.errors).join(' ');
-            errorText!.textContent = errorList;
+            errorText.textContent = errorList;
           } else {
-            errorText!.textContent = data.error || 'Something went wrong. Please try again.';
+            errorText.textContent = data.error || 'Something went wrong. Please try again.';
           }
           errorMessage?.classList.remove('hidden');
           
@@ -419,7 +427,8 @@ const description =
         window.location.href = '/thanks';
         
       } catch (err) {
-        errorText!.textContent = 'Network error. Please check your connection and try again.';
+        console.error('Submission error:', err);
+        errorText.textContent = 'Network error. Please check your connection and try again.';
         errorMessage?.classList.remove('hidden');
         
         submitBtn.disabled = false;

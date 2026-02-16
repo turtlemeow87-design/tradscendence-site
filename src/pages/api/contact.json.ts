@@ -126,49 +126,59 @@ export const POST: APIRoute = async ({ request }) => {
                     "unknown";
   const userAgent = request.headers.get("user-agent") || "unknown";
 
-  // 7) Save to database
-try {
-  // console.log("Attempting database insert...");
-  // console.log("DATABASE_URL exists:", !!import.meta.env.DATABASE_URL);
+  // 7) Determine environment
+  const isDevelopment = import.meta.env.DEV || !import.meta.env.DATABASE_URL;
   
-  const sql = neon(import.meta.env.DATABASE_URL);
-  const result = await sql`
-    INSERT INTO contact_submissions (
-      name, email, phone, event_date, location, 
-      instruments, genres, genre_other, message, 
-      form_name, ip_address, user_agent
-    )
-    VALUES (
-      ${name}, ${email}, ${formattedPhone}, ${date || null}, ${location},
-      ${instruments}, ${genres}, ${genreOther}, ${message},
-      ${formName}, ${ipAddress}, ${userAgent}
-    )
-    RETURNING id
-  `;
-  
-  // console.log("Database insert successful! ID:", result[0]?.id);
-} catch (dbError) {
-  console.error("Database error:", dbError);
-  // Continue even if database fails - still send email
-}
+  console.log(`📝 Contact form submission in ${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'} mode`);
+  console.log(`   Name: ${name}`);
+  console.log(`   Email: ${email}`);
+  console.log(`   Location: ${location}`);
 
-  // 8) Send email via Resend
-  const resendApiKey = import.meta.env.RESEND_API_KEY;
-  const contactEmail = import.meta.env.CONTACT_EMAIL;
-
-  if (!resendApiKey || !contactEmail) {
-    return json(500, { 
-      error: "Server misconfigured. Missing email configuration." 
-    });
+  // 8) Save to database (skip in development)
+  if (!isDevelopment) {
+    try {
+      const sql = neon(import.meta.env.DATABASE_URL);
+      const result = await sql`
+        INSERT INTO contact_submissions (
+          name, email, phone, event_date, location, 
+          instruments, genres, genre_other, message, 
+          form_name, ip_address, user_agent
+        )
+        VALUES (
+          ${name}, ${email}, ${formattedPhone}, ${date || null}, ${location},
+          ${instruments}, ${genres}, ${genreOther}, ${message},
+          ${formName}, ${ipAddress}, ${userAgent}
+        )
+        RETURNING id
+      `;
+      
+      console.log("✅ Database insert successful! ID:", result[0]?.id);
+    } catch (dbError) {
+      console.error("❌ Database error:", dbError);
+      // Continue even if database fails - still send email
+    }
+  } else {
+    console.log("🔧 Development mode: Skipping database insert");
   }
 
-  const resend = new Resend(resendApiKey);
+  // 9) Send email via Resend (skip in development)
+  if (!isDevelopment) {
+    const resendApiKey = import.meta.env.RESEND_API_KEY;
+    const contactEmail = import.meta.env.CONTACT_EMAIL;
 
-  // Build email content
-  const instrumentList = instruments.length > 0 ? instruments.join(", ") : "Not specified";
-  const genreList = genres.length > 0 ? genres.join(", ") : "Not specified";
+    if (!resendApiKey || !contactEmail) {
+      return json(500, { 
+        error: "Server misconfigured. Missing email configuration." 
+      });
+    }
 
-  const emailBody = `
+    const resend = new Resend(resendApiKey);
+
+    // Build email content
+    const instrumentList = instruments.length > 0 ? instruments.join(", ") : "Not specified";
+    const genreList = genres.length > 0 ? genres.join(", ") : "Not specified";
+
+    const emailBody = `
 New Inquiry from ${name}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -192,31 +202,35 @@ ${message}
 Submitted from: ${formName}
 IP: ${ipAddress}
 Timestamp: ${new Date().toISOString()}
-  `.trim();
+    `.trim();
 
-  try {
-    const { data, error } = await resend.emails.send({
-      from: 'Tradscendence Booking <bookings@soundbeyondborders.com>',
-      to: [contactEmail],
-      replyTo: email,
-      subject: `🎵 SoundBeyondBorders Booking Inquiries and Questions`,
-      text: emailBody,
-    });
+    try {
+      const { data, error } = await resend.emails.send({
+        from: 'Tradscendence Booking <bookings@soundbeyondborders.com>',
+        to: [contactEmail],
+        replyTo: email,
+        subject: `🎵 SoundBeyondBorders Booking Inquiries and Questions`,
+        text: emailBody,
+      });
 
-    if (error) {
-      console.error("Resend error:", error);
+      if (error) {
+        console.error("❌ Resend error:", error);
+        return json(502, { 
+          error: "Failed to send email notification." 
+        });
+      }
+
+      console.log("✅ Email sent successfully:", data);
+    } catch (emailError) {
+      console.error("❌ Email error:", emailError);
       return json(502, { 
         error: "Failed to send email notification." 
       });
     }
-
-    console.log("Email sent successfully:", data);
-    return json(200, { ok: true });
-
-  } catch (emailError) {
-    console.error("Email error:", emailError);
-    return json(502, { 
-      error: "Failed to send email notification." 
-    });
+  } else {
+    console.log("🔧 Development mode: Skipping email send");
   }
+
+  // Always return success
+  return json(200, { ok: true });
 };
