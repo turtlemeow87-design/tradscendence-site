@@ -33,6 +33,28 @@
 **Date:** 2026-02-19
 **Triggered by:** BUG-002 fix
 **Scope:** Confirmation retest of TC-003 only
+**Tester:** Hunter Eastland
+**Environment:** Production
+**Browser:** Chrome
+
+| TC # | Title | Result | Actual Result | Bug Filed |
+|------|-------|--------|---------------|-----------|
 | TC-003 | Phone Number Auto-Formatting | Pass | Typing 18045551234 truncated "1" - resulting in proper 10-digit number | BUG-002 |
 
+**Summary:** 1 passed, 0 failed
+
+## Session 003
+
+**Date:** 2026-02-19
+**Triggered by:** BUG-003 fix
+**Scope:** Confirmation retest of TC-005 only
+**Tester:** Hunter Eastland
+**Environment:** Production
+**Browser:** Chrome
+
+| TC # | Title | Result | Actual Result | Bug Filed |
+|------|-------|--------|---------------|-----------|
+| TC-005 | "Other" Genre Reveals Custom Text Field | Pass | Textarea appeared when "Other" selected, and hid correctly when "Other" pill was removed via × button | — |
+
+**Summary:** 1 passed, 0 failed
 ...

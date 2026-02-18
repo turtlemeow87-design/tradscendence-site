@@ -214,6 +214,9 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
   </section>
 
   <style is:global>
+    input, textarea, button[type="button"] {
+  scroll-margin-top: 200px;
+}
     .pill {
       display: inline-flex;
       align-items: center;
@@ -379,6 +382,12 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
 
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      // Scroll to first invalid field
+const firstInvalid = form.querySelector(':invalid');
+if (firstInvalid) {
+  firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return;
+}
 
       // Disable submit button
       submitBtn.disabled = true;
