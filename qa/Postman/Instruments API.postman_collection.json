@@ -1,0 +1,307 @@
+{
+  "info": {
+    "_postman_id": "c19a21cb-b447-43f8-b85e-aba747919e69",
+    "name": "Instruments API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51236303",
+    "_collection_link": "https://go.postman.co/collection/51236303-c19a21cb-b447-43f8-b85e-aba747919e69?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Populating Instruments",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response contains instruments array\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.be.an(\"array\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url}}/api/instruments/index.json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "instruments",
+            "index.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Returning a single instrument page",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Instrument has required fields\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"name\");\r",
+              "    pm.expect(json).to.have.property(\"slug\");\r",
+              "    pm.expect(json).to.have.property(\"tagline\");\r",
+              "    pm.expect(json).to.have.property(\"image_url\");\r",
+              "    pm.expect(json).to.have.property(\"videos\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url}}/api/instruments/TOud.json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "instruments",
+            "TOud.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Featured instruments",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Featured instruments is an array\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Each featured instrument has required fields\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    json.forEach(function(instrument) {\r",
+              "        pm.expect(instrument).to.have.property(\"name\");\r",
+              "        pm.expect(instrument).to.have.property(\"slug\");\r",
+              "        pm.expect(instrument).to.have.property(\"image_url\");\r",
+              "        pm.expect(instrument).to.have.property(\"audio_teaser\");\r",
+              "    });\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/instruments/featured.json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "instruments",
+            "featured.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Panel Add Instrument Page",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response confirms creation\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"success\");\r",
+              "    pm.expect(json.success).to.equal(true);\r",
+              "    pm.expect(json).to.have.property(\"id\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "key",
+              "value": "x-admin-key",
+              "type": "string"
+            },
+            {
+              "key": "value",
+              "value": "45a99ef683fe05e1d53e1d24f15c7e9d1f1a06e6e720fdb54149513b7e7545a7",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "45a99ef683fe05e1d53e1d24f15c7e9d1f1a06e6e720fdb54149513b7e7545a7",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"slug\": \"Santoor\",\r\n  \"name\": \"Persian Santoor\",\r\n  \"origin_prefix\": \"Persian\",\r\n  \"display_order\": 18,\r\n  \"page_ready\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/instruments/index.json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "instruments",
+            "index.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Panel Delete Instrument Page",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response confirms deletion\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"success\");\r",
+              "    pm.expect(json.success).to.equal(true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "key",
+              "value": "x-admin-key",
+              "type": "string"
+            },
+            {
+              "key": "value",
+              "value": "45a99ef683fe05e1d53e1d24f15c7e9d1f1a06e6e720fdb54149513b7e7545a7",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/instruments/Santoor.json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "instruments",
+            "Santoor.json"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
