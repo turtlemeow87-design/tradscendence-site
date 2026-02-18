@@ -55,6 +55,7 @@
 | 1 | Navigate to `/contact` | Page loads with empty form |
 | 2 | Leave all fields empty | No changes |
 | 3 | Click **Send** | browser displays native validation tooltip on the first empty required field |
+| 4 | Observe page behavior | Page scrolls smoothly to the first empty required field, visible belabove the sticky header |
 | 5 | Confirm Submit button is re-enabled | Button text returns to "Send" and is clickable |
 
 **Expected Final Result:** Validation tooltip appears on first required field. Page does not redirect. Form remains filled with any data the user entered.
@@ -145,8 +146,10 @@
 |---|---|---|
 | 1 | Fill in all required fields with valid data | Fields populated |
 | 2 | Clear the **Email** field and enter `not-an-email` | Text appears in field |
-| 3 | Click **Send** | Red error banner appears |
-| 4 | Read the error message | Error specifically mentions email is invalid |
+| 3 | Click **Send** | Browser displays native validation tooltip on the email field |
+| 4 | Read the tooltip message | Tooltip specifically mentions the email format is invalid (missing '@') |
+
+**Expected Final Result:** Form does not submit. Browser native validation tooltip appears on the email field explaining the format error.
 
 **Expected Final Result:** Form does not submit, error banner mentions the email field specifically.
 
@@ -184,7 +187,7 @@
 | # | Action | Expected Result |
 |---|---|---|
 | 1 | Fill in name, email, and message but leave **Location** empty | Three fields populated |
-| 2 | Click **Send** | Error banner appears mentioning location is required |
+| 2 | Click **Send** | Native browser tooltip appears mentioning location is required |
 | 3 | Confirm the name, email, and message fields still contain the data entered | Previously entered data is preserved |
 | 4 | Confirm the Submit button is re-enabled | Button shows "Send" and is clickable |
 | 5 | Fill in the **Location** field | Field populated |
