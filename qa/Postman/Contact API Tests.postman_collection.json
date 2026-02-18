@@ -1,0 +1,562 @@
+{
+  "info": {
+    "_postman_id": "1567b03c-8ad3-49bf-b2e0-c5307ecb4101",
+    "name": "Contact API Tests",
+    "description": "Local contact page validation tests and edge cases.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51236303",
+    "_collection_link": "https://go.postman.co/collection/51236303-1567b03c-8ad3-49bf-b2e0-c5307ecb4101?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Happy Path",
+      "item": [
+        {
+          "name": "Happy Path - Full Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response confirms success\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"ok\");\r",
+                  "    pm.expect(json.ok).to.equal(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hunter Eastland\",\r\n  \"email\": \"hunter@example.com\",\r\n  \"phone\": \"8045551234\",\r\n  \"date\": \"2026-03-14\",\r\n  \"location\": \"Richmond, VA\",\r\n  \"instruments\": [\"Turkish Oud\", \"Duduk\"],\r\n  \"genres\": [\"Classical\", \"Traditional/Folk\"],\r\n  \"genre_other\": \"\",\r\n  \"message\": \"I'd like to book you for a wedding ceremony.\",\r\n  \"formName\": \"Contact Page\",\r\n  \"honeypot\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact.json",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact.json"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Custom Genre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response confirms success\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"ok\");\r",
+                  "    pm.expect(json.ok).to.equal(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hunter Eastland\",\r\n  \"email\": \"hunter@example.com\",\r\n  \"phone\": \"8045551234\",\r\n  \"date\": \"2026-03-14\",\r\n  \"location\": \"Richmond, VA\",\r\n  \"instruments\": [\"Turkish Oud\", \"Duduk\"],\r\n  \"genres\": [\"Classical\", \"Traditional/Folk\"],\r\n  \"genre_other\": \"Mystical Ambient\",\r\n  \"message\": \"I'd like to book you for a wedding ceremony.\",\r\n  \"formName\": \"Contact Page\",\r\n  \"honeypot\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact.json",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact.json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Validation Errors",
+      "item": [
+        {
+          "name": "Missing Required Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains validation errors\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"errors\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All required fields are flagged\", function () {\r",
+                  "    const errors = pm.response.json().errors;\r",
+                  "    pm.expect(errors).to.have.property(\"name\");\r",
+                  "    pm.expect(errors).to.have.property(\"email\");\r",
+                  "    pm.expect(errors).to.have.property(\"location\");\r",
+                  "    pm.expect(errors).to.have.property(\"message\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"\",\r\n  \"email\": \"\",\r\n  \"location\": \"\",\r\n  \"message\": \"\",\r\n  \"honeypot\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact.json",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact.json"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wrong Content Type",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 415\", function () {\r",
+                  "    pm.response.to.have.status(415);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response flags unsupported media type\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"error\");\r",
+                  "    pm.expect(json.error).to.include(\"Unsupported Media Type\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hunter Eastland\",\r\n  \"email\": \"hunter@example.com\",\r\n  \"phone\": \"8045551234\",\r\n  \"date\": \"2026-03-14\",\r\n  \"location\": \"Richmond, VA\",\r\n  \"instruments\": [\"Turkish Oud\", \"Duduk\"],\r\n  \"genres\": [\"Classical\", \"Traditional/Folk\"],\r\n  \"genre_other\": \"\",\r\n  \"message\": \"I'd like to book you for a wedding ceremony.\",\r\n  \"formName\": \"Contact Page\",\r\n  \"honeypot\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact.json",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact.json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Edge Cases",
+      "item": [
+        {
+          "name": "Invalid Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response flags invalid email\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"errors\");\r",
+                  "    pm.expect(json.errors).to.have.property(\"email\");\r",
+                  "    pm.expect(json.errors.email).to.include(\"invalid\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Test User\",\r\n  \"email\": \"not-an-email\",\r\n  \"location\": \"Richmond\",\r\n  \"message\": \"Testing\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact.json",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact.json"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Phone",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response flags invalid phone\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"errors\");\r",
+                  "    pm.expect(json.errors).to.have.property(\"phone\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hunter Eastland\",\r\n  \"email\": \"hunter@example.com\",\r\n  \"phone\": \"123123124\",\r\n  \"date\": \"2026-03-14\",\r\n  \"location\": \"Richmond, VA\",\r\n  \"instruments\": [\"Turkish Oud\", \"Duduk\"],\r\n  \"genres\": [\"Classical\", \"Traditional/Folk\"],\r\n  \"genre_other\": \"\",\r\n  \"message\": \"I'd like to book you for a wedding ceremony.\",\r\n  \"formName\": \"Contact Page\",\r\n  \"honeypot\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact.json",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact.json"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response flags invalid date format\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"errors\");\r",
+                  "    pm.expect(json.errors).to.have.property(\"date\");\r",
+                  "    pm.expect(json.errors.date).to.include(\"YYYY-MM-DD\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hunter Eastland\",\r\n  \"email\": \"hunter@example.com\",\r\n  \"phone\": \"8045551234\",\r\n  \"date\": \"03/14/2026\",\r\n  \"location\": \"Richmond, VA\",\r\n  \"instruments\": [\"Turkish Oud\", \"Duduk\"],\r\n  \"genres\": [\"Classical\", \"Traditional/Folk\"],\r\n  \"genre_other\": \"\",\r\n  \"message\": \"I'd like to book you for a wedding ceremony.\",\r\n  \"formName\": \"Contact Page\",\r\n  \"honeypot\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact.json",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contact.json"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Honeypot Triggered",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Honeypot silently returns ok\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"ok\");\r",
+              "    pm.expect(json.ok).to.equal(true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"Hunter Eastland\",\r\n  \"email\": \"hunter@example.com\",\r\n  \"phone\": \"8045551234\",\r\n  \"date\": \"2026-03-14\",\r\n  \"location\": \"Richmond, VA\",\r\n  \"instruments\": [\"Turkish Oud\", \"Duduk\"],\r\n  \"genres\": [\"Classical\", \"Traditional/Folk\"],\r\n  \"genre_other\": \"\",\r\n  \"message\": \"I'd like to book you for a wedding ceremony.\",\r\n  \"formName\": \"Contact Page\",\r\n  \"honeypot\": \"I am a bot\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/contact.json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "contact.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Max Length Message",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Oversized message is accepted and clamped\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"ok\");\r",
+              "    pm.expect(json.ok).to.equal(true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const longMessage = \"A\".repeat(4500);\r",
+              "const body = {\r",
+              "    name: \"Test User\",\r",
+              "    email: \"test.user@example.com\",\r",
+              "    location: \"Richmond\",\r",
+              "    message: longMessage,\r",
+              "    honeypot: \"\"\r",
+              "};\r",
+              "pm.request.body.raw = JSON.stringify(body);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"Test User\",\r\n  \"email\": \"test.user@example.com\",\r\n  \"location\": \"Richmond\",\r\n  \"message\": \"PLACEHOLDER\",\r\n  \"honeypot\": \"\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/contact.json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "contact.json"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
