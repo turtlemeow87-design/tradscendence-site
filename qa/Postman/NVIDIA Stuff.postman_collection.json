@@ -1,0 +1,430 @@
+{
+  "info": {
+    "_postman_id": "4efa1a27-c002-48bc-845f-af62d45e1284",
+    "name": "NVIDIA Stuff",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51236303",
+    "_collection_link": "https://go.postman.co/collection/51236303-4efa1a27-c002-48bc-845f-af62d45e1284?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get Language Models",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Instant Mode",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "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",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"model\": \"moonshotai/kimi-k2.5\",\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"system\",\r\n      \"content\": \"You are a helpful coding assistant.\"\r\n    },\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"Write a JavaScript function that validates an email address and explain how it works.\"\r\n    }\r\n  ],\r\n  \"temperature\": 0.6,\r\n  \"max_tokens\": 4096,\r\n  \"stream\": false,\r\n  \"chat_template_kwargs\": {\"thinking\": false}\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://integrate.api.nvidia.com/v1/chat/completions",
+          "protocol": "https",
+          "host": [
+            "integrate",
+            "api",
+            "nvidia",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "chat",
+            "completions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Thinking Mode",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"model\": \"moonshotai/kimi-k2.5\",\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"A contact form API should return a 400 if the email field is missing. Write 3 test cases for this scenario including edge cases.\"\r\n    }\r\n  ],\r\n  \"temperature\": 1.0,\r\n  \"max_tokens\": 2048,\r\n  \"stream\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://integrate.api.nvidia.com/v1/chat/completions",
+          "protocol": "https",
+          "host": [
+            "integrate",
+            "api",
+            "nvidia",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "chat",
+            "completions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TC001 - Validate Successful Chat Completion Response",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response has choices array\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"choices\");\r",
+              "    pm.expect(json.choices).to.be.an(\"array\");\r",
+              "    pm.expect(json.choices.length).to.be.greaterThan(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Content field is not null\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    const content = json.choices[0].message.content;\r",
+              "    pm.expect(content).to.not.be.null;\r",
+              "    pm.expect(content).to.be.a(\"string\");\r",
+              "    pm.expect(content.length).to.be.greaterThan(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Model matches expected\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.model).to.include(\"kimi\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "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",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"model\": \"moonshotai/kimi-k2.5\",\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"system\",\r\n      \"content\": \"You are a helpful assistant. Keep responses concise.\"\r\n    },\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"What is 2 + 2? Answer in one sentence.\"\r\n    }\r\n  ],\r\n  \"temperature\": 0.6,\r\n  \"max_tokens\": 256,\r\n  \"stream\": false,\r\n  \"chat_template_kwargs\": {\"thinking\": false}\r\n}"
+        },
+        "url": {
+          "raw": "https://integrate.api.nvidia.com/v1/chat/completions",
+          "protocol": "https",
+          "host": [
+            "integrate",
+            "api",
+            "nvidia",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "chat",
+            "completions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TC002 - Verify the API respects max_tokens and returns usage data.",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Usage object is present\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"usage\");\r",
+              "    pm.expect(json.usage).to.have.property(\"prompt_tokens\");\r",
+              "    pm.expect(json.usage).to.have.property(\"completion_tokens\");\r",
+              "    pm.expect(json.usage).to.have.property(\"total_tokens\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Completion tokens within max_tokens limit\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.usage.completion_tokens).to.be.at.most(50);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Finish reason is present\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    const finishReason = json.choices[0].finish_reason;\r",
+              "    pm.expect(finishReason).to.be.a(\"string\");\r",
+              "    pm.expect([\"stop\", \"length\"]).to.include(finishReason);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "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",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"model\": \"moonshotai/kimi-k2.5\",\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"Write a haiku about coding.\"\r\n    }\r\n  ],\r\n  \"temperature\": 0.6,\r\n  \"max_tokens\": 50,\r\n  \"stream\": false,\r\n  \"chat_template_kwargs\": {\"thinking\": false}\r\n}"
+        },
+        "url": {
+          "raw": "https://integrate.api.nvidia.com/v1/chat/completions",
+          "protocol": "https",
+          "host": [
+            "integrate",
+            "api",
+            "nvidia",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "chat",
+            "completions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TC003 - Validate 400 Returned When Model Field Is Missing",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 404 Not Found\", function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response indicates resource not found\", function () {\r",
+              "    pm.expect(pm.response.text()).to.include(\"404\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response indicates resource not found\", function () {\r",
+              "    pm.expect(pm.response.text()).to.include(\"404\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "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",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"What is 2 + 2?\"\r\n    }\r\n  ],\r\n  \"temperature\": 0.6,\r\n  \"max_tokens\": 256,\r\n  \"stream\": false\r\n}"
+        },
+        "url": {
+          "raw": "https://integrate.api.nvidia.com/v1/chat/completions",
+          "protocol": "https",
+          "host": [
+            "integrate",
+            "api",
+            "nvidia",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "chat",
+            "completions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "TC004 - Validate 403 Returned When Invalid API Key Provided",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 403 Forbidden\", function () {\r",
+              "    pm.response.to.have.status(403);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response contains status field\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"status\");\r",
+              "    pm.expect(json.status).to.equal(403);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Detail indicates authorization failed\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.detail.toLowerCase()).to.include(\"authorization failed\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "nvapi-2FAKEKEY123",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"model\": \"moonshotai/kimi-k2.5\",\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"What is 2 + 2?\"\r\n    }\r\n  ],\r\n  \"temperature\": 0.6,\r\n  \"max_tokens\": 256,\r\n  \"stream\": false\r\n}"
+        },
+        "url": {
+          "raw": "https://integrate.api.nvidia.com/v1/chat/completions",
+          "protocol": "https",
+          "host": [
+            "integrate",
+            "api",
+            "nvidia",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "chat",
+            "completions"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{NVIDIA_API_KEY}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "NVIDIA_API_KEY",
+      "value": ""
+    }
+  ]
+}
