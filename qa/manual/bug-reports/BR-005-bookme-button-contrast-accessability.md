@@ -60,5 +60,8 @@ The button has a contrast ratio of 2.12:1 — foreground color `#f5f1e8` (ivory)
 
 ---
 
+## Evidence
+- `BR-005-contrast-failure.png` — Chrome DevTools accessibility panel showing 2.12:1 contrast ratio on Book Me button with warning icon
+
 ## Priority
 **Medium** — Does not break functionality but affects accessibility compliance and impacts the most prominent button on the home page.

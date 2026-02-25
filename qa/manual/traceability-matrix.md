@@ -8,7 +8,7 @@
 
 ## What is a Traceability Matrix?
 
-A traceability matrix maps each feature or requirement to the specific test cases that verify it. It answers the question: *"How do I know everything important is tested?"*
+Since I built this site myself with the help of AI, there wasn't a formal spec or product manager handing me requirements — so I worked backwards from the intended behavior of the application to derive them. From there I tried to map each one to the test cases I wrote to verify it. In a real team environment I'd be working from requirements written by others upstream, but I wanted to practice understanding how the pieces connect. That's what this matrix is attempting to do.
 
 ---
 
@@ -67,6 +67,43 @@ A traceability matrix maps each feature or requirement to the specific test case
 
 ---
 
+## Database Validation — contact_submissions
+
+| Feature / Requirement | Test Case | Type | Expected Result | Status |
+|---|---|---|---|---|
+| Recent submissions retrievable | TC-002-DB-001 | Data Validation | Rows returned sorted by created_at DESC, no NULLs in id/name/email | ✅ Pass |
+| Submission stored with correct field values | TC-002-DB-002 | Data Integrity | All fields match submitted form data exactly | ✅ Pass |
+| Required fields never NULL | TC-002-DB-003 | Data Integrity | Zero rows returned when checking for NULLs on name/email/location/message | ✅ Pass |
+| Duplicate submissions detectable | TC-002-DB-004 | Data Integrity | Query identifies multiple submissions from same email within short window | ✅ Pass |
+
+---
+
+## Core Navigation
+
+| Feature / Requirement | Test Case | Type | Expected Result | Status |
+|---|---|---|---|---|
+| Desktop nav links route correctly | TC-003-01 | Happy Path | All 5 links navigate to correct pages, no 404s | ✅ Pass |
+| Logo routes to home | TC-003-02 | Happy Path | Clicking logo from any page returns to `/` | ✅ Pass |
+| @Tradscendence handle routes to footer | TC-003-03 | UI Behavior | Smooth scroll to footer on home page | ✅ Pass |
+| Mobile menu opens and closes | TC-003-04 | UI Behavior | Hamburger toggles menu, button state updates | ✅ Pass |
+| Mobile menu closes on outside click | TC-003-05 | UI Behavior | Clicking outside dismisses menu | ✅ Pass |
+| Mobile menu closes on Escape key | TC-003-06 | UI Behavior / Accessibility | Escape key closes menu, supports keyboard nav | ✅ Pass |
+| Mobile menu links route correctly | TC-003-07 | Happy Path | All 5 mobile nav links navigate correctly | ✅ Pass |
+| Future nav links not visible | TC-003-08 | Validation | Blog, Calendar, Store not visible in desktop or mobile nav | ✅ Pass |
+
+---
+
+## Accessibility
+
+| Feature / Requirement | Test Case | Type | Expected Result | Status |
+|---|---|---|---|---|
+| No critical axe violations on contact page | TS-003 | Accessibility | Zero critical violations in axe DevTools scan | ✅ Pass |
+| Screen reader announces page content | TS-003 | Accessibility | Windows Narrator reads headings, labels, and interactive elements correctly | ✅ Pass |
+| Hamburger button ARIA state updates | TC-003-04 | Accessibility | aria-expanded and aria-label update on open/close | ✅ Pass |
+| Book Me button color contrast | TS-003 | Accessibility | Requires 4.5:1 contrast ratio (WCAG 2.1 AA) | ❌ Fail — BR-005 (2.12:1 actual) |
+
+---
+
 ## Authentication & Security
 
 | Feature / Requirement | Test Case | Collection | Expected Result | Status |
@@ -78,6 +115,18 @@ A traceability matrix maps each feature or requirement to the specific test case
 
 ---
 
+## Open Bugs
+
+| Bug ID | Description | Severity | Status |
+|---|---|---|---|
+| BR-001 | *(resolved)* | — | ✅ Closed |
+| BR-002 | *(resolved — leading country code stripping)* | — | ✅ Closed |
+| BR-003 | *(resolved — Other genre textarea toggle)* | — | ✅ Closed |
+| BR-004 | Intermittent SSL error on custom domain | Medium | 🔴 Open |
+| BR-005 | Book Me button fails WCAG 2.1 AA color contrast — 2.12:1 actual, 4.5:1 required | Medium | 🔴 Open |
+
+---
+
 ## Environment Coverage
 
 | Test Collection | Local | Production |
@@ -85,6 +134,9 @@ A traceability matrix maps each feature or requirement to the specific test case
 | Instruments API | ✅ Tested | ✅ Tested |
 | Contact API Tests | ✅ Tested | ⬜ Not yet run (triggers real emails/DB) |
 | Contact Form Manual UI | N/A | ✅ Tested |
+| Database Validation | N/A | ✅ Tested (Neon SQL Editor) |
+| Core Navigation | N/A | ✅ Tested |
+| Accessibility (axe + Narrator) | N/A | ✅ Tested |
 
 ---
 
@@ -101,5 +153,7 @@ A traceability matrix maps each feature or requirement to the specific test case
 | Non-existent instrument slug | Should return 404 | High |
 | Contact form — Production DB write | Needs verification against live database | High |
 | Contact form — Resend email delivery | Needs end-to-end email verification | High |
-| Navigation & core pages | TC-003 placeholder not yet completed | Medium |
 | Media playback | TC-004 placeholder not yet completed | Medium |
+| Physical device testing | Not yet run on real mobile hardware | Medium |
+| axe scans on remaining pages | Only contact page scanned so far | Medium |
+| Mobile screen reader testing | Narrator tested on desktop only | Medium |
