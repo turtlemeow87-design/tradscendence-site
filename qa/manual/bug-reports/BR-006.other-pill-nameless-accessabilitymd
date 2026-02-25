@@ -1,0 +1,71 @@
+# Bug Report — BR-006
+**Site:** https://www.soundbeyondborders.com  
+**Author:** Hunter Eastland  
+**Date Filed:** February 25, 2026  
+**Status:** Resolved  
+
+---
+
+## Summary
+The "Other" genre pill remove button (×) had no accessible name, making it unannounced and unusable for screen reader users.
+
+---
+
+## Environment
+| Field | Details |
+|---|---|
+| URL | https://www.soundbeyondborders.com/contact |
+| Browser | Chrome |
+| OS | Windows |
+| Tool | Chrome DevTools — Elements Panel, Accessibility Section |
+| Standard | WCAG 2.1 AA |
+
+---
+
+## Element
+```html
+<button type="button" data-value="Other">×</button>
+```
+
+---
+
+## Steps to Reproduce
+1. Navigate to `/contact`
+2. Open the Genre(s) dropdown and select "Other"
+3. Close the dropdown — "Other" pill appears
+4. Open DevTools → inspector cursor → click the × button on the "Other" pill
+5. Observe Accessibility section — Name is empty
+
+---
+
+## Expected Result
+The × pill remove button should have an accessible name so screen readers can announce its purpose to keyboard and assistive technology users.
+
+## Actual Result
+Name field is empty in the accessibility tree. A screen reader user would reach this button with no announcement — no name, making it impossible to understand its purpose.
+
+---
+
+## Impact
+**Low-Medium** — Affects screen reader users who select "Other" and attempt to remove it via keyboard navigation. The button's purpose is completely unannounced.
+
+---
+
+## Fix Applied
+Added `aria-label="Remove Other"` to the × button element in `contact.astro`:
+```html
+<button type="button" aria-label="Remove Other" data-value="Other">×</button>
+```
+
+## Verification
+Fix prototyped and confirmed working in Chrome DevTools — Accessibility panel updated to show Name: "Remove Other" after aria-label was applied. Pending verification on production after deployment.
+
+---
+
+## Evidence
+- `BR-006-missing-aria-label.png` — DevTools Accessibility panel showing Name populated as "Remove Other" after fix applied
+
+---
+
+## Priority
+**Low** — Narrow impact path but genuine WCAG accessibility gap. Fix is a one-line change.
