@@ -169,7 +169,7 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
               <input type="checkbox" value="Oldies" class="genre-checkbox mr-2"> Oldies
             </label>
             <label class="flex items-center px-3 py-2 hover:bg-gold/10 cursor-pointer">
-              <input type="checkbox" aria-label="remove-other" value="Other" class="genre-checkbox mr-2"> Other
+              <input type="checkbox" value="Other" class="genre-checkbox mr-2"> Other
             </label>
           </div>
         </div>
@@ -325,7 +325,7 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
           pill.className = 'pill';
           pill.innerHTML = `
             ${value}
-            <button type="button" data-value="${value}">&times;</button>
+            <button type="button" aria-label="Remove ${value}" data-value="${value}">&times;</button>
           `;
           
           const removeBtn = pill.querySelector('button');
