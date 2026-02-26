@@ -5,7 +5,7 @@ const email = 'HunterEast.Musiq@gmail.com';
 const title = "Contact / Booking — Tradscendence | Sound Beyond Borders";
 const description =
   "Contact Hunter Eastland (Tradscendence), world & folk multi-instrumentalist in Richmond, VA. Book for weddings, ceremonies, funerals, small gatherings, or studio sessions.";
-
+const minDate = new Date().toISOString().split('T')[0];
 // Get API base URL from environment (defaults to current origin in production)
 const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
 ---
@@ -55,7 +55,7 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
       <label class="grid gap-1">
         <span class="text-sm">Event date (If Applicable)</span>
         <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
-               type="date" name="date" />
+       type="date" name="date" min={minDate} />
       </label>
 
       <!-- Required: Location -->
