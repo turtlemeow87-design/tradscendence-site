@@ -143,4 +143,13 @@
       submitBtn.textContent = 'Send';
     }
   });
+ window.addEventListener('message-field-active', (e) => {
+  const btn = document.getElementById('open-book') as HTMLButtonElement;
+  if (!btn) return;
+  const active = (e as CustomEvent).detail.active;
+  btn.disabled = active;
+  btn.classList.toggle('opacity-40', active);
+  btn.classList.toggle('cursor-not-allowed', active);
+  btn.classList.toggle('pointer-events-none', active);
+});
 </script>

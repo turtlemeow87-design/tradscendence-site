@@ -260,7 +260,13 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
         input.value = value;
       });
     }
-
+// Disable Book Me button when message field has content
+const messageField = document.querySelector('#contact-form textarea[name="message"]');
+messageField?.addEventListener('input', () => {
+  window.dispatchEvent(new CustomEvent('message-field-active', {
+    detail: { active: messageField.value.trim().length > 0 }
+  }));
+});
     // Multi-select dropdown functionality
     function setupMultiSelect(
       btnId,
