@@ -20,13 +20,13 @@ const {
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical} />}
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WKHBP3PKLL"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
-      gtag('config', 'G-WKHBP3PKLL');
-    </script>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-WKHBP3PKLL"></script>
+    <script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-WKHBP3PKLL');
+</script>
     
   </head>
   <body class="min-h-screen flex flex-col">
