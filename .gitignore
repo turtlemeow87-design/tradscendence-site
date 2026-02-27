@@ -24,6 +24,9 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# My dagone host server I'll tell you hwut
+.vercel
+
 # Playwright
 /test-results/
 /playwright-report/
