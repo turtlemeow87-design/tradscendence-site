@@ -3,19 +3,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Divider from "../components/Divider.astro";
 import FeaturedInstrumentCard from "../components/FeaturedInstrumentCard.astro";
 import YouTubeFacade from "../components/YouTubeFacade.astro";
-import { Image } from 'astro:assets';
 
-// ✅ SEO: clear, keyworded title (brand + what you do)
 const title =
   "Hunter Eastland / Tradscendence — World & Folk Multi-Instrumentalist | Sound Beyond Borders";
 
-// ✅ SEO: unique, human description (kept concise for SERP snippets)
 const description =
   "World/folk multi-instrumentalist in Richmond, VA. Book for private/intimate events, and studio sessions. Explore through videos and sound teasers. Surbahar, Arabic Oud, Esraj, Duduk, Azeri Tar, Turkish Baglama Saz, and more!";
 
-// NOTE: videoId and siParam are now split so the facade thumbnail works correctly.
-// The original code had a typo: "Vh8olflrhQvMtgcsnpm " — "npm " was accidentally appended.
-// Fixed below.
 const LATEST_YT = {
   id: 'OUpYRKzTAhM',
   si: 'Vh8olflrhQvMtgcs',
@@ -41,7 +35,6 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
   canonical="https://www.soundbeyondborders.com/"
 >
 
-  <!-- Header block with name, handle, catchphrase -->
   <section class="mx-auto max-w-6xl px-4 pt-3 sm:pt-10">
     <div class="flex flex-col sm:items-center sm:text-center">
       <h1 class="font-display text-[9vw] sm:text-5xl md:text-6xl leading-[1.05] opacity-75 bg-gradient-to-r from-black via-black/85 to-transparent rounded-md bg-clip-text text-transparent drop-shadow-[0_0_1px_ivory]">
@@ -52,7 +45,7 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
         <a
           href="#transcend-video"
           class="outline-none no-underline hover:opacity-80 focus:opacity-80"
-          title="Jump to the &quot;Transcend the Traditional&quot; video"
+          title="Jump to the Transcend the Traditional video"
         >
           Transcend the traditional.
         </a>
@@ -62,25 +55,18 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
   <Divider />
 
-  <!-- Hero: wide image + caption -->
   <section class="mx-auto max-w-6xl px-4">
     <figure class="relative rounded-2xl overflow-hidden frame shadow-soft">
-      <!--
-        Image component converts to WebP at build time and adds proper width/height
-        to prevent layout shift (CLS). Dimensions match the display size at max viewport.
-        fetchpriority="high" tells the browser to load this immediately (it's above the fold).
-      -->
-      <Image
-  src="/media/hero-placeholder.jpg"
-  alt="Hunter with instruments"
-  width={1200}
-  height={848}
-  format="webp"
-  quality={82}
-  class="w-full h-[42vh] sm:h-[56vh] object-cover"
-  loading="eager"
-  fetchpriority="high"
-/>
+      <img
+        src="/media/hero-placeholder.webp"
+        alt="Hunter with instruments"
+        width="1200"
+        height="848"
+        class="w-full h-[42vh] sm:h-[56vh] object-cover"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
       <div class="hero-fade-overlay"></div>
       <figcaption class="relative p-3 sm:p-4 text-xs sm:text-sm bg-gradient-to-r from-ebony via-ebony to-transparent">
         <div class="font-display">What is sound beyond borders?</div>
@@ -104,7 +90,6 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
   <Divider />
 
-  <!-- Two-column intro -->
   <section class="mx-auto max-w-6xl px-4 space-y-6 sm:space-y-8">
     <h2 class="font-display text-xl sm:text-2xl">About my approach</h2>
 
@@ -138,14 +123,12 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
             <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
           </span>
         </a>
-
         <a href="/about" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
           <span class="inline-flex items-center gap-1">
             More about me and my approach
             <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
           </span>
         </a>
-
         <a href="#latest-video" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
           <span class="inline-flex items-center gap-1">
             See my latest YouTube video!
@@ -157,20 +140,19 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
     <Divider />
 
-    <!-- 3 featured instruments with audio teasers -->
     <section class="mx-auto max-w-6xl px-4 pb-8">
       <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">Featured sounds</h2>
       <div class="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
         <div class="space-y-2">
-          <FeaturedInstrumentCard title="Surbahar" imgSrc="/media/inst-surbahar.jpg" audioSrc="/media/surbahar.m4a" />
+          <FeaturedInstrumentCard title="Surbahar" imgSrc="/media/inst-surbahar.webp" audioSrc="/media/surbahar.m4a" />
           <a href="/instruments/Surbahar" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Surbahar →</a>
         </div>
         <div class="space-y-2">
-          <FeaturedInstrumentCard title="Baglama Saz" imgSrc="/media/inst-baglamasaz.jpg" audioSrc="/media/baglamasaz1.m4a" />
+          <FeaturedInstrumentCard title="Baglama Saz" imgSrc="/media/inst-baglamasaz.webp" audioSrc="/media/baglamasaz1.m4a" />
           <a href="/instruments/BaglamaSaz" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Baglama Saz →</a>
         </div>
         <div class="space-y-2">
-          <FeaturedInstrumentCard title="Arabic Oud" imgSrc="/media/inst-arabicoud.jpg" audioSrc="/media/arabicoud.m4a" />
+          <FeaturedInstrumentCard title="Arabic Oud" imgSrc="/media/inst-arabicoud.webp" audioSrc="/media/arabicoud.m4a" />
           <a href="/instruments/ArabicOud" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Arabic Oud →</a>
         </div>
       </div>
@@ -178,18 +160,12 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
     <Divider />
 
-    <!-- First video — YouTube Facade replaces the <iframe> -->
     <section id="latest-video" class="mx-auto max-w-6xl px-4 pb-6 scroll-mt-24">
       <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">My Latest Youtube Upload!</h2>
 
       <figure class="space-y-3">
         <div class="relative rounded-2xl overflow-hidden frame shadow-soft p-[2px] bg-gradient-to-r from-[#C2A45F] via-[#A8743D] to-[#6E2A2A]">
           <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[14px] overflow-hidden`}>
-            <!--
-              YouTubeFacade goes here — same location as the old <iframe>.
-              The parent div already has aspect-video and overflow-hidden,
-              so the facade fills it exactly the same way the iframe did.
-            -->
             <YouTubeFacade
               videoId={LATEST_YT.id}
               siParam={LATEST_YT.si}
@@ -199,7 +175,6 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
             />
           </div>
         </div>
-
         <figcaption class="text-sm opacity-80 flex flex-col sm:flex-row sm:items-center sm:gap-3">
           <span class="font-display">{LATEST_YT.title}</span>
           <a href={watchUrl} target="_blank" rel="noopener" class="gothic-link font-bold">Watch on YouTube →</a>
@@ -216,7 +191,6 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
     <Divider />
 
-    <!-- Second video — YouTube Facade -->
     <section id="transcend-video" class="mx-auto max-w-6xl px-4 pb-10 scroll-mt-24">
       <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">Transcend The Traditional</h2>
 

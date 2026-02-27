@@ -1,20 +1,16 @@
 ---
-// src/components/FeaturedInstrumentCard.astro
-import { Image } from 'astro:assets';
-
 const { title, imgSrc, audioSrc, href = '/instruments' } = Astro.props;
 ---
 <div class="js-teaser-card cursor-pointer rounded-xl overflow-hidden frame shadow-soft">
   <div class="relative">
-    <Image
+    <img
       src={imgSrc}
       alt={title}
-      width={600}
-      height={192}
+      width="600"
+      height="192"
       class="w-full h-48 object-cover"
       loading="lazy"
-      format="webp"
-      quality={80}
+      decoding="async"
     />
     <span class="absolute top-2 right-2 play-icon bg-black/50 text-white text-sm px-2 py-1 rounded">▶︎</span>
   </div>

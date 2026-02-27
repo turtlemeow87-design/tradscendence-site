@@ -1,9 +1,6 @@
 ---
-// src/pages/about.astro
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { Image } from 'astro:assets';
 
-// SEO
 const title = "About Hunter Eastland — Tradscendence";
 const description =
   "About Hunter Eastland (Tradscendence) — a world/folk multi-instrumentalist in Richmond, VA exploring music across cultures. Story, ethos, instruments, mission.";
@@ -30,19 +27,15 @@ const description =
 
     <p>Metal music continued to change and grow.  And in fact, I began noticing some of these "exotic" scale patterns and notest coming from some of the most notable guitarists in my world --one quick example: Mark Morton from Lamb of God's use of the blues pentatonic crossed with... Harmonic Minor?!!  Whoa.  I was intrigued.  And then youtube came along, and fast.  ALL of the music that I wanted to hear before not only became available, but they started crossbreeding (in a sense)!!  But wait!!  I wanted to do MORE with this.  What I came across was amazing, and at the rate I was discovering new music from around the world, I couldn't keep up with myself anymore.  However... I needed to play more than just the guitar.  I needed to produce different sounds!  Would if I could -- Okay, we'll get there.  But next, I bought a cello.  Yes, a cello.  Fretless --allowing for any of these "exotic" expressions and mictrotones that I was burning to play and compose with.  And then it hit me... I can now order instruments from around the world!!  COVID was a curse, of course, right?  But being out of work for a few months... It gave me time to think (and maybe a few extra bucks), and research, and learn... </p>
 
-    <!-- cello.jpg -->
     <figure class="memory-figure">
-      <Image
-        src="/media/cello.jpg"
+      <img
+        src="/media/cello.webp"
         alt="My first cello (Strobel) resting in a room."
-        width={544}
-        height={680}
-        format="webp"
-        quality={82}
+        width="544"
+        height="680"
         class="memory-img"
         loading="lazy"
         decoding="async"
-        inferSize={true}
       />
       <figcaption class="memory-caption">My first cello, I still have it (Strobel).</figcaption>
     </figure>
@@ -51,19 +44,15 @@ const description =
 
     <p>So, next, I bought an Oud.  My first instrument from across the world -- A Turkish Oud FROM Turkey!!  Whoa.  I was in paradise.  What next??  Got an Erhu for my birthday.  Super cool!  Wait, how am I able to learn how to play these instruments so fast??  Ah!   Passion (right?), that's right!  What's next??  Then I got a Sitar.  Then a Baglama Saz.  And then a Divan Saz.  And then a Rabab.  And -- you get the idea.  I was learning, playing all of the different sounds, and bringing the world to ME.  This world of music, I realized is something that even if I can't afford to travel regularly yet, it can <i>always</i> be here with me, no matter where I am.  Oh!  And what I was hearing??  Everything!  Metal music matured --and immatured, depending on the subgenre, sometimes both.  It started crossing borders and exploring new limits.  Everything else?  Well, it also matured, and became more readily accessible.  The world of music, and all of its beauty, and emotions, all at my fingertips --both in a technological sense, and, of course, in my ability to play it!!</p>
 
-    <!-- turkishoud.jpg -->
     <figure class="memory-figure">
-      <Image
-        src="/media/turkishoud.jpg"
+      <img
+        src="/media/turkishoud.webp"
         alt="My first Turkish Oud by EthnicMusical, Istanbul."
-        width={544}
-        height={680}
-        format="webp"
-        quality={82}
+        width="544"
+        height="680"
         class="memory-img"
         loading="lazy"
         decoding="async"
-        inferSize={true}
       />
       <figcaption class="memory-caption">My first instrument from across the world. My Turkish Oud by EthnicMusical (Istanbul)</figcaption>
     </figure>
@@ -72,19 +61,15 @@ const description =
 
     <p>So, naturally... I ended up with more instruments than I can count.  But I matured, too!  I promise.  My supportive fiance helped with that, of course, but also calmly breaking the realistic news to me that :  We cannot possibly, sanely, fit anymore instruments in this small apartment.  Fair!  Okay, but seriously, I did mature.  My "taste" in music has expanded to the point where I no longer care.  And I mean, yes, there ARE some mainstream songs that I will listen to now.  I DO appreciate jazz music (and how difficult it is to master).  In fact, when asked "whak kind of music do you like?", I cannot simply answer "pretty much everything", becasue also as I got older I realized that what most people mean by "everything" is Rap, Pop, Rock, and sometimes Country (just as an exmaple).  NO, I mean EVERYTHING.  So many genres that both do and don't exist (but do in my mind) that some days I want to play something Arabic on a bluegrass (resonator) banjo, for example.  But wait, is this possible??  Is it now.  Okay, let's get to that.  More briefly, let's get to my entire purpose in being inspired to build this website, and <b>where I want my journey to go next </b> (<i>also, as an aside, there are technically "banjo"-like instruments made specifically to play Arabic and Turkish scales on</i>):</p>
 
-    <!-- tanbur.jpg -->
     <figure class="memory-figure">
-      <Image
-        src="/media/tanbur.jpg"
+      <img
+        src="/media/tanbur.webp"
         alt="My Turkish Cümbüş Tanbur from SalaMuzik, Istanbul."
-        width={544}
-        height={680}
-        format="webp"
-        quality={82}
+        width="544"
+        height="680"
         class="memory-img"
         loading="lazy"
         decoding="async"
-        inferSize={true}
       />
       <figcaption class="memory-caption">My Turkish Cümbüş Tanbur from SalaMuzik, Istanbul</figcaption>
     </figure>
@@ -128,23 +113,10 @@ const description =
       </a>
     </nav>
 
-    <!-- Signature row: name left, logo right -->
     <div class="mt-8 grid grid-cols-2 items-center gap-4">
       <p class="font-display text-lg md:text-xl">~ Hunter Eastland ~</p>
       <div class="justify-self-end">
-        <!--
-          Logo stays as PNG — logos with flat/sharp lines often look worse as WebP.
-          Added explicit width/height to prevent layout shift.
-        -->
-        <img
-          src="/media/logo.png"
-          alt="Tradscendence logo"
-          width="100"
-          height="100"
-          class="h-25 w-auto opacity-90"
-          loading="lazy"
-          decoding="async"
-        />
+        <img src="/media/logo.png" alt="Tradscendence logo" width="100" height="100" class="h-25 w-auto opacity-90" loading="lazy" decoding="async" />
       </div>
     </div>
   </section>
@@ -155,7 +127,6 @@ const description =
       margin-top: 0.5rem;
       margin-bottom: 1.25rem;
     }
-
     .memory-img {
       width: 100%;
       height: auto;
@@ -172,7 +143,6 @@ const description =
               mask-size: cover;
       filter: blur(0px) drop-shadow(0 0 8px rgba(0,0,0,0.35));
     }
-
     .memory-caption {
       margin-top: 0.5rem;
       font-size: 0.9rem;
