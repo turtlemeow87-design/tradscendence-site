@@ -1,0 +1,37 @@
+import { c as createComponent, r as renderComponent, a as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_CfHE34sL.mjs';
+import 'kleur/colors';
+import { $ as $$BaseLayout } from '../chunks/BaseLayout_DPR2iDcX.mjs';
+export { renderers } from '../renderers.mjs';
+
+const $$Thanks = createComponent(($$result, $$props, $$slots) => {
+  const title = "Thank you \u2014 Tradscendence";
+  return renderTemplate`${renderComponent($$result, "BaseLayout", $$BaseLayout, { "title": title }, { "default": ($$result2) => renderTemplate` ${maybeRenderHead()}<section class="mx-auto max-w-6xl px-4 py-12"> <!-- Grid: Left = message, Middle = CTA links, Right = photo --> <div class="grid gap-8 md:gap-10 md:grid-cols-[1fr_auto_minmax(260px,360px)] items-start"> <!-- LEFT: Thank-you + space for disclaimers --> <div class="space-y-5"> <h1 class="font-display text-4xl sm:text-5xl leading-tight">
+Thank you so much for reaching out!
+</h1> <p class="opacity-80 text-base sm:text-lg">
+I received your message and I’ll reply as soon as I can. In the meantime, feel free to keep exploring the instruments and recordings.
+</p> <!-- Your custom sentences / disclaimers --> <div class="mt-6 rounded-xl frame border border-black/30 bg-black/20 p-4 sm:p-5"> <h2 class="font-display text-lg mb-2">Notes & disclaimers (if planning to book)</h2> <p class="text-sm leading-relaxed opacity-90"> <!-- Edit these lines with your own copy -->
+• Typical response time is 24–48 hours.<br>
+• *All booking message submissions are inquiries only.  No guarantees until we discuss content, travel, pricing, and required dress code for your special event (which I will absolutely follow, within reason!).<br>
+• Rates are tailored by event and set length.<br>
+• *Due to the handmade nature, materials, and finishes on some instruments, extreme weather (e.g.high heat, rain without cover) is a no-go!<br>
+• I do not carry a P.A. system.  Smaller events only!!<br>
+• I know this sounds like a lot, but I'm transparent and will work with you to figure things out!!<br> </p> </div> </div> <!-- MIDDLE: logo + two stacked links --> <nav aria-label="Next steps" class="flex flex-col items-center gap-3 md:gap-4"> <!-- Small logo above links --> <div class="logo-fade shrink-0 w-[104px] h-[104px] sm:w-[160px] sm:h-[160px] md:max-w-[200px] aspect-square frame flex items-center justify-center opacity-70"> <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover"> </div> <a href="/instruments" class="group inline-flex items-center gap-2 rounded-lg px-3 py-2 frame border border-black/30 hover:border-black/50 hover:bg-black/10"> <span class="font-semibold">Keep exploring</span> <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span> </a> <a href="/" class="group inline-flex items-center gap-2 rounded-lg px-3 py-2 frame border border-black/30 hover:border-black/50 hover:bg-black/10"> <span class="font-semibold">Home</span> <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span> </a> </nav> <!-- RIGHT: vertical photo + small caption --> <figure class="rounded-2xl overflow-hidden frame shadow-soft"> <img src="/media/thankyou-guitar.jpg" alt="Hunter Eastland holding a guitar" class="w-full h-full object-cover max-h-[560px]" loading="lazy"> <figcaption class="text-xs opacity-80 px-3 py-2 bg-black/40">
+Portrait of me with my electric guitar (about 15 years ago).
+</figcaption> </figure> </div> <!-- Optional: subtle divider & a small footer note --> <div class="mt-10 h-px bg-[var(--line)] opacity-60"></div> <p class="mt-6 text-sm opacity-70">
+If you made a mistake in your submission, you can <a href="/contact" class="underline decoration-[var(--accent-gold)] decoration-2 underline-offset-2 hover:opacity-100">go back to the contact form</a> and send another message.
+</p> </section> ` })}`;
+}, "C:/Users/Owner/tradscendence-site/src/pages/thanks.astro", void 0);
+
+const $$file = "C:/Users/Owner/tradscendence-site/src/pages/thanks.astro";
+const $$url = "/thanks";
+
+const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: $$Thanks,
+  file: $$file,
+  url: $$url
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const page = () => _page;
+
+export { page };

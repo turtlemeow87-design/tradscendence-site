@@ -1,0 +1,316 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Divider from "../components/Divider.astro";
+import FeaturedInstrumentCard from "../components/FeaturedInstrumentCard.astro";
+import YouTubeFacade from "../components/YouTubeFacade.astro";
+import { Image } from 'astro:assets';
+
+// ✅ SEO: clear, keyworded title (brand + what you do)
+const title =
+  "Hunter Eastland / Tradscendence — World & Folk Multi-Instrumentalist | Sound Beyond Borders";
+
+// ✅ SEO: unique, human description (kept concise for SERP snippets)
+const description =
+  "World/folk multi-instrumentalist in Richmond, VA. Book for private/intimate events, and studio sessions. Explore through videos and sound teasers. Surbahar, Arabic Oud, Esraj, Duduk, Azeri Tar, Turkish Baglama Saz, and more!";
+
+// NOTE: videoId and siParam are now split so the facade thumbnail works correctly.
+// The original code had a typo: "Vh8olflrhQvMtgcsnpm " — "npm " was accidentally appended.
+// Fixed below.
+const LATEST_YT = {
+  id: 'OUpYRKzTAhM',
+  si: 'Vh8olflrhQvMtgcs',
+  isShort: false,
+  title: 'Instrument: Turkish Cümbüş Oud',
+};
+
+const SECOND_YT = {
+  id: '1p_zNEC1FY8',
+  si: 'Tcx8T5XA-lamzTlU',
+  isShort: false,
+  title:
+    'This is the first and only music video that I recorded and produced entirely by myself a couple years ago with the goal of composing the most "unlikely" instruments together in one place.  Trying my best to convey a message about relativity through sound, but only a very small portion of the internet noticed it.  Anyway, Enjoy!',
+};
+
+const watchUrl  = `https://youtu.be/${LATEST_YT.id}`;
+const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="https://www.soundbeyondborders.com/"
+>
+
+  <!-- Header block with name, handle, catchphrase -->
+  <section class="mx-auto max-w-6xl px-4 pt-3 sm:pt-10">
+    <div class="flex flex-col sm:items-center sm:text-center">
+      <h1 class="font-display text-[9vw] sm:text-5xl md:text-6xl leading-[1.05] opacity-75 bg-gradient-to-r from-black via-black/85 to-transparent rounded-md bg-clip-text text-transparent drop-shadow-[0_0_1px_ivory]">
+        ~<span class="font-extrabold text-[1.05em]">Sound</span> <span class="text-rosewood/70">Beyond</span> Borders~
+      </h1>
+
+      <p class="mt-1 sm:mt-2 text-base sm:text-lg opacity-60 bg-gradient-to-r from-rosewood via-rosewood/10 to-transparent rounded-md max-w-[42ch]">
+        <a
+          href="#transcend-video"
+          class="outline-none no-underline hover:opacity-80 focus:opacity-80"
+          title="Jump to the &quot;Transcend the Traditional&quot; video"
+        >
+          Transcend the traditional.
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <Divider />
+
+  <!-- Hero: wide image + caption -->
+  <section class="mx-auto max-w-6xl px-4">
+    <figure class="relative rounded-2xl overflow-hidden frame shadow-soft">
+      <!--
+        Image component converts to WebP at build time and adds proper width/height
+        to prevent layout shift (CLS). Dimensions match the display size at max viewport.
+        fetchpriority="high" tells the browser to load this immediately (it's above the fold).
+      -->
+      <Image
+  src="/media/hero-placeholder.jpg"
+  alt="Hunter with instruments"
+  width={1200}
+  height={848}
+  format="webp"
+  quality={82}
+  class="w-full h-[42vh] sm:h-[56vh] object-cover"
+  loading="eager"
+  fetchpriority="high"
+/>
+      <div class="hero-fade-overlay"></div>
+      <figcaption class="relative p-3 sm:p-4 text-xs sm:text-sm bg-gradient-to-r from-ebony via-ebony to-transparent">
+        <div class="font-display">What is sound beyond borders?</div>
+        <div class="opacity-80">Music as a bridge between cultures, not a separation.</div>
+      </figcaption>
+    </figure>
+  </section>
+
+  <style>
+    .hero-fade-overlay {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 115%, rgba(17,17,17,0.85) 12%, rgba(17,17,17,0.0) 55%),
+        linear-gradient(to bottom, rgba(17,17,17,0.0) 72%, rgba(17,17,17,0.85) 98%),
+        linear-gradient(to top, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 22%),
+        linear-gradient(to right, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 20%),
+        linear-gradient(to left, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 20%);
+      mix-blend-mode: normal;
+    }
+  </style>
+
+  <Divider />
+
+  <!-- Two-column intro -->
+  <section class="mx-auto max-w-6xl px-4 space-y-6 sm:space-y-8">
+    <h2 class="font-display text-xl sm:text-2xl">About my approach</h2>
+
+    <div class="grid sm:grid-cols-2 gap-6 sm:gap-8 items-center">
+      <div class="space-y-4">
+        <p>
+          Every instrument has an origin story. Sometimes these stories are pretty well-documented, and other times we are left to fill in the blanks for ourselves. In fact, academic studies such as organology exist for that purpose. The same is true for the sound that comes out of those instruments. Ethnomusicology exists for that purpose. And as beautiful as it is to be able to discover and study all of the ways in which a particular sound, or musical framework (theory) relate to their culture or country of origin: what is equally as beautiful, to me, is to be able to take a particular sound, and explore how it can relate to anybody from any culture.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <p>
+          Music is important for different people at different times in different ways. I'm available for intimate events: <b>proposals, private weddings, other ceremonies, small gatherings, and yes, even funerals.</b>~
+        </p>
+        <p>I am based in <i>Richmond, VA</i> (US), but willing to travel if travel expenses are covered.</p>
+        <p>
+          Working on a song/album and you want something different that isn't digital? I also take studio musician inquiries!
+        </p>
+      </div>
+    </div>
+
+    <div class="space-y-4 pt-1">
+      <p class="opacity-90 font-semibold text-[0.92rem]">
+        *All sound teasers and photos on this website are of my own making on my own instruments!! No special effects.*
+      </p>
+
+      <div class="flex flex-col gap-2">
+        <a href="/instruments" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
+          <span class="inline-flex items-center gap-1">
+            Explore the instruments
+            <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
+        </a>
+
+        <a href="/about" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
+          <span class="inline-flex items-center gap-1">
+            More about me and my approach
+            <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
+        </a>
+
+        <a href="#latest-video" class="group gothic-link font-bold block drop-shadow-[0_0_2px_ivory]">
+          <span class="inline-flex items-center gap-1">
+            See my latest YouTube video!
+            <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">↓</span>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <Divider />
+
+    <!-- 3 featured instruments with audio teasers -->
+    <section class="mx-auto max-w-6xl px-4 pb-8">
+      <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">Featured sounds</h2>
+      <div class="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
+        <div class="space-y-2">
+          <FeaturedInstrumentCard title="Surbahar" imgSrc="/media/inst-surbahar.jpg" audioSrc="/media/surbahar.m4a" />
+          <a href="/instruments/Surbahar" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Surbahar →</a>
+        </div>
+        <div class="space-y-2">
+          <FeaturedInstrumentCard title="Baglama Saz" imgSrc="/media/inst-baglamasaz.jpg" audioSrc="/media/baglamasaz1.m4a" />
+          <a href="/instruments/BaglamaSaz" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Baglama Saz →</a>
+        </div>
+        <div class="space-y-2">
+          <FeaturedInstrumentCard title="Arabic Oud" imgSrc="/media/inst-arabicoud.jpg" audioSrc="/media/arabicoud.m4a" />
+          <a href="/instruments/ArabicOud" class="gothic-link text-sm font-bold drop-shadow-[0_0_2px_ivory]">Explore more Arabic Oud →</a>
+        </div>
+      </div>
+    </section>
+
+    <Divider />
+
+    <!-- First video — YouTube Facade replaces the <iframe> -->
+    <section id="latest-video" class="mx-auto max-w-6xl px-4 pb-6 scroll-mt-24">
+      <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">My Latest Youtube Upload!</h2>
+
+      <figure class="space-y-3">
+        <div class="relative rounded-2xl overflow-hidden frame shadow-soft p-[2px] bg-gradient-to-r from-[#C2A45F] via-[#A8743D] to-[#6E2A2A]">
+          <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[14px] overflow-hidden`}>
+            <!--
+              YouTubeFacade goes here — same location as the old <iframe>.
+              The parent div already has aspect-video and overflow-hidden,
+              so the facade fills it exactly the same way the iframe did.
+            -->
+            <YouTubeFacade
+              videoId={LATEST_YT.id}
+              siParam={LATEST_YT.si}
+              title={LATEST_YT.title}
+              isShort={LATEST_YT.isShort}
+              class="absolute inset-0 rounded-[12px]"
+            />
+          </div>
+        </div>
+
+        <figcaption class="text-sm opacity-80 flex flex-col sm:flex-row sm:items-center sm:gap-3">
+          <span class="font-display">{LATEST_YT.title}</span>
+          <a href={watchUrl} target="_blank" rel="noopener" class="gothic-link font-bold">Watch on YouTube →</a>
+        </figcaption>
+      </figure>
+
+      <div class="pt-4">
+        <a href="/instruments/CumbusOud" class="group gothic-link font-bold inline-flex items-center gap-1 drop-shadow-[0_0_2px_ivory]">
+          <span>Explore this instrument more</span>
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+        </a>
+      </div>
+    </section>
+
+    <Divider />
+
+    <!-- Second video — YouTube Facade -->
+    <section id="transcend-video" class="mx-auto max-w-6xl px-4 pb-10 scroll-mt-24">
+      <h2 class="font-display text-xl sm:text-2xl mb-3 sm:mb-4">Transcend The Traditional</h2>
+
+      <figure class="space-y-3">
+        <div class="relative rounded-[20px] overflow-hidden p-[5px] bg-gradient-to-r from-[#A07133] via-[#8D5A2C] to-[#6E2A2A] shadow-[0_0_28px_10px_rgba(141,90,44,0.22)]">
+          <div class="absolute -inset-[2px] bg-[radial-gradient(circle_at_center,rgba(141,90,44,0.35)_0%,transparent_70%)] blur-[30px] opacity-60 pointer-events-none"></div>
+          <div class="absolute inset-0 bg-rosewood/15 mix-blend-multiply pointer-events-none"></div>
+
+          <div class={`relative w-full ${SECOND_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[16px] overflow-hidden`}>
+            <YouTubeFacade
+              videoId={SECOND_YT.id}
+              siParam={SECOND_YT.si}
+              title={SECOND_YT.title}
+              isShort={SECOND_YT.isShort}
+              class="absolute inset-0 rounded-[14px]"
+            />
+          </div>
+        </div>
+
+        <figcaption class="text-sm opacity-80">
+          <span class="font-display block">{SECOND_YT.title}</span>
+          <a href={watchUrl2} target="_blank" rel="noopener" class="gothic-link font-bold inline-block mt-2">
+            Watch on YouTube →
+          </a>
+        </figcaption>
+      </figure>
+    </section>
+
+    <script is:inline>
+      document.addEventListener('click', (e) => {
+        const card = e.target.closest('.js-teaser-card');
+        if (!card) return;
+        const audio = card.querySelector('audio.teaser');
+        if (!audio) return;
+        document.querySelectorAll('audio.teaser').forEach((a) => {
+          if (a !== audio) { try { a.pause(); a.currentTime = 0; } catch {} }
+        });
+        if (audio.paused) {
+          audio.muted = false; audio.volume = 1;
+          audio.play().catch((err) => console.warn('play failed:', err));
+        } else { audio.pause(); }
+      });
+
+      const attachIconSync = (a) => {
+        const card = a.closest('.js-teaser-card');
+        const icon = card?.querySelector('.play-icon');
+        if (!icon) return;
+        a.addEventListener('play',  () => icon.textContent = '❚❚');
+        a.addEventListener('pause', () => icon.textContent = '▶︎');
+        a.addEventListener('ended', () => { icon.textContent = '▶︎'; a.currentTime = 0; });
+      };
+      document.querySelectorAll('audio.teaser').forEach(attachIconSync);
+    </script>
+
+    <style is:global>
+      html { scroll-behavior: smooth; }
+      #latest-video, #transcend-video { scroll-margin-top: 96px; }
+    </style>
+
+    <script is:inline>
+      document.addEventListener("DOMContentLoaded", () => {
+        const scrollOffset = 80;
+        const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+        function smoothScroll(targetY, duration = 900) {
+          const startY = window.scrollY;
+          const distance = targetY - startY;
+          let startTime = null;
+
+          function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = easeOutCubic(progress);
+            window.scrollTo(0, startY + distance * eased);
+            if (elapsed < duration) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+          const href = link.getAttribute("href");
+          const targetEl = document.querySelector(href);
+          if (targetEl) {
+            link.addEventListener("click", (e) => {
+              e.preventDefault();
+              const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - scrollOffset;
+              smoothScroll(targetTop, 1800);
+            });
+          }
+        });
+      });
+    </script>
+
+  </section>
+
+</BaseLayout>

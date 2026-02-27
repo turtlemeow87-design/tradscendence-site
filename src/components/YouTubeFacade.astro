@@ -1,0 +1,132 @@
+---
+// src/components/YouTubeFacade.astro
+// Drop-in replacement for YouTube <iframe> embeds.
+// Renders a clickable thumbnail — the real player only loads on click.
+// This is the main Lighthouse win: avoids loading YouTube's ~500 KB of scripts on page load.
+
+interface Props {
+  videoId: string;   // Just the base video ID, e.g. "OUpYRKzTAhM"
+  siParam?: string;  // Optional si= tracking param, e.g. "Vh8olflrhQvMtgcs"
+  title: string;
+  isShort?: boolean;
+  class?: string;
+}
+
+const { videoId, siParam, title, isShort = false, class: className = '' } = Astro.props;
+
+// YouTube serves thumbnails at predictable URLs — no API needed
+const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+// Fallback in case maxresdefault doesn't exist for older/unlisted videos
+const thumbnailFallback = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+// Autoplay=1 so clicking immediately starts the video
+const siQuery = siParam ? `si=${siParam}&` : '';
+const embedUrl = `https://www.youtube.com/embed/${videoId}?${siQuery}rel=0&autoplay=1`;
+---
+
+<div
+  class:list={['yt-facade', className]}
+  data-embed={embedUrl}
+  data-title={title}
+  role="button"
+  tabindex="0"
+  aria-label={`Play video: ${title}`}
+>
+  <img
+    src={thumbnailUrl}
+    alt={title}
+    width="1280"
+    height={isShort ? 2275 : 720}
+    loading="lazy"
+    decoding="async"
+    onerror={`this.onerror=null;this.src='${thumbnailFallback}'`}
+  />
+
+  <!-- YouTube-style play button -->
+  <div class="yt-play-btn" aria-hidden="true">
+    <svg width="68" height="48" viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg">
+      <path d="M66.5 7.5C65.7 4.7 63.5 2.5 60.7 1.7 55.3.2 34 .2 34 .2S12.7.2 7.3 1.7C4.5 2.5 2.3 4.7 1.5 7.5.2 13 .2 24 .2 24s0 11 1.3 16.5c.8 2.8 3 5 5.8 5.8C12.7 47.8 34 47.8 34 47.8s21.3 0 26.7-1.5c2.8-.8 5-3 5.8-5.8C67.8 35 67.8 24 67.8 24s0-11-1.3-16.5z" fill="#FF0000"/>
+      <path d="M27 34l18-10-18-10v20z" fill="white"/>
+    </svg>
+  </div>
+</div>
+
+<style>
+  .yt-facade {
+    position: relative;
+    cursor: pointer;
+    background: #000;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .yt-facade img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.2s ease;
+  }
+
+  .yt-facade:hover img,
+  .yt-facade:focus-visible img {
+    filter: brightness(0.8);
+  }
+
+  .yt-play-btn {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .yt-play-btn svg {
+    filter: drop-shadow(0 2px 12px rgba(0,0,0,0.7));
+    transition: transform 0.15s ease;
+  }
+
+  .yt-facade:hover .yt-play-btn svg,
+  .yt-facade:focus-visible .yt-play-btn svg {
+    transform: scale(1.1);
+  }
+
+  .yt-facade:focus-visible {
+    outline: 2px solid var(--accent-gold, #C2A45F);
+    outline-offset: 3px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.yt-facade').forEach((facade) => {
+    const activate = () => {
+      const embedUrl = facade.dataset.embed!;
+      const title = facade.dataset.title!;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = embedUrl;
+      iframe.title = title;
+      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:inherit;';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+
+      const wrapper = facade.parentElement;
+      if (wrapper) {
+        // Ensure the parent is positioned so the iframe fills it
+        wrapper.style.position = 'relative';
+        wrapper.appendChild(iframe);
+        facade.remove();
+      }
+    };
+
+    facade.addEventListener('click', activate);
+    facade.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activate();
+      }
+    });
+  });
+</script>
