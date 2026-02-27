@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.6.0",
+    "@fontsource/cinzel": "^5.2.8",
+    "@fontsource/inter": "^5.2.8",
     "@neondatabase/serverless": "^1.0.2",
     "astro": "^5.13.5",
     "resend": "^6.9.1"
