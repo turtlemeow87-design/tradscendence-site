@@ -1,21 +1,22 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Divider from "../../components/Divider.astro";
+import YouTubeFacade from "../../components/YouTubeFacade.astro";
 
 // ✅ SEO
 const title = "My Instruments — Tradscendence | Sound Beyond Borders";
 const description =
-  "Browse Hunter Eastland’s world & folk instruments. Hear quick audio teasers and jump to pages: Surbahar, Oud, Saz, Rabab, Esraj, Duduk, Tar, and more.";
+  "Browse Hunter Eastland's world & folk instruments. Hear quick audio teasers and jump to pages: Surbahar, Oud, Saz, Rabab, Esraj, Duduk, Tar, and more.";
 
 /** Latest YouTube embed (manual) */
 const LATEST_YT = {
-  id: "OUpYRKzTAhM?si=Vh8olflrhQvMtgcs", // e.g. 'dQw4w9WgXcQ'
-  isShort: false,                        // true if the latest is a Short (9:16)
-  title: "My latest performance",        // caption + a11y title
-  instrumentLink: "/instruments/CumbusOud",  // point to the featured instrument (or '/instruments')
+  id: "OUpYRKzTAhM",
+  si: "Vh8olflrhQvMtgcs",
+  isShort: false,
+  title: "My latest performance",
+  instrumentLink: "/instruments/CumbusOud",
 };
 
-const embedUrl = `https://www.youtube.com/embed/${LATEST_YT.id}?rel=0`;
 const watchUrl = `https://youtu.be/${LATEST_YT.id}`;
 
 import { neon } from "@neondatabase/serverless";
@@ -27,7 +28,6 @@ const dbItems = await sql`
   ORDER BY display_order ASC
 `;
 
-// Map to the shape your template already expects
 const items = dbItems.map((row) => ({
   name: row.name,
   file: row.audio_teaser,
@@ -70,17 +70,16 @@ const items = dbItems.map((row) => ({
     </h2>
 
     <figure class="space-y-3">
-      <!-- Responsive frame that adapts to Shorts vs. regular -->
-      <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-2xl overflow-hidden frame shadow-soft`}>
-        <iframe
-          class="absolute inset-0 w-full h-full"
-          src={embedUrl}
-          title={LATEST_YT.title}
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-        ></iframe>
+      <div class="relative rounded-2xl overflow-hidden frame shadow-soft p-[2px] bg-gradient-to-r from-[#C2A45F] via-[#A8743D] to-[#6E2A2A]">
+        <div class={`relative w-full ${LATEST_YT.isShort ? 'aspect-[9/16]' : 'aspect-video'} rounded-[14px] overflow-hidden`}>
+          <YouTubeFacade
+            videoId={LATEST_YT.id}
+            siParam={LATEST_YT.si}
+            title={LATEST_YT.title}
+            isShort={LATEST_YT.isShort}
+            class="absolute inset-0 rounded-[12px]"
+          />
+        </div>
       </div>
 
       <figcaption class="text-sm opacity-80 flex flex-col sm:flex-row sm:items-center sm:gap-3">
@@ -91,7 +90,6 @@ const items = dbItems.map((row) => ({
       </figcaption>
     </figure>
 
-    <!-- “Explore this instrument” link, matching your CTA style -->
     <div class="pt-4">
       <a 
         href={LATEST_YT.instrumentLink ?? '/instruments'} 
@@ -106,16 +104,16 @@ const items = dbItems.map((row) => ({
     document.addEventListener('DOMContentLoaded', () => {
       const supportsHover = window.matchMedia('(hover: hover)').matches;
 
-      const players = new Map();
-      let current = null;
+      const players = new Map<string, HTMLAudioElement>();
+      let current: HTMLAudioElement | null = null;
 
-      function getPlayer(src) {
+      function getPlayer(src: string): HTMLAudioElement {
         if (!players.has(src)) {
           const a = new Audio(src);
           a.preload = 'none';
           players.set(src, a);
         }
-        return players.get(src);
+        return players.get(src)!;
       }
 
       function stopCurrent() {
@@ -125,7 +123,7 @@ const items = dbItems.map((row) => ({
         }
       }
 
-      async function play(src) {
+      async function play(src: string) {
         stopCurrent();
         const a = getPlayer(src);
         current = a;
@@ -140,6 +138,7 @@ const items = dbItems.map((row) => ({
 
       document.querySelectorAll('[data-audio]').forEach((btn) => {
         const src = btn.getAttribute('data-audio');
+        if (!src) return;
 
         btn.addEventListener('click', () => play(src), { passive: true });
 
@@ -156,7 +155,6 @@ const items = dbItems.map((row) => ({
     });
   </script>
 
-  <!-- Smooth-scrolling + anchor offset in case you link here from elsewhere -->
   <style is:global>
     html { scroll-behavior: smooth; }
     #latest-video { scroll-margin-top: 96px; }
@@ -165,11 +163,7 @@ const items = dbItems.map((row) => ({
   <style>
     .instruments-page ul li.frame {
       position: relative;
-      background: linear-gradient(
-        to right,
-        rgba(205, 127, 50, 0.15),
-        transparent
-      );
+      background: linear-gradient(to right, rgba(205, 127, 50, 0.15), transparent);
       border-radius: 0.75rem;
       overflow: hidden;
     }
@@ -180,14 +174,8 @@ const items = dbItems.map((row) => ({
       inset: 0;
       border-radius: inherit;
       padding: 1px;
-      background: linear-gradient(
-        to right,
-        rgba(205, 127, 50, 0.8),
-        transparent
-      );
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
+      background: linear-gradient(to right, rgba(205, 127, 50, 0.8), transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
               mask-composite: exclude;
       pointer-events: none;
