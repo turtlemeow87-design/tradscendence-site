@@ -150,8 +150,19 @@ const questions = suggestedQuestions ?? defaultQuestions;
 
       input.value = '';
 
-      // On mobile, dismiss keyboard immediately after sending
-      if (!isDesktop) input.blur();
+      // On mobile: blur immediately to dismiss keyboard, hide chips
+      if (!isDesktop) {
+        input.blur();
+        // Small delay to let blur register before async work starts
+        await new Promise(r => setTimeout(r, 50));
+        const suggestionsEl = document.getElementById('chat-suggestions');
+        if (suggestionsEl) {
+          suggestionsEl.style.transition = 'opacity 200ms ease';
+          suggestionsEl.style.opacity = '0';
+          suggestionsEl.style.pointerEvents = 'none';
+          setTimeout(() => { suggestionsEl.style.display = 'none'; }, 200);
+        }
+      }
 
       messagesEl.appendChild(createMessage('user', trimmed));
       scrollToBottom();
