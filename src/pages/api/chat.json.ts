@@ -104,15 +104,18 @@ export const POST: APIRoute = async ({ request }) => {
   ];
 
   const geminiBody = {
-    system_instruction: {
-      parts: [{ text: SYSTEM_PROMPT(instrumentName, instrumentOrigin, pageContext) }],
+  system_instruction: {
+    parts: [{ text: SYSTEM_PROMPT(instrumentName, instrumentOrigin, pageContext) }],
+  },
+  contents,
+  generationConfig: {
+    maxOutputTokens: 800,
+    temperature: 0.7,
+    thinkingConfig: {
+      thinkingBudget: 0,
     },
-    contents,
-    generationConfig: {
-      maxOutputTokens: 400,
-      temperature: 0.7,
-    },
-  };
+  },
+};
 
   try {
     const res = await fetch(
