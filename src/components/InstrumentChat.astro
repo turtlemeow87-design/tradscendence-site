@@ -117,9 +117,13 @@ const questions = suggestedQuestions ?? defaultQuestions;
       if (isMobile) {
         // Scroll internal messages so top of new message is visible
         messagesEl.scrollTo({ top: el.offsetTop - messagesEl.offsetTop, behavior: 'smooth' });
-        // Then scroll page to top of chat section
+        // Then scroll page to top of chat section, offset for sticky nav
         setTimeout(() => {
-          section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (section) {
+            const navOffset = 80; // approx sticky nav height in px
+            const top = section.getBoundingClientRect().top + window.scrollY - navOffset;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
         }, 80);
       } else {
         scrollToBottom();
