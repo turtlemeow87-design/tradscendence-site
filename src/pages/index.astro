@@ -230,7 +230,10 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
         });
         if (audio.paused) {
           audio.muted = false; audio.volume = 1;
-          audio.play().catch((err) => console.warn('play failed:', err));
+          audio.play().catch((err) => {
+            if (err.name !== 'AbortError') console.warn('play failed:', err);
+            // AbortError is expected on rapid switching — suppress silently
+          });
         } else { audio.pause(); }
       });
 

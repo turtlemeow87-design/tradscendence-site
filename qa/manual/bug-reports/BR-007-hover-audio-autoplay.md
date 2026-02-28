@@ -2,8 +2,9 @@
 
 **Title:** Hover-to-play audio silently fails on first page load before any click interaction  
 **Reported by:** Hunter Eastland  
-**Date:** 2026-02-27  
-**Status:** Open  
+**Date Filed:** 2026-02-27  
+**Date Resolved:** 2026-02-27  
+**Status:** ✅ Resolved — Verified  
 **Severity:** Medium  
 **Priority:** Medium
 
@@ -20,63 +21,52 @@
 
 ## Description
 
-On the `/instruments` page, hovering over any ▶︎ play button on first page load produces no audio and no visible feedback. The hover interaction appears to do nothing. After the user clicks any play button at least once, hover-to-play begins working normally across all buttons for the remainder of the session.
+On the `/instruments` page, hovering over any ▶︎ play button on first page load produced no audio and no visible feedback. After the user clicked any play button at least once, hover-to-play began working normally for the rest of the session.
 
 ---
 
-## Steps to Reproduce
+## Steps to Reproduce (Original)
 
 1. Open a fresh browser tab and navigate to `https://www.soundbeyondborders.com/instruments/`
 2. Without clicking anywhere on the page, hover the mouse over any ▶︎ button
 3. Observe: no audio plays, no feedback given
 4. Click any ▶︎ button once
-5. Observe: audio plays on click
-6. Now hover over a different ▶︎ button without clicking
-7. Observe: hover now works normally
-
----
-
-## Expected Result
-
-Hovering over a ▶︎ button should begin playing audio immediately, regardless of whether the user has previously clicked anywhere on the page.
-
----
-
-## Actual Result
-
-Hover-to-play is silently blocked on first page load. No audio, no error shown to user, no console error logged. After one click anywhere on the page, hover works correctly for the rest of the session.
+5. Hover again — now works normally
 
 ---
 
 ## Root Cause
 
-Modern browsers enforce an autoplay policy that blocks audio from playing until the user has made at least one deliberate interaction (click or tap) with the page. The hover handler calls `audio.play()` but the browser rejects it silently. The `catch {}` block in the playback code swallows the rejection without any feedback. The first click anywhere on the page satisfies the browser's gesture requirement, after which hover works normally.
+Modern browsers enforce an autoplay policy that blocks audio from playing until the user has made at least one deliberate click/tap on the page. The hover handler called `audio.play()` but the browser rejected it silently. The `catch {}` block swallowed the rejection with no user feedback.
 
 ---
 
-## Proposed Fix
+## Fix Applied
 
-Add a one-time click listener on `document.body` that calls a silent, zero-duration audio play to unlock the browser's autoplay policy as early as possible — before the user has hovered over anything. This is a standard pattern for sites that rely on hover-triggered audio.
+Added a subtle toast notification to the `/instruments` page (desktop only) reading "👆 Click anywhere to enable audio previews." The toast:
+- Only renders on hover-capable devices via `window.matchMedia('(hover: hover)')`
+- Fades in on page load
+- Fades out and removes itself on first click anywhere on the page
+- That first click simultaneously satisfies the browser autoplay gesture requirement, unlocking hover-to-play for the rest of the session
 
-Alternatively, show a subtle visual indicator on first load (e.g. a tooltip or pulsing effect on the first ▶︎ button) prompting the user to click once to enable sound.
-
----
-
-## Impact
-
-- Users on desktop who try to preview instruments by hovering on first visit will hear nothing and may assume the feature is broken
-- No crash or data loss — purely a UX/discoverability issue
-- After one click, behavior is fully correct
+**Files changed:** `src/pages/instruments/index.astro`
 
 ---
 
-## Screenshots
+## Verification Steps
 
-No console error produced — failure is silent. See TS-004 Session 001 notes.
+1. Hard refresh `/instruments` on desktop
+2. Confirm toast appears at bottom of page
+3. Hover over any ▶︎ button — no audio yet (expected, no click has occurred)
+4. Click anywhere on page — toast fades out
+5. Hover over any ▶︎ button — audio plays correctly
+6. Confirm toast does not appear on mobile
+
+**Verified in:** TS-004 Session 004
 
 ---
 
 ## Linked Test Case
 
 TC-004-01 — Hover Triggers Audio Playback (Desktop)  
-**Test Session:** TS-004 Session 001
+**Test Sessions:** TS-004 Session 001 (fail), Session 004 (pass)

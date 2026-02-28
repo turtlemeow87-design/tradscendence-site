@@ -2,8 +2,9 @@
 
 **Title:** favicon.ico returns 404 on all pages  
 **Reported by:** Hunter Eastland  
-**Date:** 2026-02-27  
-**Status:** Open  
+**Date Filed:** 2026-02-27  
+**Date Resolved:** 2026-02-27  
+**Status:** ✅ Resolved — Verified  
 **Severity:** Low  
 **Priority:** Low
 
@@ -20,11 +21,11 @@
 
 ## Description
 
-Every page load generates a 404 error in the browser console for `favicon.ico`. The site has a `favicon.svg` in the public directory but does not serve a `favicon.ico` file. Browsers automatically request `favicon.ico` by convention regardless of whether one is declared in the HTML, causing this error on every page.
+Every page load generated a 404 error in the browser console for `favicon.ico`. The site had a `favicon.svg` in the public directory but no `favicon.ico` file. Browsers automatically request `favicon.ico` by convention regardless of what is declared in the HTML.
 
 ---
 
-## Steps to Reproduce
+## Steps to Reproduce (Original)
 
 1. Navigate to any page on `https://www.soundbeyondborders.com/`
 2. Open DevTools → Console
@@ -32,51 +33,45 @@ Every page load generates a 404 error in the browser console for `favicon.ico`. 
 
 ---
 
-## Expected Result
-
-No 404 errors in the console related to favicon. The browser tab icon displays correctly.
-
----
-
-## Actual Result
-
-Console logs a 404 on every page load:  
-`Failed to load resource: the server responded with a status of 404 () — favicon.ico`
-
-The SVG favicon still displays correctly in the browser tab (Chrome falls back to the SVG), but the 404 is logged regardless.
-
----
-
 ## Screenshots
 
-**BR-008-favicon-404.png** — DevTools Console showing the favicon.ico 404 error (`GET https://www.soundbeyondborders.com/favicon.ico 404 (Not Found)`) visible at top and bottom of console output. Captured during TC-004-01 execution on 2026-02-27.
+**BR-008-screenshot-1.png** — DevTools Console showing the favicon.ico 404 error appearing at top and bottom of console output. Captured during TC-004-01 execution on 2026-02-27.
 
 ---
 
 ## Root Cause
 
-The site declares `favicon.svg` but does not include a `favicon.ico` fallback. Browsers request `favicon.ico` automatically by convention even when an SVG is declared. No `.ico` file exists at the site root to satisfy this request.
+No `favicon.ico` file existed at the site root. Browsers request it automatically by convention even when an SVG favicon is declared.
 
 ---
 
-## Proposed Fix
+## Fix Applied
 
-Add a `favicon.ico` file to the `/public` directory. Can be generated from the existing logo using any free online converter (e.g. favicon.io) — a 32x32 or 48x48 `.ico` export is sufficient. No code changes required.
+Two-part fix:
 
-Optionally also add the following to `BaseLayout.astro` `<head>` for explicit browser guidance:
+1. Generated a `favicon.ico` file (32x32) from the existing logo using [favicon.io](https://favicon.io) and added it to `/public/favicon.ico`
+
+2. Added explicit favicon link tags to `BaseLayout.astro` `<head>`:
 
 ```html
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 ```
 
+The SVG tag is the modern preferred format; the `.ico` tag is the fallback for browsers that request it by convention.
+
+**Files changed:** `src/layouts/BaseLayout.astro`, `public/favicon.ico` (new file)
+
 ---
 
-## Impact
+## Verification Steps
 
-- Console noise on every page load — minor but clutters DevTools during testing
-- No user-facing impact — SVG favicon still displays correctly in Chrome
-- Low priority but quick fix (~5 minutes)
+1. Hard refresh any page on the live site
+2. Open DevTools → Console
+3. Confirm no favicon.ico 404 error appears
+4. Confirm browser tab displays the correct icon
+
+**Verified in:** TS-004 Session 004
 
 ---
 

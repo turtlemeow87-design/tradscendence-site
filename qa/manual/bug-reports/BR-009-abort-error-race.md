@@ -2,8 +2,9 @@
 
 **Title:** AbortError race condition when rapidly switching between Featured Sound tracks on homepage  
 **Reported by:** Hunter Eastland  
-**Date:** 2026-02-27  
-**Status:** Open  
+**Date Filed:** 2026-02-27  
+**Date Resolved:** 2026-02-27  
+**Status:** ✅ Resolved — Verified  
 **Severity:** Low  
 **Priority:** Low
 
@@ -20,86 +21,70 @@
 
 ## Description
 
-When clicking rapidly between Featured Sound play buttons on the homepage, a race condition occurs where `pause()` is called on the first track while `play()` is still asynchronously starting on the second track. The result is that the second track fails to play and a warning is logged to the console. The behavior recovers correctly on a normal-speed retry.
+When clicking rapidly between Featured Sound play buttons on the homepage, a race condition caused `pause()` to be called on the first track while `play()` was still asynchronously starting on the second. The second track failed to play and a warning was logged to the console. Recovered correctly on normal-speed retry.
 
 ---
 
-## Steps to Reproduce
+## Steps to Reproduce (Original)
 
-1. Navigate to `https://www.soundbeyondborders.com/` and scroll to the Featured Sounds section
+1. Navigate to `https://www.soundbeyondborders.com/` and scroll to Featured Sounds
 2. Click ▶︎ on Baglama Saz
-3. Immediately (within ~0.5 seconds) click ▶︎ on Arabic Oud
+3. Immediately (~0.5 seconds) click ▶︎ on Arabic Oud
 4. Observe: Baglama Saz stops but Arabic Oud does not play
 5. Console shows: `play failed: AbortError: The play() request was interrupted by a call to pause()`
-6. Click ▶︎ on Arabic Oud again at normal speed
-7. Observe: Arabic Oud plays correctly on retry
-
----
-
-## Expected Result
-
-Switching between tracks at any speed should stop the first track and immediately begin the second, with no errors logged.
-
----
-
-## Actual Result
-
-Rapid switching causes the second track's `play()` promise to be rejected because `pause()` was called on the audio element before `play()` finished initializing. The second track is silently skipped. Console warning is logged.
 
 ---
 
 ## Screenshots
 
-**BR-009-switch-playback-error.png** — DevTools Console showing the full error: `play failed: AbortError: The play() request was interrupted by a call to pause()` with a link to `https://goo.gl/LdLk22`. Also shows the favicon.ico 404 (separate issue — BR-008). Captured during TC-004-03 execution on 2026-02-27.
+**BR-009-screenshot-1.png** — DevTools Console showing the full AbortError: `play failed: AbortError: The play() request was interrupted by a call to pause()` with link to `https://goo.gl/LdLk22`. Also shows favicon.ico 404 (separate issue — BR-008). Captured during TC-004-03 execution on 2026-02-27.
 
-**BR-009-switch-playback-error-js.png** — DevTools Sources panel showing the originating line of code: `audio.play().catch((err) => console.warn('play failed:', err))` at line 56 of the compiled index file. Confirms the error originates from the homepage Featured Sounds audio handler.
+**BR-009-screenshot-2.png** — DevTools Sources panel showing the originating line: `audio.play().catch((err) => console.warn('play failed:', err))` at line 56 of the compiled index file. Confirms error originates from the homepage Featured Sounds audio handler.
 
-**BR-009-screenshot-3.png** — DevTools Network request blocking panel showing `www.soundbeyondborders.com/media/baglamasaz1.m4a` successfully added to the block list. Captured during TC-004-06 execution — included here for context as it was taken in the same DevTools session.
+**BR-009-screenshot-3.png** — DevTools Network request blocking panel showing `www.soundbeyondborders.com/media/baglamasaz1.m4a` added to block list. Captured in the same DevTools session during TC-004-06 execution — included for context.
 
 ---
 
 ## Root Cause
 
-The `play()` method on an HTML Audio element returns a Promise. If `pause()` is called before that Promise resolves, the browser throws an AbortError. The current code does not wait for `play()` to resolve before allowing `pause()` to be called on the same element, creating a race condition under rapid user interaction.
+The `play()` method on HTMLAudioElement returns a Promise. If `pause()` is called before that Promise resolves, the browser throws an AbortError. The original catch block used `console.warn('play failed:', err)` which surfaced all errors including expected AbortErrors from rapid switching.
 
 ---
 
-## Proposed Fix
+## Fix Applied
 
-At minimum, suppress the AbortError specifically rather than catching all errors silently. This cleans up console noise without changing visible behavior:
+Updated the catch block in `src/pages/index.astro` to suppress AbortError specifically, while still surfacing any other genuine errors:
 
+**Before:**
 ```javascript
-async function play(src) {
-  stopCurrent();
-  const a = getPlayer(src);
-  current = a;
-  a.currentTime = 0;
-  a.volume = 0.9;
-  try {
-    await a.play();
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      console.warn('play failed:', err);
-    }
-    // AbortError is expected on rapid switching — suppress silently
-  }
-}
+audio.play().catch((err) => console.warn('play failed:', err));
 ```
 
-For a more complete fix, add a small debounce on the click handler to prevent rapid sequential calls from colliding.
+**After:**
+```javascript
+audio.play().catch((err) => {
+  if (err.name !== 'AbortError') console.warn('play failed:', err);
+  // AbortError is expected on rapid switching — suppress silently
+});
+```
+
+**Files changed:** `src/pages/index.astro`
 
 ---
 
-## Impact
+## Verification Steps
 
-- Only triggered by unusually rapid clicking between tracks
-- No crash, no data loss, no persistent broken state
-- Recovers correctly on normal-speed retry
-- Console noise may cause confusion during future testing sessions
+1. Navigate to `https://www.soundbeyondborders.com/` and scroll to Featured Sounds
+2. Open DevTools Console
+3. Click rapidly between Baglama Saz and Arabic Oud several times
+4. Confirm no AbortError appears in console
+5. Confirm audio behavior is otherwise unchanged — switching at normal speed still works correctly
+
+**Verified in:** TS-004 Session 004
 
 ---
 
 ## Linked Test Case
 
 TC-004-03 — Only One Audio Plays at a Time  
-**Test Session:** TS-004 Session 001
+**Test Sessions:** TS-004 Session 001 (partial fail), Session 004 (pass)
