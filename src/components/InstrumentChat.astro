@@ -107,7 +107,7 @@ const questions = suggestedQuestions ?? defaultQuestions;
     const history: { role: 'user' | 'model'; text: string }[] = [];
     let isLoading = false;
 
-    const isDesktop = window.matchMedia('(hover: hover)').matches;
+    const isMobile = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
 
     function scrollToBottom() {
       messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
@@ -151,17 +151,9 @@ const questions = suggestedQuestions ?? defaultQuestions;
       input.value = '';
 
       // On mobile: force keyboard down and hide chips
-      if (!isDesktop) {
-        // Samsung/Android keyboard dismiss: focus a hidden offscreen input then blur it
-        const dummy = document.createElement('input');
-        dummy.setAttribute('type', 'text');
-        dummy.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
-        document.body.appendChild(dummy);
-        dummy.focus();
-        dummy.blur();
-        document.body.removeChild(dummy);
+      if (isMobile) {
         input.blur();
-        // Hide suggestion chips on mobile
+        // Hide suggestion chips on mobile after first send
         const suggestionsEl = document.getElementById('chat-suggestions');
         if (suggestionsEl) {
           suggestionsEl.style.transition = 'opacity 200ms ease';
@@ -208,8 +200,8 @@ const questions = suggestedQuestions ?? defaultQuestions;
       } finally {
         setLoading(false);
         scrollToBottom();
-        // Only refocus on desktop — on mobile this would re-open the keyboard
-        if (isDesktop) input.focus();
+        // Only refocus on desktop — on mobile this re-opens the keyboard
+        if (!isMobile) input.focus();
       }
     }
 
