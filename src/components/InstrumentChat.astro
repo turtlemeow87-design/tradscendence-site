@@ -113,11 +113,11 @@ const questions = suggestedQuestions ?? defaultQuestions;
       messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
     }
 
-    function scrollToMessage(_el: HTMLElement) {
+    function scrollToMessage(el: HTMLElement) {
       if (isMobile) {
-        // On mobile: scroll the internal messages div to bottom,
-        // then scroll the PAGE to show the top of the chat section
-        scrollToBottom();
+        // Scroll internal messages so top of new message is visible
+        messagesEl.scrollTo({ top: el.offsetTop - messagesEl.offsetTop, behavior: 'smooth' });
+        // Then scroll page to top of chat section
         setTimeout(() => {
           section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 80);
