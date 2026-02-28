@@ -1,13 +1,9 @@
 ---
 // src/components/InstrumentChat.astro
-// Props are injected invisibly into the Gemini system prompt.
-// No props are required — the component works in any context.
-
 interface Props {
   instrumentName?: string;
   instrumentOrigin?: string;
   pageContext?: string;
-  /** Suggested questions shown as clickable chips */
   suggestedQuestions?: string[];
 }
 
@@ -18,7 +14,6 @@ const {
   suggestedQuestions,
 } = Astro.props;
 
-// Default suggested questions fall back based on context
 const defaultQuestions = instrumentName
   ? [
       `Where does the ${instrumentName} come from?`,
@@ -34,13 +29,6 @@ const defaultQuestions = instrumentName
     ];
 
 const questions = suggestedQuestions ?? defaultQuestions;
-
-// Encode props for the client script safely
-const clientProps = JSON.stringify({
-  instrumentName: instrumentName ?? null,
-  instrumentOrigin: instrumentOrigin ?? null,
-  pageContext: pageContext ?? null,
-});
 ---
 
 <section 
@@ -113,13 +101,13 @@ const clientProps = JSON.stringify({
     const messagesEl = document.getElementById('chat-messages');
     const input = document.getElementById('chat-input') as HTMLInputElement | null;
     const sendBtn = document.getElementById('chat-send');
-    const suggestionsEl = document.getElementById('chat-suggestions');
 
     if (!messagesEl || !input || !sendBtn) return;
 
-    // Conversation history for multi-turn
     const history: { role: 'user' | 'model'; text: string }[] = [];
     let isLoading = false;
+
+    const isDesktop = window.matchMedia('(hover: hover)').matches;
 
     function scrollToBottom() {
       messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
@@ -156,23 +144,15 @@ const clientProps = JSON.stringify({
       sendBtn.classList.toggle('is-loading', state);
     }
 
-    // Hide suggestions once user sends first message
-    function hideSuggestions() {
-      if (suggestionsEl) {
-        suggestionsEl.style.opacity = '0';
-        suggestionsEl.style.pointerEvents = 'none';
-        setTimeout(() => { if (suggestionsEl) suggestionsEl.style.display = 'none'; }, 300);
-      }
-    }
-
     async function sendMessage(text: string) {
       const trimmed = text.trim();
       if (!trimmed || isLoading) return;
 
-      hideSuggestions();
       input.value = '';
 
-      // Add user message
+      // On mobile, dismiss keyboard immediately after sending
+      if (!isDesktop) input.blur();
+
       messagesEl.appendChild(createMessage('user', trimmed));
       scrollToBottom();
 
@@ -193,7 +173,6 @@ const clientProps = JSON.stringify({
         });
 
         const data = await res.json();
-
         thinkingEl.remove();
 
         if (!res.ok || data.error) {
@@ -202,9 +181,7 @@ const clientProps = JSON.stringify({
         } else {
           history.push({ role: 'user', text: trimmed });
           history.push({ role: 'model', text: data.reply });
-          // Keep history trimmed to last 10 turns to avoid token bloat
           while (history.length > 20) history.splice(0, 2);
-
           messagesEl.appendChild(createMessage('bot', data.reply));
         }
       } catch {
@@ -213,7 +190,8 @@ const clientProps = JSON.stringify({
       } finally {
         setLoading(false);
         scrollToBottom();
-        input.focus();
+        // Only refocus on desktop — on mobile this would re-open the keyboard
+        if (isDesktop) input.focus();
       }
     }
 
@@ -225,7 +203,6 @@ const clientProps = JSON.stringify({
       }
     });
 
-    // Suggestion chips
     document.querySelectorAll('.chat-suggestion-chip').forEach((chip) => {
       chip.addEventListener('click', () => {
         const q = chip.getAttribute('data-question');
@@ -388,7 +365,6 @@ const clientProps = JSON.stringify({
     flex-wrap: wrap;
     gap: 0.4rem;
     padding: 0 1.125rem 0.75rem;
-    transition: opacity 300ms ease;
   }
 
   .chat-suggestion-chip {
@@ -423,24 +399,24 @@ const clientProps = JSON.stringify({
 
   .chat-input {
     flex: 1;
-    background: rgba(194,164,95,0.07);
-    border: 1.5px solid rgba(194,164,95,0.45);
+    background: rgba(245,241,232,0.92);
+    border: 1.5px solid rgba(194,164,95,0.5);
     border-radius: 0.625rem;
     padding: 0.55rem 0.875rem;
     font-size: 0.875rem;
-    color: var(--ivory, #F5F1E8);
+    color: #1a1208;
     outline: none;
     transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
     font-family: inherit;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4), 0 0 0 0 rgba(194,164,95,0);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
   }
 
-  .chat-input::placeholder { color: rgba(194,164,95,0.45); }
+  .chat-input::placeholder { color: rgba(90,70,30,0.5); }
 
   .chat-input:focus {
-    border-color: rgba(194,164,95,0.8);
-    background: rgba(194,164,95,0.1);
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 0 0 2px rgba(194,164,95,0.15);
+    background: rgba(245,241,232,1);
+    border-color: rgba(194,164,95,0.9);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 0 0 2px rgba(194,164,95,0.2);
   }
 
   .chat-input:disabled {
