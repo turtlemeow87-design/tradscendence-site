@@ -150,11 +150,14 @@ const questions = suggestedQuestions ?? defaultQuestions;
 
       input.value = '';
 
-      // On mobile: blur immediately to dismiss keyboard, hide chips
+      // On mobile: aggressively dismiss keyboard and hide chips
       if (!isDesktop) {
+        // Move focus to a non-input element to force keyboard down on Android
+        input.setAttribute('readonly', 'true');
         input.blur();
-        // Small delay to let blur register before async work starts
-        await new Promise(r => setTimeout(r, 50));
+        (document.activeElement as HTMLElement)?.blur();
+        await new Promise(r => setTimeout(r, 80));
+        input.removeAttribute('readonly');
         const suggestionsEl = document.getElementById('chat-suggestions');
         if (suggestionsEl) {
           suggestionsEl.style.transition = 'opacity 200ms ease';
@@ -403,7 +406,7 @@ const questions = suggestedQuestions ?? defaultQuestions;
   .chat-input-row {
     display: flex;
     gap: 0.5rem;
-    padding: 0.875rem 1.125rem;
+    padding: 0.75rem 0.75rem;
     border-top: 1px solid rgba(194,164,95,0.25);
     background: rgba(0,0,0,0.35);
   }
@@ -437,8 +440,9 @@ const questions = suggestedQuestions ?? defaultQuestions;
 
   .chat-send-btn {
     flex-shrink: 0;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 2.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
     display: grid;
     place-items: center;
     border-radius: 0.625rem;
