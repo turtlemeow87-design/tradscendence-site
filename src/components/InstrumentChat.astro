@@ -120,7 +120,7 @@ const questions = suggestedQuestions ?? defaultQuestions;
         // Then scroll page to top of chat section, offset for sticky nav
         setTimeout(() => {
           if (section) {
-            const navOffset = 120; // approx sticky nav height in px
+            const navOffset = 80; // approx sticky nav height in px
             const top = section.getBoundingClientRect().top + window.scrollY - navOffset;
             window.scrollTo({ top, behavior: 'smooth' });
           }
@@ -335,17 +335,17 @@ const questions = suggestedQuestions ?? defaultQuestions;
 
   .chat-message--user {
     align-self: flex-end;
-    background: rgba(194,164,95,0.15);
-    border: 1px solid rgba(194,164,95,0.3);
+    background: rgba(194,164,95,0.35);
+    border: 1px solid rgba(194,164,95,0.6);
     color: var(--ivory, #F5F1E8);
     border-bottom-right-radius: 0.25rem;
   }
 
   .chat-message--bot {
     align-self: flex-start;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: rgba(245,241,232,0.88);
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(245,241,232,0.95);
     border-bottom-left-radius: 0.25rem;
   }
 
