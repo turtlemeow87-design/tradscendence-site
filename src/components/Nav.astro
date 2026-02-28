@@ -9,6 +9,11 @@ const links = [
   { href: '/calendar', label: 'Calendar', future: true },
   { href: '/store', label: 'Store', future: true },
 ];
+
+const user = Astro.locals.user;
+const authLink = user
+  ? { href: '/dashboard', label: 'My Account' }
+  : { href: '/login', label: 'Login' };
 ---
 
 <header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70 border-b border-black/40">
@@ -40,6 +45,7 @@ const links = [
         {links.filter(l => !l.future).map(l => (
           <a class="gothic-link text-ivory hover:text-rosewood" href={l.href}>{l.label}</a>
         ))}
+        <a class="gothic-link text-ivory hover:text-rosewood" href={authLink.href}>{authLink.label}</a>
       </nav>
 
       <!-- Mobile menu button -->
@@ -75,6 +81,7 @@ const links = [
         {links.filter(l => !l.future).map(l => (
           <a class="gothic-link text-ivory" href={l.href}>{l.label}</a>
         ))}
+        <a class="gothic-link text-ivory" href={authLink.href}>{authLink.label}</a>
       </div>
     </div>
   </div>

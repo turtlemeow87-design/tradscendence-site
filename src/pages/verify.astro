@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const email = Astro.url.searchParams.get('email') || '';
+const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
+
+// If no email param, redirect back to login
+if (!email) {
+  return Astro.redirect('/login');
+}
+---
+
+<BaseLayout title="Verify — Tradscendence" description="Enter your verification code.">
+  <section class="mx-auto max-w-md px-4 py-16 sm:py-24">
+
+    <h1 class="font-display text-3xl text-gold text-center mb-2">Check Your Email</h1>
+    <p class="text-ivory/60 text-center text-sm mb-8">
+      We sent a 6-digit code to <span class="text-ivory">{email}</span>
+    </p>
+
+    <!-- Status message area -->
+    <div id="statusMsg" class="hidden mb-6 rounded-xl px-4 py-3 text-sm border border-gold/40 bg-gold/10 text-ivory" role="alert"></div>
+
+    <form id="verifyForm" class="flex flex-col gap-4" novalidate>
+      <input type="hidden" name="email" value={email} />
+      <input type="hidden" name="redirect" value={redirect} />
+
+      <label class="flex flex-col gap-1">
+        <span class="text-ivory/80 text-sm font-display">Verification Code</span>
+        <input
+          type="text"
+          name="code"
+          required
+          inputmode="numeric"
+          maxlength="6"
+          pattern="\d{6}"
+          autocomplete="one-time-code"
+          class="bg-ebony/60 frame rounded-xl px-3 py-3 border border-[var(--accent-bronze)] text-ivory text-center text-2xl tracking-[0.5em] font-mono placeholder:text-ivory/20 placeholder:tracking-[0.3em] placeholder:text-base focus:outline-none focus:border-gold"
+          placeholder="000000"
+          autofocus
+        />
+      </label>
+
+      <button
+        id="verifyBtn"
+        type="submit"
+        class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors mt-2"
+      >
+        Verify
+      </button>
+    </form>
+
+    <!-- Resend link with cooldown -->
+    <p class="text-center text-sm text-ivory/50 mt-6">
+      Didn't get it?
+      <button id="resendBtn" type="button" class="gothic-link text-gold hover:text-rosewood ml-1" disabled>
+        Resend code <span id="cooldown">(30s)</span>
+      </button>
+    </p>
+
+    <p class="text-center text-sm text-ivory/40 mt-3">
+      <a href="/login" class="gothic-link text-ivory/50 hover:text-rosewood">← Back to login</a>
+    </p>
+
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('verifyForm') as HTMLFormElement;
+  const statusMsg = document.getElementById('statusMsg')!;
+  const verifyBtn = document.getElementById('verifyBtn') as HTMLButtonElement;
+  const resendBtn = document.getElementById('resendBtn') as HTMLButtonElement;
+  const cooldownSpan = document.getElementById('cooldown')!;
+  const codeInput = form.querySelector('[name="code"]') as HTMLInputElement;
+
+  // ── Resend cooldown ──────────────────────────────────
+  let cooldownSeconds = 30;
+  let cooldownTimer: ReturnType<typeof setInterval>;
+
+  function startCooldown() {
+    cooldownSeconds = 30;
+    resendBtn.disabled = true;
+    cooldownSpan.classList.remove('hidden');
+    cooldownSpan.textContent = `(${cooldownSeconds}s)`;
+
+    cooldownTimer = setInterval(() => {
+      cooldownSeconds--;
+      cooldownSpan.textContent = `(${cooldownSeconds}s)`;
+      if (cooldownSeconds <= 0) {
+        clearInterval(cooldownTimer);
+        resendBtn.disabled = false;
+        cooldownSpan.classList.add('hidden');
+      }
+    }, 1000);
+  }
+
+  startCooldown(); // Start on page load
+
+  function showStatus(msg: string, isError = false) {
+    statusMsg.textContent = msg;
+    statusMsg.classList.remove('hidden');
+    if (isError) {
+      statusMsg.classList.add('border-rosewood/60', 'bg-rosewood/10');
+      statusMsg.classList.remove('border-gold/40', 'bg-gold/10');
+    } else {
+      statusMsg.classList.remove('border-rosewood/60', 'bg-rosewood/10');
+      statusMsg.classList.add('border-gold/40', 'bg-gold/10');
+    }
+  }
+
+  // ── Auto-submit on 6 digits ─────────────────────────
+  codeInput.addEventListener('input', () => {
+    // Strip non-digits
+    codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 6);
+    if (codeInput.value.length === 6) {
+      form.requestSubmit();
+    }
+  });
+
+  // ── Verify submission ───────────────────────────────
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = 'Verifying…';
+
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email, code: data.code }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        showStatus(result.error || 'Verification failed.', true);
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Verify';
+        codeInput.value = '';
+        codeInput.focus();
+        return;
+      }
+
+      // Success — redirect
+      window.location.href = (data.redirect as string) || '/dashboard';
+    } catch {
+      showStatus('Network error — please try again.', true);
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify';
+    }
+  });
+
+  // ── Resend OTP ──────────────────────────────────────
+  resendBtn.addEventListener('click', async () => {
+    const email = (form.querySelector('[name="email"]') as HTMLInputElement).value;
+    resendBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await res.json();
+
+      if (res.status === 429) {
+        showStatus(result.error || 'Please wait before requesting another code.', true);
+      } else {
+        showStatus('A new code has been sent to your email.', false);
+      }
+    } catch {
+      showStatus('Could not resend. Please try again.', true);
+    }
+
+    startCooldown();
+  });
+</script>

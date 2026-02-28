@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { neon } from '@neondatabase/serverless';
+
+// User is guaranteed by middleware — protected route
+const user = Astro.locals.user!;
+
+// Fetch their booking submissions
+let submissions: Array<Record<string, unknown>> = [];
+
+if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
+  const sql = neon(import.meta.env.DATABASE_URL);
+  submissions = await sql`
+    SELECT id, name, email, event_date, location, instruments, genres, message, status, created_at
+    FROM contact_submissions
+    WHERE LOWER(email) = ${user.email.toLowerCase()}
+    ORDER BY created_at DESC
+  `;
+}
+
+// Status badge styling
+const badgeStyles: Record<string, string> = {
+  'Pending':    'bg-gold/20 text-gold border-gold/40',
+  'Reviewing':  'bg-sky-500/20 text-sky-300 border-sky-400/40',
+  'Offer Sent': 'bg-amber-500/20 text-amber-300 border-amber-400/40',
+  'Confirmed':  'bg-emerald-500/20 text-emerald-300 border-emerald-400/40',
+  'Declined':   'bg-ivory/10 text-ivory/40 border-ivory/20',
+};
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric'
+  });
+}
+---
+
+<BaseLayout title="Dashboard — Tradscendence" description="Your booking dashboard.">
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:py-16">
+    <div class="flex flex-col md:flex-row gap-8">
+
+      <!-- ─── Sidebar ─────────────────────────────────── -->
+      <aside class="md:w-56 shrink-0">
+        <div class="bg-charcoal border border-gold/20 rounded-xl p-4 frame">
+          <p class="font-display text-gold text-sm mb-4 truncate" title={user.email}>
+            {user.email}
+          </p>
+
+          <nav class="flex flex-col gap-2">
+            <a href="/dashboard" class="text-sm text-ivory bg-gold/10 border border-gold/30 rounded-lg px-3 py-2 font-display">
+              My Bookings
+            </a>
+            <!-- Future sidebar links go here -->
+            <!--
+            <a href="/dashboard/contracts" class="text-sm text-ivory/60 hover:text-ivory hover:bg-gold/5 rounded-lg px-3 py-2 font-display transition-colors">
+              Contracts
+            </a>
+            <a href="/dashboard/invoices" class="text-sm text-ivory/60 hover:text-ivory hover:bg-gold/5 rounded-lg px-3 py-2 font-display transition-colors">
+              Invoices
+            </a>
+            -->
+          </nav>
+
+          <hr class="border-gold/20 my-4" />
+
+          <button
+            id="logoutBtn"
+            class="w-full text-sm text-ivory/50 hover:text-rosewood rounded-lg px-3 py-2 text-left font-display transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- ─── Main Content ────────────────────────────── -->
+      <main class="flex-1 min-w-0">
+        <h1 class="font-display text-3xl text-gold mb-1">Welcome back</h1>
+        <p class="text-ivory/50 text-sm mb-8">
+          Here are your booking inquiries and their current status.
+        </p>
+
+        {submissions.length === 0 ? (
+          <div class="border border-gold/20 rounded-xl p-8 text-center">
+            <p class="text-ivory/40 text-sm">No booking inquiries yet.</p>
+            <a href="/contact" class="inline-block mt-4 rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors text-sm">
+              Submit a Booking Inquiry
+            </a>
+          </div>
+        ) : (
+          <div class="flex flex-col gap-4">
+            {submissions.map((s) => {
+              const status = (s.status as string) || 'Pending';
+              const badge = badgeStyles[status] || badgeStyles['Pending'];
+              return (
+                <div class="border border-gold/20 rounded-xl p-5 bg-charcoal/50 frame">
+                  <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                    <div>
+                      <p class="font-display text-ivory text-base">
+                        {s.event_date ? formatDate(s.event_date as string) : 'No date specified'}
+                      </p>
+                      {s.location && (
+                        <p class="text-ivory/50 text-sm">{s.location}</p>
+                      )}
+                    </div>
+                    <span class={`text-xs font-display px-3 py-1 rounded-full border ${badge}`}>
+                      {status}
+                    </span>
+                  </div>
+
+                  {s.instruments && (s.instruments as string[]).length > 0 && (
+                    <div class="flex flex-wrap gap-1.5 mb-2">
+                      {(s.instruments as string[]).map((inst: string) => (
+                        <span class="text-xs bg-gold/10 text-gold/80 border border-gold/20 rounded-md px-2 py-0.5">
+                          {inst}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {s.message && (
+                    <p class="text-ivory/40 text-sm line-clamp-2 mt-2">{s.message}</p>
+                  )}
+
+                  <p class="text-ivory/30 text-xs mt-3">
+                    Submitted {formatDate(s.created_at as string)}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // Even if the call fails, clear by navigating
+    }
+    window.location.href = '/login';
+  });
+</script>
