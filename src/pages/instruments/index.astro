@@ -125,6 +125,14 @@ const items = dbItems.map((row) => ({
         document.addEventListener('click', () => {
           if (audioUnlocked) return;
           audioUnlocked = true;
+
+          // Actually unlock the browser's audio policy via AudioContext
+          // This allows hover-to-play to work immediately after this click
+          try {
+            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            ctx.resume().then(() => ctx.close());
+          } catch {}
+
           // Fade out and remove toast
           toast.style.opacity = '0';
           setTimeout(() => toast.remove(), 500);
