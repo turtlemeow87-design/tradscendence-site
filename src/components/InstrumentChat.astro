@@ -150,14 +150,18 @@ const questions = suggestedQuestions ?? defaultQuestions;
 
       input.value = '';
 
-      // On mobile: aggressively dismiss keyboard and hide chips
+      // On mobile: force keyboard down and hide chips
       if (!isDesktop) {
-        // Move focus to a non-input element to force keyboard down on Android
-        input.setAttribute('readonly', 'true');
+        // Samsung/Android keyboard dismiss: focus a hidden offscreen input then blur it
+        const dummy = document.createElement('input');
+        dummy.setAttribute('type', 'text');
+        dummy.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+        document.body.appendChild(dummy);
+        dummy.focus();
+        dummy.blur();
+        document.body.removeChild(dummy);
         input.blur();
-        (document.activeElement as HTMLElement)?.blur();
-        await new Promise(r => setTimeout(r, 80));
-        input.removeAttribute('readonly');
+        // Hide suggestion chips on mobile
         const suggestionsEl = document.getElementById('chat-suggestions');
         if (suggestionsEl) {
           suggestionsEl.style.transition = 'opacity 200ms ease';
@@ -236,7 +240,7 @@ const questions = suggestedQuestions ?? defaultQuestions;
       0 0 0 1px rgba(0,0,0,0.6),
       0 4px 32px rgba(0,0,0,0.4),
       inset 0 1px 0 rgba(194,164,95,0.08);
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -406,9 +410,10 @@ const questions = suggestedQuestions ?? defaultQuestions;
   .chat-input-row {
     display: flex;
     gap: 0.5rem;
-    padding: 0.75rem 0.75rem;
+    padding: 0.75rem;
     border-top: 1px solid rgba(194,164,95,0.25);
     background: rgba(0,0,0,0.35);
+    border-radius: 0 0 1rem 1rem;
   }
 
   .chat-input {
