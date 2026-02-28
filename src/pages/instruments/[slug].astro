@@ -4,6 +4,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Divider from "../../components/Divider.astro";
 import { neon } from "@neondatabase/serverless";
+import InstrumentChat from "../../components/InstrumentChat.astro";
 
 const { slug } = Astro.params;
 const sql = neon(import.meta.env.DATABASE_URL);
@@ -169,6 +170,11 @@ const description = inst.seo_description || `Explore the ${inst.name} with Hunte
         )}
       </section>
     )}
+    <InstrumentChat
+      instrumentName={inst.name}
+      instrumentOrigin={inst.origin_prefix ? `${inst.origin_prefix} origin` : undefined}
+      pageContext={`Individual instrument page for the ${inst.name}`}
+    />
 
     <!-- ═══ Back Link ═══ -->
     <div class="pt-8">

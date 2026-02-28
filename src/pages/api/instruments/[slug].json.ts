@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { neon } from "@neondatabase/serverless";
+import InstrumentChat from "../../components/InstrumentChat.astro";
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {

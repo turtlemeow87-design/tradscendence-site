@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Divider from "../../components/Divider.astro";
 import YouTubeFacade from "../../components/YouTubeFacade.astro";
+import InstrumentChat from "../../components/InstrumentChat.astro";
 
 // ✅ SEO
 const title = "My Instruments — Tradscendence | Sound Beyond Borders";
@@ -70,7 +71,15 @@ const items = dbItems.map((row) => ({
       ))}
     </ul>
   </section>
-
+<InstrumentChat
+  pageContext="Instruments index page — visitor is browsing all available instruments including Surbahar, Baglama Saz, Arabic Oud, Duduk, Esraj, Setar, Rabab, and more"
+  suggestedQuestions={[
+    "Which of these instruments is hardest to learn?",
+    "What do the Surbahar and Baglama Saz have in common?",
+    "Tell me about the Armenian Duduk",
+    "Which instruments here share Middle Eastern roots?",
+  ]}
+/>
   <Divider />
 
   <!-- Latest YouTube video (bottom of page, above footer) -->
