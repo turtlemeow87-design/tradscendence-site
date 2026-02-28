@@ -120,7 +120,7 @@ const questions = suggestedQuestions ?? defaultQuestions;
         // Then scroll page to top of chat section, offset for sticky nav
         setTimeout(() => {
           if (section) {
-            const navOffset = 80; // approx sticky nav height in px
+            const navOffset = 120; // approx sticky nav height in px
             const top = section.getBoundingClientRect().top + window.scrollY - navOffset;
             window.scrollTo({ top, behavior: 'smooth' });
           }
