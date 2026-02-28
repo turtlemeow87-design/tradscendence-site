@@ -113,6 +113,18 @@ const questions = suggestedQuestions ?? defaultQuestions;
       messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
     }
 
+    function scrollToMessage(el: HTMLElement) {
+      if (isMobile) {
+        // On mobile: scroll page so the top of the new message is visible
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      } else {
+        // On desktop: scroll the chat window to bottom as normal
+        scrollToBottom();
+      }
+    }
+
     function createMessage(role: 'user' | 'bot', text: string): HTMLDivElement {
       const div = document.createElement('div');
       div.className = `chat-message chat-message--${role}`;
@@ -187,19 +199,24 @@ const questions = suggestedQuestions ?? defaultQuestions;
 
         if (!res.ok || data.error) {
           const errMsg = data.error ?? 'Something went wrong. Please try again.';
-          messagesEl.appendChild(createMessage('bot', errMsg));
+          const errEl = createMessage('bot', errMsg);
+          messagesEl.appendChild(errEl);
+          scrollToMessage(errEl);
         } else {
           history.push({ role: 'user', text: trimmed });
           history.push({ role: 'model', text: data.reply });
           while (history.length > 20) history.splice(0, 2);
-          messagesEl.appendChild(createMessage('bot', data.reply));
+          const botEl = createMessage('bot', data.reply);
+          messagesEl.appendChild(botEl);
+          scrollToMessage(botEl);
         }
       } catch {
         thinkingEl.remove();
-        messagesEl.appendChild(createMessage('bot', 'Connection error — please try again.'));
+        const errEl = createMessage('bot', 'Connection error — please try again.');
+        messagesEl.appendChild(errEl);
+        scrollToMessage(errEl);
       } finally {
         setLoading(false);
-        scrollToBottom();
         // Only refocus on desktop — on mobile this re-opens the keyboard
         if (!isMobile) input.focus();
       }
