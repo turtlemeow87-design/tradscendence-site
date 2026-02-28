@@ -43,13 +43,26 @@
 | TC-004-06 | Graceful Failure on Broken Audio Source | ✅ Pass | After hard refresh with `baglamasaz1.m4a` blocked via Network request blocking panel, clicking ▶︎ on Baglama Saz produced no audio. No visible crash or error shown to user. All other play buttons continued to function normally. | — |
 
 **Summary:** 1 passed  
-**Notes:** Blocked URL: `www.soundbeyondborders.com/media/baglamasaz1.m4a`. Page remained fully stable throughout. Network blocking panel confirmed successful block after refresh.
+**Notes:** Blocked URL: `www.soundbeyondborders.com/media/baglamasaz1.m4a`. Page remained fully stable throughout.
 
 ---
 
 ## Session 003
 
-*(Pending — mobile testing: TC-004-02 mobile steps, TC-004-04 mobile)*
+**Date:** 2026-02-27  
+**Tester:** Hunter Eastland  
+**Environment:** Production  
+**Browser:** Chrome Mobile  
+**Device:** Android  
+**Scope:** Mobile testing — TC-004-02 tap trigger, TC-004-04 homepage featured sounds
+
+| TC # | Title | Result | Actual Result | Bug Filed |
+|------|-------|--------|---------------|-----------|
+| TC-004-02 | Click/Tap — Mobile tap as primary trigger | ✅ Pass | Tapping ▶︎ on instruments page triggered audio playback correctly. Audio stopped when a second instrument was tapped. No page reload or navigation occurred. Behavior consistent across multiple instruments tested. | — |
+| TC-004-04 | Homepage Featured Sounds Playback — Mobile | ✅ Pass | All three featured sound cards (Surbahar, Baglama Saz, Arabic Oud) responded correctly to tap. Mutual exclusion worked — tapping a second card stopped the first. | — |
+
+**Summary:** 2 passed  
+**Notes:** No hover behavior on mobile as expected — tap-only confirmed working correctly. No issues observed.
 
 ---
 
@@ -64,9 +77,9 @@
 
 | TC # | Title | Result | Actual Result | Bug Closed |
 |------|-------|--------|---------------|------------|
-| TC-004-01 | Hover Triggers Audio Playback (Desktop) | ✅ Pass | Toast appeared on page load. After clicking anywhere, toast faded out and hover-to-play worked immediately on first hover attempt. No console errors. | BR-007 ✅ Closed |
+| TC-004-01 | Hover Triggers Audio Playback (Desktop) | ✅ Pass | Toast appeared on page load. After clicking anywhere on the page, toast faded out and hover-to-play worked immediately on first hover attempt. No console errors. | BR-007 ✅ Closed |
 | TC-004-03 | Only One Audio Plays at a Time — Rapid switching | ✅ Pass | Rapid switching between Featured Sound tracks no longer produces AbortError in console. Audio behavior unchanged at normal switching speed. | BR-009 ✅ Closed |
 | BR-008 | favicon.ico 404 | ✅ Resolved | No favicon.ico 404 error in console on any page. Browser tab displays correct icon. | BR-008 ✅ Closed |
 
 **Summary:** 3 passed, 0 failed  
-**Notes:** All three bugs confirmed resolved. Mobile testing (Session 003) still pending.
+**Notes:** All three bugs confirmed resolved. Full TC-004 test suite now complete across desktop and mobile.
