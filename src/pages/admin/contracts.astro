@@ -3,8 +3,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout
-  title="Admin: Contract Management — Tradscendence"
-  description="Upload and manage contracts"
+  title="Admin: Documents — Tradscendence"
+  description="Upload and manage contracts and invoices"
   canonical={`${Astro.url.origin}/admin/contracts`}
 >
   <div class="min-h-screen bg-charcoal text-ivory px-4 py-8">
@@ -34,7 +34,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       <div id="adminContent" class="hidden">
         
         <div class="flex items-center justify-between mb-8">
-          <h1 class="font-display text-3xl text-gold">Contract Management</h1>
+          <h1 class="font-display text-3xl text-gold">Document Management</h1>
           <button
             id="refreshBtn"
             class="px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold frame transition"
@@ -53,55 +53,54 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   <script>
     let ADMIN_KEY = '';
 
-    // Auth handling
     document.getElementById('unlockBtn')?.addEventListener('click', () => {
       const input = document.getElementById('adminKeyInput') as HTMLInputElement;
       ADMIN_KEY = input.value;
-      
-      if (ADMIN_KEY) {
-        loadSubmissions();
-      }
+      if (ADMIN_KEY) loadAll();
     });
 
     document.getElementById('adminKeyInput')?.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        document.getElementById('unlockBtn')?.click();
-      }
+      if (e.key === 'Enter') document.getElementById('unlockBtn')?.click();
     });
 
-    // Load submissions
-    async function loadSubmissions() {
-      const authPanel = document.getElementById('authPanel');
-      const adminContent = document.getElementById('adminContent');
+    async function loadAll() {
       const authError = document.getElementById('authError');
       const listEl = document.getElementById('submissionsList');
-
       if (!listEl) return;
 
       try {
-        // Test auth by fetching submissions (reusing instruments endpoint for auth check)
-        const testRes = await fetch('/api/admin/contracts/submissions', {
-          headers: { 'x-admin-key': ADMIN_KEY }
-        });
+        // Fetch submissions and invoices in parallel
+        const [subRes, invRes] = await Promise.all([
+          fetch('/api/admin/contracts/submissions', { headers: { 'x-admin-key': ADMIN_KEY } }),
+          fetch('/api/admin/invoices/list', { headers: { 'x-admin-key': ADMIN_KEY } }),
+        ]);
 
-        if (!testRes.ok) {
+        if (!subRes.ok) {
           authError?.classList.remove('hidden');
           return;
         }
 
-        // Auth successful
-        authPanel?.classList.add('hidden');
-        adminContent?.classList.remove('hidden');
+        document.getElementById('authPanel')?.classList.add('hidden');
+        document.getElementById('adminContent')?.classList.remove('hidden');
 
-        const data = await testRes.json();
-        renderSubmissions(data.submissions);
+        const { submissions } = await subRes.json();
+        const { invoices } = invRes.ok ? await invRes.json() : { invoices: [] };
+
+        // Build invoices map: submission_id -> invoice[]
+        const invoiceMap: Record<number, any[]> = {};
+        for (const inv of invoices) {
+          if (!invoiceMap[inv.submission_id]) invoiceMap[inv.submission_id] = [];
+          invoiceMap[inv.submission_id].push(inv);
+        }
+
+        renderSubmissions(submissions, invoiceMap);
       } catch (err) {
-        console.error('Failed to load submissions:', err);
+        console.error('Failed to load:', err);
         listEl.innerHTML = '<p class="text-rosewood text-center py-8">Failed to load submissions</p>';
       }
     }
 
-    function renderSubmissions(submissions: any[]) {
+    function renderSubmissions(submissions: any[], invoiceMap: Record<number, any[]>) {
       const listEl = document.getElementById('submissionsList');
       if (!listEl) return;
 
@@ -110,7 +109,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         return;
       }
 
-      listEl.innerHTML = submissions.map(sub => `
+      listEl.innerHTML = submissions.map(sub => {
+        const invoices = invoiceMap[sub.id] || [];
+        return `
         <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id="${sub.id}">
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
@@ -126,18 +127,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
           ${sub.location ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Location:</span> ${sub.location}</p>` : ''}
           ${sub.instruments?.length ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Instruments:</span> ${sub.instruments.join(', ')}</p>` : ''}
-          
+
+          <!-- Contract Section -->
           <div class="mt-6 pt-6 border-t border-gold/20">
+            <h4 class="font-display text-gold mb-3">Contract</h4>
             ${sub.contract ? `
               <div class="flex items-center justify-between gap-4">
                 <div>
                   <p class="text-green-400 font-semibold mb-1">✓ Contract Uploaded</p>
                   <p class="text-ivory/60 text-sm">Uploaded: ${new Date(sub.contract.uploaded_at).toLocaleDateString()}</p>
-                  ${sub.contract.signed_at ? `
-                    <p class="text-green-400 text-sm mt-1">
-                      Signed by ${sub.contract.signature_name} on ${new Date(sub.contract.signed_at).toLocaleDateString()}
-                    </p>
-                  ` : '<p class="text-gold text-sm mt-1">Awaiting client signature</p>'}
+                  ${sub.contract.signed_at
+                    ? `<p class="text-green-400 text-sm mt-1">Signed by ${sub.contract.signature_name} on ${new Date(sub.contract.signed_at).toLocaleDateString()}</p>`
+                    : '<p class="text-gold text-sm mt-1">Awaiting client signature</p>'}
                 </div>
                 <a
                   href="${sub.contract.file_url}"
@@ -149,59 +150,107 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 </a>
               </div>
             ` : `
-              <div>
-                <h4 class="font-display text-gold mb-3">Upload Contract</h4>
-                <form class="upload-form space-y-3" data-submission-id="${sub.id}">
-                  <input
-                    type="file"
-                    name="file"
-                    accept=".pdf"
-                    required
-                    class="w-full text-ivory/80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-gold/20 file:text-gold hover:file:bg-gold hover:file:text-ivory file:cursor-pointer file:font-semibold"
-                  />
-                  <button
-                    type="submit"
-                    class="px-6 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
-                  >
-                    Upload Contract
-                  </button>
-                  <p class="error-message text-rosewood text-sm hidden"></p>
-                </form>
-              </div>
+              <form class="upload-contract-form space-y-3" data-submission-id="${sub.id}">
+                <input
+                  type="file"
+                  name="file"
+                  accept=".pdf"
+                  required
+                  class="w-full text-ivory/80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-gold/20 file:text-gold hover:file:bg-gold hover:file:text-ivory file:cursor-pointer file:font-semibold"
+                />
+                <button
+                  type="submit"
+                  class="px-6 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
+                >
+                  Upload Contract
+                </button>
+                <p class="error-message text-rosewood text-sm hidden"></p>
+              </form>
             `}
           </div>
-        </article>
-      `).join('');
 
-      // Attach upload handlers
-      document.querySelectorAll('.upload-form').forEach(form => {
-        form.addEventListener('submit', handleUpload);
+          <!-- Invoice Section -->
+          <div class="mt-6 pt-6 border-t border-gold/20">
+            <h4 class="font-display text-gold mb-3">Invoices & Receipts</h4>
+
+            ${invoices.length > 0 ? `
+              <div class="space-y-2 mb-4">
+                ${invoices.map(inv => `
+                  <div class="flex items-center justify-between bg-charcoal/60 rounded-lg px-4 py-3 border border-gold/20">
+                    <div>
+                      <p class="text-ivory/90 font-semibold text-sm">${inv.label}</p>
+                      <p class="text-ivory/50 text-xs">Uploaded: ${new Date(inv.uploaded_at).toLocaleDateString()}</p>
+                    </div>
+                    <a
+                      href="${inv.file_url}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="px-3 py-1 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold transition"
+                    >
+                      View PDF
+                    </a>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <form class="upload-invoice-form space-y-3" data-submission-id="${sub.id}">
+              <div class="flex gap-3">
+                <select
+                  name="label"
+                  class="bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory"
+                >
+                  <option value="Invoice">Invoice</option>
+                  <option value="Receipt">Receipt</option>
+                  <option value="Quote">Quote</option>
+                </select>
+                <input
+                  type="file"
+                  name="file"
+                  accept=".pdf"
+                  required
+                  class="flex-1 text-ivory/80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-gold/20 file:text-gold hover:file:bg-gold hover:file:text-ivory file:cursor-pointer file:font-semibold"
+                />
+              </div>
+              <button
+                type="submit"
+                class="px-6 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
+              >
+                Upload Document
+              </button>
+              <p class="error-message text-rosewood text-sm hidden"></p>
+            </form>
+          </div>
+        </article>
+      `}).join('');
+
+      // Attach contract upload handlers
+      document.querySelectorAll('.upload-contract-form').forEach(form => {
+        form.addEventListener('submit', handleContractUpload);
+      });
+
+      // Attach invoice upload handlers
+      document.querySelectorAll('.upload-invoice-form').forEach(form => {
+        form.addEventListener('submit', handleInvoiceUpload);
       });
     }
 
-    async function handleUpload(e: Event) {
+    async function handleContractUpload(e: Event) {
       e.preventDefault();
-      
       const formEl = e.target as HTMLFormElement;
       const submissionId = formEl.dataset.submissionId;
       const fileInput = formEl.querySelector('input[type="file"]') as HTMLInputElement;
       const errorEl = formEl.querySelector('.error-message') as HTMLElement;
       const submitBtn = formEl.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-      if (!fileInput.files || fileInput.files.length === 0) {
-        return;
-      }
-
+      if (!fileInput.files?.length) return;
       const file = fileInput.files[0];
-      
-      // Validate file type
+
       if (file.type !== 'application/pdf') {
         errorEl.textContent = 'Only PDF files are allowed';
         errorEl.classList.remove('hidden');
         return;
       }
-
-      // Validate file size (10MB)
       if (file.size > 10 * 1024 * 1024) {
         errorEl.textContent = 'File too large (max 10MB)';
         errorEl.classList.remove('hidden');
@@ -223,18 +272,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           body: formData,
         });
 
+        if (res.status === 401) throw new Error('Session expired — please refresh the page and re-enter your admin key');
         const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
 
-        if (res.status === 401) {
-          throw new Error('Session expired — please refresh the page and re-enter your admin key');
-        }
-
-        if (!res.ok) {
-          throw new Error(data.error || 'Upload failed');
-        }
-
-        // Success - reload submissions
-        loadSubmissions();
+        loadAll();
       } catch (err: any) {
         errorEl.textContent = err.message || 'Upload failed';
         errorEl.classList.remove('hidden');
@@ -243,7 +285,58 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
     }
 
-    // Refresh button
-    document.getElementById('refreshBtn')?.addEventListener('click', loadSubmissions);
+    async function handleInvoiceUpload(e: Event) {
+      e.preventDefault();
+      const formEl = e.target as HTMLFormElement;
+      const submissionId = formEl.dataset.submissionId;
+      const fileInput = formEl.querySelector('input[type="file"]') as HTMLInputElement;
+      const labelSelect = formEl.querySelector('select[name="label"]') as HTMLSelectElement;
+      const errorEl = formEl.querySelector('.error-message') as HTMLElement;
+      const submitBtn = formEl.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+      if (!fileInput.files?.length) return;
+      const file = fileInput.files[0];
+
+      if (file.type !== 'application/pdf') {
+        errorEl.textContent = 'Only PDF files are allowed';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        errorEl.textContent = 'File too large (max 10MB)';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      errorEl.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading...';
+
+      try {
+        const formData = new FormData();
+        formData.append('submission_id', submissionId!);
+        formData.append('file', file);
+        formData.append('label', labelSelect.value);
+
+        const res = await fetch('/api/admin/invoices/upload', {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY },
+          body: formData,
+        });
+
+        if (res.status === 401) throw new Error('Session expired — please refresh the page and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+        loadAll();
+      } catch (err: any) {
+        errorEl.textContent = err.message || 'Upload failed';
+        errorEl.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Upload Document';
+      }
+    }
+
+    document.getElementById('refreshBtn')?.addEventListener('click', loadAll);
   </script>
 </BaseLayout>

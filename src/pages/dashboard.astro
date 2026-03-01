@@ -9,12 +9,12 @@ if (!user) {
 }
 
 let submissions: any[] = [];
-let contracts: Record<number, any> = {}; // Map submission_id -> contract
+let contracts: Record<number, any> = {};
+let invoices: Record<number, any[]> = {};
 
 if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
   const sql = neon(import.meta.env.DATABASE_URL);
   
-  // Get user's submissions
   submissions = await sql`
     SELECT 
       id, name, email, event_date, location, 
@@ -24,20 +24,30 @@ if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
     ORDER BY created_at DESC
   `;
 
-  // Get contracts for user's submissions
   if (submissions.length > 0) {
     const submissionIds = submissions.map(s => s.id);
-    const contractResults = await sql`
-      SELECT 
-        submission_id, id, file_url, uploaded_at, 
-        signed_at, signature_name
-      FROM contracts
-      WHERE submission_id = ANY(${submissionIds})
-    `;
-    
-    // Map contracts by submission_id
+
+    const [contractResults, invoiceResults] = await Promise.all([
+      sql`
+        SELECT submission_id, id, file_url, uploaded_at, signed_at, signature_name
+        FROM contracts
+        WHERE submission_id = ANY(${submissionIds})
+      `,
+      sql`
+        SELECT id, submission_id, file_url, label, uploaded_at
+        FROM invoices
+        WHERE submission_id = ANY(${submissionIds})
+        ORDER BY submission_id, uploaded_at ASC
+      `,
+    ]);
+
     contractResults.forEach(c => {
       contracts[c.submission_id] = c;
+    });
+
+    invoiceResults.forEach(inv => {
+      if (!invoices[inv.submission_id]) invoices[inv.submission_id] = [];
+      invoices[inv.submission_id].push(inv);
     });
   }
 }
@@ -68,9 +78,6 @@ const statusColors: Record<string, string> = {
               <a href="#bookings" class="block px-3 py-2 rounded-lg bg-gold/10 text-gold font-semibold">
                 Booking Inquiries
               </a>
-              <!-- Future features -->
-              <!-- <a href="#contracts" class="block px-3 py-2 rounded-lg hover:bg-gold/10 transition">Contracts</a> -->
-              <!-- <a href="#invoices" class="block px-3 py-2 rounded-lg hover:bg-gold/10 transition">Invoices</a> -->
             </nav>
             <div class="mt-8 pt-6 border-t border-gold/20">
               <button
@@ -85,12 +92,11 @@ const statusColors: Record<string, string> = {
 
         <!-- Main Content -->
         <main class="flex-1">
-          <!-- Welcome Header -->
           <div class="mb-8">
             <h1 class="font-display text-3xl md:text-4xl text-gold mb-2">
               Welcome back, {user.email.split('@')[0]}
             </h1>
-            <p class="text-ivory/70">Manage your booking inquiries and contracts</p>
+            <p class="text-ivory/70">Manage your booking inquiries and documents</p>
           </div>
 
           <!-- Bookings Section -->
@@ -108,6 +114,7 @@ const statusColors: Record<string, string> = {
             ) : (
               submissions.map((sub) => {
                 const contract = contracts[sub.id];
+                const subInvoices = invoices[sub.id] || [];
                 return (
                   <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id={sub.id}>
                     <!-- Submission Header -->
@@ -225,6 +232,34 @@ const statusColors: Record<string, string> = {
                         )}
                       </div>
                     )}
+
+                    <!-- Invoices Section -->
+                    {subInvoices.length > 0 && (
+                      <div class="mt-6 pt-6 border-t border-gold/20">
+                        <h4 class="font-display text-lg text-gold mb-3">Invoices & Receipts</h4>
+                        <div class="space-y-2">
+                          {subInvoices.map((inv) => (
+                            <div class="flex items-center justify-between bg-charcoal/60 rounded-lg px-4 py-3 border border-gold/20">
+                              <div>
+                                <p class="text-ivory/90 font-semibold text-sm">{inv.label}</p>
+                                <p class="text-ivory/50 text-xs">
+                                  {new Date(inv.uploaded_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <a
+                                href={inv.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                                class="px-4 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood border border-gold/40 text-sm font-semibold frame transition"
+                              >
+                                Download
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </article>
                 );
               })
@@ -236,19 +271,15 @@ const statusColors: Record<string, string> = {
   </div>
 
   <script>
-    // Logout handler
     document.getElementById("logoutBtn")?.addEventListener("click", async () => {
       try {
         const res = await fetch("/api/auth/logout", { method: "POST" });
-        if (res.ok) {
-          window.location.href = "/login";
-        }
+        if (res.ok) window.location.href = "/login";
       } catch (err) {
         console.error("Logout failed:", err);
       }
     });
 
-    // Contract signing handlers
     document.querySelectorAll(".sign-contract-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -272,12 +303,8 @@ const statusColors: Record<string, string> = {
           });
 
           const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Failed to sign contract');
 
-          if (!res.ok) {
-            throw new Error(data.error || 'Failed to sign contract');
-          }
-
-          // Success - reload page to show signed status
           window.location.reload();
         } catch (err: any) {
           errorEl.textContent = err.message || 'Failed to sign contract';
