@@ -164,18 +164,19 @@ const statusColors: Record<string, string> = {
                 </div>
 
                 {!userProfile.prefix && (
-                  <label class="flex flex-col gap-1">
+                  <label class="flex flex-col gap-1 max-w-[220px]">
   <span class="text-ivory/80 text-sm font-display">How would you like to be addressed?</span>
   <select
     name="prefix"
     required
-    class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory focus:outline-none focus:border-gold"
+    class="bg-charcoal frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory focus:outline-none focus:border-gold appearance-none"
+    style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23C2A45F%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center;"
   >
-    <option value="" disabled selected>Select a prefix</option>
-    <option value="Mr.">Mr.</option>
-    <option value="Mrs.">Mrs.</option>
-    <option value="Ms.">Ms.</option>
-    <option value="none">Prefer not to disclose</option>
+    <option value="" disabled selected class="bg-[#111] text-ivory">Select a prefix</option>
+    <option value="Mr." class="bg-[#111] text-ivory">Mr.</option>
+    <option value="Mrs." class="bg-[#111] text-ivory">Mrs.</option>
+    <option value="Ms." class="bg-[#111] text-ivory">Ms.</option>
+    <option value="none" class="bg-[#111] text-ivory">Prefer not to disclose</option>
   </select>
 </label>
                 )}
