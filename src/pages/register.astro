@@ -1,0 +1,193 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Create Account — Tradscendence" description="Create your Tradscendence account to track your booking inquiries.">
+  <section class="mx-auto max-w-md px-4 py-16 sm:py-24">
+
+    <h1 id="authHeading" class="font-display text-3xl text-gold text-center mb-2">Create Account</h1>
+    <p id="authSubtext" class="text-ivory/60 text-center text-sm mb-8">
+      Set up your account to track your booking inquiries.
+    </p>
+
+    <div id="statusMsg" class="hidden mb-6 rounded-xl px-4 py-3 text-sm border border-gold/40 bg-gold/10 text-ivory" role="alert"></div>
+
+    <!-- ─── Login Form (hidden by default) ─────────────── -->
+    <form id="loginForm" class="hidden flex flex-col gap-4" novalidate>
+      <input type="hidden" name="redirect" value="/dashboard" />
+
+      <label class="flex flex-col gap-1">
+        <span class="text-ivory/80 text-sm font-display">Email</span>
+        <input
+          type="email"
+          name="email"
+          required
+          autocomplete="email"
+          class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+          placeholder="you@example.com"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-ivory/80 text-sm font-display">Password</span>
+        <input
+          type="password"
+          name="password"
+          required
+          autocomplete="current-password"
+          class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+          placeholder="••••••••"
+        />
+      </label>
+
+      <button
+        type="submit"
+        class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors mt-2"
+      >
+        Sign In
+      </button>
+    </form>
+
+    <!-- ─── Register Form (shown by default) ───────────── -->
+    <form id="registerForm" class="flex flex-col gap-4" novalidate>
+      <label class="flex flex-col gap-1">
+        <span class="text-ivory/80 text-sm font-display">Email</span>
+        <input
+          type="email"
+          name="email"
+          required
+          autocomplete="email"
+          class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+          placeholder="you@example.com"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-ivory/80 text-sm font-display">Password</span>
+        <input
+          type="password"
+          name="password"
+          required
+          autocomplete="new-password"
+          minlength="8"
+          class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+          placeholder="At least 8 characters"
+        />
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="text-ivory/80 text-sm font-display">Confirm Password</span>
+        <input
+          type="password"
+          name="confirmPassword"
+          required
+          autocomplete="new-password"
+          class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+          placeholder="••••••••"
+        />
+      </label>
+
+      <button
+        type="submit"
+        class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors mt-2"
+      >
+        Create Account
+      </button>
+    </form>
+
+    <!-- Toggle link -->
+    <p class="text-center text-sm text-ivory/50 mt-6">
+      <span id="toggleText">Already have an account?</span>
+      <button id="toggleBtn" type="button" class="gothic-link text-gold hover:text-rosewood ml-1">
+        Sign in
+      </button>
+    </p>
+
+  </section>
+</BaseLayout>
+
+<script>
+  const loginForm = document.getElementById('loginForm') as HTMLFormElement;
+  const registerForm = document.getElementById('registerForm') as HTMLFormElement;
+  const toggleBtn = document.getElementById('toggleBtn')!;
+  const toggleText = document.getElementById('toggleText')!;
+  const heading = document.getElementById('authHeading')!;
+  const subtext = document.getElementById('authSubtext')!;
+  const statusMsg = document.getElementById('statusMsg')!;
+
+  let isLogin = false; // Start in register mode
+
+  toggleBtn.addEventListener('click', () => {
+    isLogin = !isLogin;
+    loginForm.classList.toggle('hidden', !isLogin);
+    registerForm.classList.toggle('hidden', isLogin);
+    heading.textContent = isLogin ? 'Sign In' : 'Create Account';
+    subtext.textContent = isLogin
+      ? 'Enter your credentials to view your bookings.'
+      : 'Set up your account to track your booking inquiries.';
+    toggleText.textContent = isLogin ? "Don't have an account?" : 'Already have an account?';
+    toggleBtn.textContent = isLogin ? 'Create one' : 'Sign in';
+    statusMsg.classList.add('hidden');
+  });
+
+  function showStatus(msg: string, isError = false) {
+    statusMsg.textContent = msg;
+    statusMsg.classList.remove('hidden');
+    if (isError) {
+      statusMsg.classList.add('border-rosewood/60', 'bg-rosewood/10');
+      statusMsg.classList.remove('border-gold/40', 'bg-gold/10');
+    } else {
+      statusMsg.classList.remove('border-rosewood/60', 'bg-rosewood/10');
+      statusMsg.classList.add('border-gold/40', 'bg-gold/10');
+    }
+  }
+
+  async function handleSubmit(e: SubmitEvent, endpoint: string) {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    if (!isLogin) {
+      if (data.password !== data.confirmPassword) {
+        showStatus('Passwords do not match.', true);
+        return;
+      }
+    }
+
+    btn.disabled = true;
+    btn.textContent = isLogin ? 'Signing in…' : 'Creating account…';
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email, password: data.password }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        showStatus(result.error || 'Something went wrong.', true);
+        btn.disabled = false;
+        btn.textContent = isLogin ? 'Sign In' : 'Create Account';
+        return;
+      }
+
+      if (result.skipOtp) {
+        window.location.href = '/dashboard';
+        return;
+      }
+
+      const email = encodeURIComponent(result.email || data.email);
+      window.location.href = `/verify?email=${email}&redirect=${encodeURIComponent('/dashboard')}`;
+    } catch {
+      showStatus('Network error — please try again.', true);
+      btn.disabled = false;
+      btn.textContent = isLogin ? 'Sign In' : 'Create Account';
+    }
+  }
+
+  loginForm.addEventListener('submit', (e) => handleSubmit(e, '/api/auth/login'));
+  registerForm.addEventListener('submit', (e) => handleSubmit(e, '/api/auth/register'));
+</script>     
