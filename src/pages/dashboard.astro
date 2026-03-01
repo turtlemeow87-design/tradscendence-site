@@ -1,146 +1,291 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { neon } from '@neondatabase/serverless';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { neon } from "@neondatabase/serverless";
 
-// User is guaranteed by middleware — protected route
-const user = Astro.locals.user!;
+const user = Astro.locals.user;
 
-// Fetch their booking submissions
-let submissions: Array<Record<string, unknown>> = [];
+if (!user) {
+  return Astro.redirect("/login");
+}
+
+let submissions: any[] = [];
+let contracts: Record<number, any> = {}; // Map submission_id -> contract
 
 if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
   const sql = neon(import.meta.env.DATABASE_URL);
+  
+  // Get user's submissions
   submissions = await sql`
-    SELECT id, name, email, event_date, location, instruments, genres, message, status, created_at
+    SELECT 
+      id, name, email, event_date, location, 
+      instruments, message, status, created_at
     FROM contact_submissions
-    WHERE LOWER(email) = ${user.email.toLowerCase()}
+    WHERE email = ${user.email}
     ORDER BY created_at DESC
   `;
+
+  // Get contracts for user's submissions
+  if (submissions.length > 0) {
+    const submissionIds = submissions.map(s => s.id);
+    const contractResults = await sql`
+      SELECT 
+        submission_id, id, file_url, uploaded_at, 
+        signed_at, signature_name
+      FROM contracts
+      WHERE submission_id = ANY(${submissionIds})
+    `;
+    
+    // Map contracts by submission_id
+    contractResults.forEach(c => {
+      contracts[c.submission_id] = c;
+    });
+  }
 }
 
-// Status badge styling
-const badgeStyles: Record<string, string> = {
-  'Pending':    'bg-gold/20 text-gold border-gold/40',
-  'Reviewing':  'bg-sky-500/20 text-sky-300 border-sky-400/40',
-  'Offer Sent': 'bg-amber-500/20 text-amber-300 border-amber-400/40',
-  'Confirmed':  'bg-emerald-500/20 text-emerald-300 border-emerald-400/40',
-  'Declined':   'bg-ivory/10 text-ivory/40 border-ivory/20',
+const statusColors: Record<string, string> = {
+  Pending: "bg-gold/20 text-gold border-gold/40",
+  Reviewing: "bg-blue-500/20 text-blue-400 border-blue-500/40",
+  "Offer Sent": "bg-purple-500/20 text-purple-400 border-purple-500/40",
+  Confirmed: "bg-green-500/20 text-green-400 border-green-500/40",
+  Declined: "bg-rosewood/20 text-rosewood border-rosewood/40",
 };
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric'
-  });
-}
 ---
 
-<BaseLayout title="Dashboard — Tradscendence" description="Your booking dashboard.">
-  <div class="mx-auto max-w-6xl px-4 py-10 sm:py-16">
-    <div class="flex flex-col md:flex-row gap-8">
-
-      <!-- ─── Sidebar ─────────────────────────────────── -->
-      <aside class="md:w-56 shrink-0">
-        <div class="bg-charcoal border border-gold/20 rounded-xl p-4 frame">
-          <p class="font-display text-gold text-sm mb-4 truncate" title={user.email}>
-            {user.email}
-          </p>
-
-          <nav class="flex flex-col gap-2">
-            <a href="/dashboard" class="text-sm text-ivory bg-gold/10 border border-gold/30 rounded-lg px-3 py-2 font-display">
-              My Bookings
-            </a>
-            <!-- Future sidebar links go here -->
-            <!--
-            <a href="/dashboard/contracts" class="text-sm text-ivory/60 hover:text-ivory hover:bg-gold/5 rounded-lg px-3 py-2 font-display transition-colors">
-              Contracts
-            </a>
-            <a href="/dashboard/invoices" class="text-sm text-ivory/60 hover:text-ivory hover:bg-gold/5 rounded-lg px-3 py-2 font-display transition-colors">
-              Invoices
-            </a>
-            -->
-          </nav>
-
-          <hr class="border-gold/20 my-4" />
-
-          <button
-            id="logoutBtn"
-            class="w-full text-sm text-ivory/50 hover:text-rosewood rounded-lg px-3 py-2 text-left font-display transition-colors"
-          >
-            Sign Out
-          </button>
-        </div>
-      </aside>
-
-      <!-- ─── Main Content ────────────────────────────── -->
-      <main class="flex-1 min-w-0">
-        <h1 class="font-display text-3xl text-gold mb-1">Welcome back</h1>
-        <p class="text-ivory/50 text-sm mb-8">
-          Here are your booking inquiries and their current status.
-        </p>
-
-        {submissions.length === 0 ? (
-          <div class="border border-gold/20 rounded-xl p-8 text-center">
-            <p class="text-ivory/40 text-sm">No booking inquiries yet.</p>
-            <a href="/contact" class="inline-block mt-4 rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors text-sm">
-              Submit a Booking Inquiry
-            </a>
+<BaseLayout
+  title="My Account — Tradscendence"
+  description="View your booking inquiries and contracts"
+  canonical={`${Astro.url.origin}/dashboard`}
+>
+  <div class="min-h-screen bg-charcoal text-ivory px-4 py-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col lg:flex-row gap-8">
+        
+        <!-- Sidebar -->
+        <aside class="lg:w-64 shrink-0">
+          <div class="bg-charcoal/80 frame rounded-xl p-6 sticky top-8">
+            <h2 class="font-display text-xl text-gold mb-4">My Account</h2>
+            <nav class="space-y-2">
+              <a href="#bookings" class="block px-3 py-2 rounded-lg bg-gold/10 text-gold font-semibold">
+                Booking Inquiries
+              </a>
+              <!-- Future features -->
+              <!-- <a href="#contracts" class="block px-3 py-2 rounded-lg hover:bg-gold/10 transition">Contracts</a> -->
+              <!-- <a href="#invoices" class="block px-3 py-2 rounded-lg hover:bg-gold/10 transition">Invoices</a> -->
+            </nav>
+            <div class="mt-8 pt-6 border-t border-gold/20">
+              <button
+                id="logoutBtn"
+                class="w-full px-4 py-2 rounded-xl bg-rosewood/20 text-rosewood hover:bg-rosewood hover:text-ivory font-semibold frame transition"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
-        ) : (
-          <div class="flex flex-col gap-4">
-            {submissions.map((s) => {
-              const status = (s.status as string) || 'Pending';
-              const badge = badgeStyles[status] || badgeStyles['Pending'];
-              return (
-                <div class="border border-gold/20 rounded-xl p-5 bg-charcoal/50 frame">
-                  <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
-                    <div>
-                      <p class="font-display text-ivory text-base">
-                        {s.event_date ? formatDate(s.event_date as string) : 'No date specified'}
-                      </p>
-                      {s.location && (
-                        <p class="text-ivory/50 text-sm">{s.location}</p>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+          <!-- Welcome Header -->
+          <div class="mb-8">
+            <h1 class="font-display text-3xl md:text-4xl text-gold mb-2">
+              Welcome back, {user.email.split('@')[0]}
+            </h1>
+            <p class="text-ivory/70">Manage your booking inquiries and contracts</p>
+          </div>
+
+          <!-- Bookings Section -->
+          <section id="bookings" class="space-y-6">
+            {submissions.length === 0 ? (
+              <div class="bg-charcoal/80 frame rounded-xl p-8 text-center">
+                <p class="text-ivory/70 mb-4">No booking inquiries yet</p>
+                <a
+                  href="/contact"
+                  class="inline-block rounded-xl px-6 py-3 bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
+                >
+                  Submit Inquiry
+                </a>
+              </div>
+            ) : (
+              submissions.map((sub) => {
+                const contract = contracts[sub.id];
+                return (
+                  <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id={sub.id}>
+                    <!-- Submission Header -->
+                    <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                      <div>
+                        <h3 class="font-display text-xl text-gold mb-1">
+                          {sub.location || "Booking Inquiry"}
+                        </h3>
+                        {sub.event_date && (
+                          <p class="text-ivory/60 text-sm">
+                            Event Date: {new Date(sub.event_date).toLocaleDateString()}
+                          </p>
+                        )}
+                        <p class="text-ivory/60 text-sm">
+                          Submitted: {new Date(sub.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span class={`px-3 py-1 rounded-lg border text-sm font-semibold ${statusColors[sub.status] || statusColors.Pending}`}>
+                        {sub.status}
+                      </span>
+                    </div>
+
+                    <!-- Submission Details -->
+                    <div class="grid md:grid-cols-2 gap-4 mb-4 text-sm">
+                      {sub.instruments && sub.instruments.length > 0 && (
+                        <div>
+                          <span class="text-gold font-semibold">Instruments:</span>
+                          <span class="text-ivory/80 ml-2">{sub.instruments.join(", ")}</span>
+                        </div>
+                      )}
+                      {sub.message && (
+                        <div class="md:col-span-2">
+                          <span class="text-gold font-semibold">Message:</span>
+                          <p class="text-ivory/80 mt-1">{sub.message}</p>
+                        </div>
                       )}
                     </div>
-                    <span class={`text-xs font-display px-3 py-1 rounded-full border ${badge}`}>
-                      {status}
-                    </span>
-                  </div>
 
-                  {s.instruments && (s.instruments as string[]).length > 0 && (
-                    <div class="flex flex-wrap gap-1.5 mb-2">
-                      {(s.instruments as string[]).map((inst: string) => (
-                        <span class="text-xs bg-gold/10 text-gold/80 border border-gold/20 rounded-md px-2 py-0.5">
-                          {inst}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                    <!-- Contract Section -->
+                    {contract && (
+                      <div class="mt-6 pt-6 border-t border-gold/20">
+                        <div class="flex items-start justify-between gap-4">
+                          <div>
+                            <h4 class="font-display text-lg text-gold mb-2">Contract</h4>
+                            <p class="text-ivory/60 text-sm mb-3">
+                              Uploaded: {new Date(contract.uploaded_at).toLocaleDateString()}
+                            </p>
+                            
+                            {contract.signed_at ? (
+                              <div class="bg-green-500/10 border border-green-500/40 rounded-lg px-4 py-3">
+                                <p class="text-green-400 font-semibold mb-1">✓ Signed</p>
+                                <p class="text-green-400/80 text-sm">
+                                  Signed by {contract.signature_name} on {new Date(contract.signed_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                            ) : (
+                              <div class="bg-gold/10 border border-gold/40 rounded-lg px-4 py-3">
+                                <p class="text-gold font-semibold mb-1">⚠ Awaiting Signature</p>
+                                <p class="text-ivory/70 text-sm">Please review and sign the contract below</p>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <a
+                            href={contract.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="shrink-0 px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold transition"
+                          >
+                            View PDF
+                          </a>
+                        </div>
 
-                  {s.message && (
-                    <p class="text-ivory/40 text-sm line-clamp-2 mt-2">{s.message}</p>
-                  )}
+                        {!contract.signed_at && (
+                          <div class="mt-6 bg-charcoal/60 rounded-lg p-4 border border-gold/20">
+                            <h5 class="font-display text-gold mb-3">Sign Contract</h5>
+                            <form class="sign-contract-form space-y-4" data-contract-id={contract.id}>
+                              <div>
+                                <label for={`signature-${contract.id}`} class="block text-ivory/80 text-sm mb-2">
+                                  Full Name (Signature)
+                                </label>
+                                <input
+                                  type="text"
+                                  id={`signature-${contract.id}`}
+                                  name="signatureName"
+                                  required
+                                  class="w-full bg-charcoal/60 frame rounded-xl px-4 py-2 border border-gold/40 focus:border-gold focus:outline-none"
+                                  placeholder="Enter your full legal name"
+                                />
+                              </div>
+                              
+                              <div class="flex items-start gap-3">
+                                <input
+                                  type="checkbox"
+                                  id={`agree-${contract.id}`}
+                                  name="agreed"
+                                  required
+                                  class="mt-1 w-4 h-4 accent-gold"
+                                />
+                                <label for={`agree-${contract.id}`} class="text-ivory/80 text-sm">
+                                  I have read and agree to the terms and conditions outlined in this contract
+                                </label>
+                              </div>
 
-                  <p class="text-ivory/30 text-xs mt-3">
-                    Submitted {formatDate(s.created_at as string)}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
-
+                              <button
+                                type="submit"
+                                class="w-full md:w-auto px-6 py-3 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
+                              >
+                                Sign Contract
+                              </button>
+                              
+                              <p class="error-message text-rosewood text-sm hidden"></p>
+                            </form>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </article>
+                );
+              })
+            )}
+          </section>
+        </main>
+      </div>
     </div>
   </div>
-</BaseLayout>
 
-<script>
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch {
-      // Even if the call fails, clear by navigating
-    }
-    window.location.href = '/login';
-  });
-</script>
+  <script>
+    // Logout handler
+    document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+      try {
+        const res = await fetch("/api/auth/logout", { method: "POST" });
+        if (res.ok) {
+          window.location.href = "/login";
+        }
+      } catch (err) {
+        console.error("Logout failed:", err);
+      }
+    });
+
+    // Contract signing handlers
+    document.querySelectorAll(".sign-contract-form").forEach((form) => {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const formEl = e.target as HTMLFormElement;
+        const contractId = formEl.dataset.contractId;
+        const signatureName = (formEl.querySelector('[name="signatureName"]') as HTMLInputElement).value;
+        const agreed = (formEl.querySelector('[name="agreed"]') as HTMLInputElement).checked;
+        const errorEl = formEl.querySelector('.error-message') as HTMLElement;
+        const submitBtn = formEl.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+        errorEl.classList.add('hidden');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing...';
+
+        try {
+          const res = await fetch(`/api/contracts/${contractId}/sign`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ signatureName, agreed }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'Failed to sign contract');
+          }
+
+          // Success - reload page to show signed status
+          window.location.reload();
+        } catch (err: any) {
+          errorEl.textContent = err.message || 'Failed to sign contract';
+          errorEl.classList.remove('hidden');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign Contract';
+        }
+      });
+    });
+  </script>
+</BaseLayout>
