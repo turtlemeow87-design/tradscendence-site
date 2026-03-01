@@ -362,10 +362,7 @@ function getStatusConfig(status: string) {
                                 </p>
                               </div>
                               <a
-                                href={inv.file_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
+                                href={`/api/invoices/${inv.id}/view`}
                                 class="px-4 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood border border-gold/40 text-sm font-semibold frame transition"
                               >
                                 Download
