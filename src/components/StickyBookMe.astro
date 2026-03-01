@@ -1,5 +1,5 @@
 ---
-/* no frontmatter needed */
+const today = new Date().toISOString().split('T')[0];
 ---
 <!-- Floating "Book me" button -->
 <div class="fixed right-4 bottom-4 md:bottom-auto md:top-4 z-50">
@@ -58,7 +58,7 @@
 
     <label class="block">
       <span class="text-sm">Event date (If Applicable)</span>
-      <input name="date" type="date" class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" />
+      <input name="date" type="date" min={today} class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" />
     </label>
 
     <label class="block">
@@ -149,13 +149,14 @@
       submitBtn.textContent = 'Send';
     }
   });
- window.addEventListener('message-field-active', (e) => {
-  const btn = document.getElementById('open-book') as HTMLButtonElement;
-  if (!btn) return;
-  const active = (e as CustomEvent).detail.active;
-  btn.disabled = active;
-  btn.classList.toggle('opacity-40', active);
-  btn.classList.toggle('cursor-not-allowed', active);
-  btn.classList.toggle('pointer-events-none', active);
-});
+
+  window.addEventListener('message-field-active', (e) => {
+    const btn = document.getElementById('open-book') as HTMLButtonElement;
+    if (!btn) return;
+    const active = (e as CustomEvent).detail.active;
+    btn.disabled = active;
+    btn.classList.toggle('opacity-40', active);
+    btn.classList.toggle('cursor-not-allowed', active);
+    btn.classList.toggle('pointer-events-none', active);
+  });
 </script>
