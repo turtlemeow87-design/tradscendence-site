@@ -23,29 +23,27 @@ export const POST: APIRoute = async ({ request }) => {
     const formData = await request.formData();
     const submissionId = formData.get("submission_id");
     const file = formData.get("file") as File | null;
+    const label = (formData.get("label") as string | null) || "Invoice";
 
     if (!submissionId || !file) {
       return json(400, { error: "Missing submission_id or file" });
     }
 
-    // Validate file type
     if (file.type !== "application/pdf") {
       return json(400, { error: "Only PDF files are allowed" });
     }
 
-    // Validate file size (10MB max)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
+    if (file.size > 10 * 1024 * 1024) {
       return json(400, { error: "File too large (max 10MB)" });
     }
 
     // Dev mode guard
     if (import.meta.env.DEV || !import.meta.env.DATABASE_URL) {
-      console.log("[DEV] Would upload contract for submission:", submissionId);
+      console.log("[DEV] Would upload invoice for submission:", submissionId, "label:", label);
       return json(200, {
         success: true,
-        message: "Dev mode: contract upload skipped",
-        contractId: 999,
+        message: "Dev mode: invoice upload skipped",
+        invoiceId: 999,
       });
     }
 
@@ -60,26 +58,40 @@ export const POST: APIRoute = async ({ request }) => {
       return json(404, { error: "Submission not found" });
     }
 
-    // Upload to Vercel Blob
-    const blob = await put(`contracts/${submissionId}-${Date.now()}.pdf`, file, {
-      access: "public",
-      addRandomSuffix: false,
-    });
+    // Check for duplicate label on this submission (enforce one per type)
+    const existing = await sql`
+      SELECT id FROM invoices
+      WHERE submission_id = ${submissionId} AND label = ${label}
+    `;
 
-    // Insert contract record
+    if (existing.length > 0) {
+      return json(409, {
+        error: `A ${label} already exists for this booking. Delete it first or choose a different document type.`,
+      });
+    }
+
+    // Upload to Vercel Blob
+    const blob = await put(
+      `invoices/${submissionId}-${Date.now()}.pdf`,
+      Buffer.from(await file.arrayBuffer()),
+      { access: "public" }
+    );
+
+    // Insert invoice record
     const result = await sql`
-      INSERT INTO contracts (submission_id, file_url)
-      VALUES (${submissionId}, ${blob.url})
+      INSERT INTO invoices (submission_id, file_url, label)
+      VALUES (${submissionId}, ${blob.url}, ${label})
       RETURNING id
     `;
 
     return json(200, {
       success: true,
-      contractId: result[0].id,
+      invoiceId: result[0].id,
       fileUrl: blob.url,
+      label,
     });
   } catch (error) {
-    console.error("Contract upload error:", error);
-    return json(500, { error: "Failed to upload contract" });
+    console.error("Invoice upload error:", error);
+    return json(500, { error: "Failed to upload invoice" });
   }
 };
