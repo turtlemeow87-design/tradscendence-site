@@ -206,14 +206,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     ? `<p class="text-green-400 text-sm mt-1">Signed by ${sub.contract.signature_name} on ${new Date(sub.contract.signed_at).toLocaleDateString()}</p>`
                     : '<p class="text-gold text-sm mt-1">Awaiting client signature</p>'}
                 </div>
-                <a
-                  href="${sub.contract.file_url}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold transition"
-                >
-                  View PDF
-                </a>
+                <div class="flex gap-2">
+                  <a
+                    href="${sub.contract.file_url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold transition"
+                  >
+                    View PDF
+                  </a>
+                  <button
+                    class="delete-contract-btn px-3 py-2 rounded-xl border border-rosewood/60 text-rosewood hover:bg-rosewood hover:text-ivory text-sm font-semibold transition"
+                    data-contract-id="${sub.contract.id}"
+                    data-submission-id="${sub.id}"
+                    data-signed="${sub.contract.signed_at ? 'true' : 'false'}"
+                    data-signer="${sub.contract.signature_name || ''}"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ` : `
               <form class="upload-contract-form space-y-3" data-submission-id="${sub.id}">
@@ -247,14 +258,24 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                       <p class="text-ivory/90 font-semibold text-sm">${inv.label}</p>
                       <p class="text-ivory/50 text-xs">Uploaded: ${new Date(inv.uploaded_at).toLocaleDateString()}</p>
                     </div>
-                    <a
-                      href="${inv.file_url}"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="px-3 py-1 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold transition"
-                    >
-                      View PDF
-                    </a>
+                    <div class="flex gap-2">
+                      <a
+                        href="${inv.file_url}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="px-3 py-1 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold transition"
+                      >
+                        View PDF
+                      </a>
+                      <button
+                        class="delete-invoice-btn px-3 py-1 rounded-lg border border-rosewood/60 text-rosewood hover:bg-rosewood hover:text-ivory text-sm font-semibold transition"
+                        data-invoice-id="${inv.id}"
+                        data-label="${inv.label}"
+                        data-submission-id="${sub.id}"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 `).join('')}
               </div>
@@ -303,6 +324,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       document.querySelectorAll('.delete-submission-btn').forEach(btn => {
         btn.addEventListener('click', handleDeleteSubmission);
       });
+      document.querySelectorAll('.delete-contract-btn').forEach(btn => {
+        btn.addEventListener('click', handleContractDelete);
+      });
+      document.querySelectorAll('.delete-invoice-btn').forEach(btn => {
+        btn.addEventListener('click', handleInvoiceDelete);
+      });
     }
 
     // ── Status save handler ──────────────────────────────
@@ -345,7 +372,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           "Complete":         "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
           "Declined":         "bg-rosewood/20 text-rosewood border-rosewood/40",
         };
-        // Remove old color classes, apply new ones
         badge.className = `status-badge px-3 py-1 rounded-lg border text-sm font-semibold ${STATUS_STYLES[newStatus] || STATUS_STYLES['Pending']}`;
         badge.textContent = newStatus;
         select.dataset.currentStatus = newStatus;
@@ -391,13 +417,89 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to delete');
 
-        // Remove the card from the DOM immediately without a full reload
         const article = btn.closest('article') as HTMLElement;
         article.style.transition = 'opacity 0.3s ease';
         article.style.opacity = '0';
         setTimeout(() => article.remove(), 300);
       } catch (err: any) {
         alert(err.message || 'Failed to delete submission');
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+      }
+    }
+
+    // ── Contract delete handler ──────────────────────────
+    async function handleContractDelete(e: Event) {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const contractId = Number(btn.dataset.contractId);
+      const isSigned = btn.dataset.signed === 'true';
+      const signerName = btn.dataset.signer;
+
+      if (!confirm('Delete this contract?\n\nThis will remove the PDF from storage and clear the contract from the client\'s dashboard.')) {
+        return;
+      }
+
+      if (isSigned) {
+        if (!confirm(`⚠️ This contract was digitally signed by "${signerName}".\n\nDeleting it will permanently destroy the signed record and the database audit trail.\n\nAre you absolutely sure you want to delete a signed contract?`)) {
+          return;
+        }
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+
+      try {
+        const res = await fetch('/api/admin/contracts/delete', {
+          method: 'DELETE',
+          headers: {
+            'x-admin-key': ADMIN_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ contract_id: contractId }),
+        });
+
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete contract');
+
+        loadAll();
+      } catch (err: any) {
+        alert(err.message || 'Failed to delete contract');
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+      }
+    }
+
+    // ── Invoice delete handler ───────────────────────────
+    async function handleInvoiceDelete(e: Event) {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const invoiceId = Number(btn.dataset.invoiceId);
+      const label = btn.dataset.label || 'this document';
+
+      if (!confirm(`Delete "${label}"?\n\nThis will remove the PDF from storage and the client will no longer see it in their dashboard.`)) {
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+
+      try {
+        const res = await fetch('/api/admin/invoices/delete', {
+          method: 'DELETE',
+          headers: {
+            'x-admin-key': ADMIN_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ invoice_id: invoiceId }),
+        });
+
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete document');
+
+        loadAll();
+      } catch (err: any) {
+        alert(err.message || 'Failed to delete document');
         btn.disabled = false;
         btn.textContent = 'Delete';
       }
