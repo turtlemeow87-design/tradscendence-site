@@ -49,8 +49,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const sql = neon(import.meta.env.DATABASE_URL);
 
-  // ── Find user ───────────────────────────────────────────
-  const [user] = await sql`SELECT id, email FROM users WHERE email = ${cleanEmail}`;
+  // ── Find user (now including name fields) ───────────────
+  const [user] = await sql`
+    SELECT id, email, first_name, last_name
+    FROM users WHERE email = ${cleanEmail}
+  `;
   if (!user) {
     return json(401, { ok: false, error: 'Invalid email or code.' });
   }
@@ -86,9 +89,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   // ── Mark OTP as used ────────────────────────────────────
   await sql`UPDATE otp_codes SET used = true WHERE id = ${matchedOtpId}`;
 
-  // ── Issue JWT ───────────────────────────────────────────
+  // ── Issue JWT (now with name fields) ────────────────────
   const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET);
-  const token = await new SignJWT({ email: user.email })
+  const token = await new SignJWT({
+    email: user.email,
+    firstName: user.first_name || '',
+    lastName: user.last_name || '',
+  })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(String(user.id))
     .setIssuedAt()
@@ -107,10 +114,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (rememberDevice) {
     const deviceToken = crypto.randomBytes(32).toString('hex');
     const deviceTokenHash = await bcrypt.hash(deviceToken, 10);
-    const deviceExpiry = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(); // 90 days
+    const deviceExpiry = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
     const userAgent = request.headers.get('user-agent') || 'Unknown device';
-    // Grab a short label from the user-agent
     const label = userAgent.length > 100 ? userAgent.slice(0, 100) + '…' : userAgent;
 
     await sql`
@@ -123,7 +129,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 90, // 90 days
+      maxAge: 60 * 60 * 24 * 90,
     });
   }
 

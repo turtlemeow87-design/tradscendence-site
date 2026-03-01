@@ -27,12 +27,19 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
     </div>
 
     <form id="contact-form" class="grid gap-4">
-      <!-- Required: Name -->
-      <label class="grid gap-1">
-        <span class="text-sm font-semibold">Your name *</span>
-        <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
-               name="name" required />
-      </label>
+      <!-- Required: First Name + Last Name -->
+      <div class="grid grid-cols-2 gap-3">
+        <label class="grid gap-1">
+          <span class="text-sm font-semibold">First name *</span>
+          <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+                 name="first_name" required autocomplete="given-name" />
+        </label>
+        <label class="grid gap-1">
+          <span class="text-sm font-semibold">Last name *</span>
+          <input class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
+                 name="last_name" required autocomplete="family-name" />
+        </label>
+      </div>
 
       <!-- Required: Email -->
       <label class="grid gap-1">

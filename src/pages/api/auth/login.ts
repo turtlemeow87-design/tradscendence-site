@@ -41,8 +41,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const sql = neon(import.meta.env.DATABASE_URL);
 
-  // ── Find user ───────────────────────────────────────────
-  const [user] = await sql`SELECT id, email, password_hash FROM users WHERE email = ${cleanEmail}`;
+  // ── Find user (now including name fields) ───────────────
+  const [user] = await sql`
+    SELECT id, email, password_hash, first_name, last_name
+    FROM users WHERE email = ${cleanEmail}
+  `;
   if (!user) {
     return json(401, { ok: false, error: 'Invalid email or password.' });
   }
@@ -67,9 +70,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     for (const device of devices) {
       const match = await bcrypt.compare(deviceToken, device.token_hash);
       if (match) {
-        // Trusted device found — skip OTP, issue JWT directly
+        // Trusted device found — skip OTP, issue JWT directly (with name fields)
         const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET);
-        const token = await new SignJWT({ email: user.email })
+        const token = await new SignJWT({
+          email: user.email,
+          firstName: user.first_name || '',
+          lastName: user.last_name || '',
+        })
           .setProtectedHeader({ alg: 'HS256' })
           .setSubject(String(user.id))
           .setIssuedAt()

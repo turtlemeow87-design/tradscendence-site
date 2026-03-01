@@ -80,7 +80,10 @@ export const POST: APIRoute = async ({ request }) => {
   // 4) Normalize & validate fields
   const errors: Record<string, string> = {};
 
-  const name = isNonEmptyString(payload?.name) ? clampTrim(payload.name, MAX_NAME) : "";
+  const firstName = isNonEmptyString(payload?.first_name) ? clampTrim(payload.first_name, MAX_NAME) : "";
+  const lastName = isNonEmptyString(payload?.last_name) ? clampTrim(payload.last_name, MAX_NAME) : "";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+
   const emailRaw = isNonEmptyString(payload?.email) ? clampTrim(payload.email, MAX_EMAIL) : "";
   const email = emailRaw.toLowerCase();
   const location = isNonEmptyString(payload?.location) ? clampTrim(payload.location, MAX_LOCATION) : "";
@@ -99,7 +102,8 @@ export const POST: APIRoute = async ({ request }) => {
   const formName = isNonEmptyString(payload?.formName) ? payload.formName : "Contact Page";
 
   // Validate required fields
-  if (!name) errors.name = "Name is required.";
+  if (!firstName) errors.first_name = "First name is required.";
+  if (!lastName) errors.last_name = "Last name is required.";
   if (!email) errors.email = "Email is required.";
   else if (!isValidEmail(email)) errors.email = "Email looks invalid.";
   if (!location) errors.location = "Location is required.";
@@ -130,7 +134,7 @@ export const POST: APIRoute = async ({ request }) => {
   const isDevelopment = import.meta.env.DEV || !import.meta.env.DATABASE_URL;
   
   console.log(`📝 Contact form submission in ${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'} mode`);
-  console.log(`   Name: ${name}`);
+  console.log(`   Name: ${fullName}`);
   console.log(`   Email: ${email}`);
   console.log(`   Location: ${location}`);
 
@@ -140,12 +144,12 @@ export const POST: APIRoute = async ({ request }) => {
       const sql = neon(import.meta.env.DATABASE_URL);
       const result = await sql`
         INSERT INTO contact_submissions (
-          name, email, phone, event_date, location, 
+          first_name, last_name, name, email, phone, event_date, location, 
           instruments, genres, genre_other, message, 
           form_name, ip_address, user_agent
         )
         VALUES (
-          ${name}, ${email}, ${formattedPhone}, ${date || null}, ${location},
+          ${firstName}, ${lastName}, ${fullName}, ${email}, ${formattedPhone}, ${date || null}, ${location},
           ${instruments}, ${genres}, ${genreOther}, ${message},
           ${formName}, ${ipAddress}, ${userAgent}
         )
@@ -179,7 +183,7 @@ export const POST: APIRoute = async ({ request }) => {
     const genreList = genres.length > 0 ? genres.join(", ") : "Not specified";
 
     const emailBody = `
-New Inquiry from ${name}
+New Inquiry from ${fullName}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

@@ -16,16 +16,19 @@ export const POST: APIRoute = async ({ request }) => {
     return json(415, { ok: false, error: 'Content-Type must be application/json' });
   }
 
-  let body: { email?: string; password?: string };
+  let body: { firstName?: string; lastName?: string; email?: string; password?: string };
   try {
     body = await request.json();
   } catch {
     return json(400, { ok: false, error: 'Invalid JSON' });
   }
 
-  const { email, password } = body;
+  const { firstName, lastName, email, password } = body;
 
   // ── Validation ──────────────────────────────────────────
+  if (!firstName || typeof firstName !== 'string' || !firstName.trim()) {
+    return json(400, { ok: false, error: 'First name is required.' });
+  }
   if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
     return json(400, { ok: false, error: 'A valid email address is required.' });
   }
@@ -33,6 +36,8 @@ export const POST: APIRoute = async ({ request }) => {
     return json(400, { ok: false, error: 'Password must be at least 8 characters.' });
   }
 
+  const cleanFirstName = firstName.trim().slice(0, 80);
+  const cleanLastName = lastName && typeof lastName === 'string' ? lastName.trim().slice(0, 80) : null;
   const cleanEmail = email.trim().toLowerCase();
 
   // ── Dev mode guard ──────────────────────────────────────
@@ -51,8 +56,8 @@ export const POST: APIRoute = async ({ request }) => {
   // ── Create user ─────────────────────────────────────────
   const passwordHash = await bcrypt.hash(password, 12);
   const [user] = await sql`
-    INSERT INTO users (email, password_hash)
-    VALUES (${cleanEmail}, ${passwordHash})
+    INSERT INTO users (email, password_hash, first_name, last_name)
+    VALUES (${cleanEmail}, ${passwordHash}, ${cleanFirstName}, ${cleanLastName})
     RETURNING id
   `;
 
@@ -87,7 +92,6 @@ export const POST: APIRoute = async ({ request }) => {
     });
   } catch (err) {
     console.error('OTP email send failed:', err);
-    // User is created — don't fail the whole request, they can resend
   }
 
   return json(200, { ok: true, email: cleanEmail });

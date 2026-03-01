@@ -15,7 +15,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (token) {
     // Dev mode: accept the dummy token from verify-otp
     if ((import.meta.env.DEV || !import.meta.env.JWT_SECRET) && token === 'dev-token') {
-      context.locals.user = { id: '0', email: 'dev@localhost' };
+      context.locals.user = { id: '0', email: 'dev@localhost', firstName: 'Dev', lastName: 'User' };
     } else {
       try {
         const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET);
@@ -23,6 +23,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         context.locals.user = {
           id: payload.sub as string,
           email: payload.email as string,
+          firstName: (payload.firstName as string) || '',
+          lastName: (payload.lastName as string) || '',
         };
       } catch {
         // Invalid or expired token — clear it silently

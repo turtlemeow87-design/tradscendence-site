@@ -35,10 +35,16 @@
       <p class="mt-1"><strong>I'm available for intimate events: proposals, private weddings, other ceremonies, small gatherings, funerals, and studio sessions.</strong></p>
     </div>
 
-    <label class="block">
-      <span class="text-sm">Your name *</span>
-      <input name="name" required class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" />
-    </label>
+    <div class="grid grid-cols-2 gap-3">
+      <label class="block">
+        <span class="text-sm">First name *</span>
+        <input name="first_name" required autocomplete="given-name" class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" />
+      </label>
+      <label class="block">
+        <span class="text-sm">Last name *</span>
+        <input name="last_name" required autocomplete="family-name" class="w-full mt-1 rounded-xl bg-black/40 p-2 border border-[var(--accent-bronze)]" />
+      </label>
+    </div>
 
     <label class="block">
       <span class="text-sm">Email *</span>

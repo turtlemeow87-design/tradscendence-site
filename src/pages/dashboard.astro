@@ -11,18 +11,33 @@ if (!user) {
 let submissions: any[] = [];
 let contracts: Record<number, any> = {};
 let invoices: Record<number, any[]> = {};
+let userProfile: { first_name: string | null; last_name: string | null; prefix: string | null } = {
+  first_name: null,
+  last_name: null,
+  prefix: null,
+};
 
 if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
   const sql = neon(import.meta.env.DATABASE_URL);
-  
-  submissions = await sql`
-    SELECT 
-      id, name, email, event_date, location, 
-      instruments, message, status, created_at
-    FROM contact_submissions
-    WHERE email = ${user.email}
-    ORDER BY created_at DESC
-  `;
+
+  // Fetch user profile + submissions + contracts + invoices in parallel
+  const [profileResult, submissionResult] = await Promise.all([
+    sql`SELECT first_name, last_name, prefix FROM users WHERE id = ${user.id}`,
+    sql`
+      SELECT 
+        id, first_name, last_name, email, event_date, location, 
+        instruments, message, status, created_at
+      FROM contact_submissions
+      WHERE email = ${user.email}
+      ORDER BY created_at DESC
+    `,
+  ]);
+
+  if (profileResult.length > 0) {
+    userProfile = profileResult[0] as typeof userProfile;
+  }
+
+  submissions = submissionResult;
 
   if (submissions.length > 0) {
     const submissionIds = submissions.map(s => s.id);
@@ -52,6 +67,24 @@ if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
   }
 }
 
+// ── Greeting logic ──────────────────────────────────────
+const needsProfile = !userProfile.last_name || !userProfile.prefix;
+let greeting = '';
+
+if (userProfile.prefix && userProfile.last_name) {
+  if (userProfile.prefix === 'none') {
+    // "Prefer not to disclose" → first initial
+    const initial = (userProfile.first_name || user.email)[0].toUpperCase();
+    greeting = `Welcome back, ${initial}. ${userProfile.last_name}`;
+  } else {
+    greeting = `Welcome back, ${userProfile.prefix} ${userProfile.last_name}`;
+  }
+} else if (userProfile.first_name) {
+  greeting = `Welcome back, ${userProfile.first_name}`;
+} else {
+  greeting = `Welcome back`;
+}
+
 const statusColors: Record<string, string> = {
   Pending: "bg-gold/20 text-gold border-gold/40",
   Reviewing: "bg-blue-500/20 text-blue-400 border-blue-500/40",
@@ -72,7 +105,7 @@ const statusColors: Record<string, string> = {
         
         <!-- Sidebar -->
         <aside class="lg:w-64 shrink-0">
-          <div class="bg-charcoal/80 frame rounded-xl p-6 sticky top-8">
+          <div class="bg-charcoal/80 frame rounded-xl p-6 sticky top-20">
             <h2 class="font-display text-xl text-gold mb-4">My Account</h2>
             <nav class="space-y-2">
               <a href="#bookings" class="block px-3 py-2 rounded-lg bg-gold/10 text-gold font-semibold">
@@ -94,13 +127,76 @@ const statusColors: Record<string, string> = {
         <main class="flex-1">
           <div class="mb-8">
             <h1 class="font-display text-3xl md:text-4xl text-gold mb-2">
-              Welcome back, {user.email.split('@')[0]}
+              {greeting}
             </h1>
             <p class="text-ivory/70">Manage your booking inquiries and documents</p>
           </div>
 
+          <!-- Profile Completion Card (shown only if name/prefix missing) -->
+          {needsProfile && (
+            <section id="profileCard" class="mb-8 bg-gold/5 border border-gold/40 rounded-xl p-6 frame">
+              <h2 class="font-display text-xl text-gold mb-2">Complete Your Profile</h2>
+              <p class="text-ivory/70 text-sm mb-5">
+                Help us greet you properly — choose how you'd like to be addressed.
+              </p>
+              <form id="profileForm" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label class="flex flex-col gap-1">
+                    <span class="text-ivory/80 text-sm font-display">First Name *</span>
+                    <input
+                      type="text"
+                      name="firstName"
+                      required
+                      value={userProfile.first_name || ''}
+                      class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1">
+                    <span class="text-ivory/80 text-sm font-display">Last Name *</span>
+                    <input
+                      type="text"
+                      name="lastName"
+                      required
+                      value={userProfile.last_name || ''}
+                      class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+                    />
+                  </label>
+                </div>
+
+                {!userProfile.prefix && (
+                  <label class="flex flex-col gap-1">
+                    <span class="text-ivory/80 text-sm font-display">How would you like to be addressed?</span>
+                    <select
+                      name="prefix"
+                      required
+                      class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory focus:outline-none focus:border-gold"
+                    >
+                      <option value="" disabled selected>Select a prefix</option>
+                      <option value="Mr.">Mr.</option>
+                      <option value="Mrs.">Mrs.</option>
+                      <option value="Ms.">Ms.</option>
+                      <option value="none">Prefer not to disclose</option>
+                    </select>
+                  </label>
+                )}
+
+                <div class="flex items-center gap-4">
+                  <button
+                    type="submit"
+                    id="profileSaveBtn"
+                    class="rounded-xl px-6 py-2 bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
+                  >
+                    Save
+                  </button>
+                  <p id="profileError" class="text-rosewood text-sm hidden"></p>
+                  <p id="profileSuccess" class="text-green-400 text-sm hidden"></p>
+                </div>
+              </form>
+            </section>
+          )}
+
           <!-- Bookings Section -->
-          <section id="bookings" class="space-y-6">
+          <section id="bookings" class="scroll-mt-20 space-y-6">
             {submissions.length === 0 ? (
               <div class="bg-charcoal/80 frame rounded-xl p-8 text-center">
                 <p class="text-ivory/70 mb-4">No booking inquiries yet</p>
@@ -115,6 +211,7 @@ const statusColors: Record<string, string> = {
               submissions.map((sub) => {
                 const contract = contracts[sub.id];
                 const subInvoices = invoices[sub.id] || [];
+                const displayName = [sub.first_name, sub.last_name].filter(Boolean).join(' ') || sub.email;
                 return (
                   <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id={sub.id}>
                     <!-- Submission Header -->
@@ -271,6 +368,7 @@ const statusColors: Record<string, string> = {
   </div>
 
   <script>
+    // ── Logout ────────────────────────────────────────────
     document.getElementById("logoutBtn")?.addEventListener("click", async () => {
       try {
         const res = await fetch("/api/auth/logout", { method: "POST" });
@@ -280,6 +378,53 @@ const statusColors: Record<string, string> = {
       }
     });
 
+    // ── Profile completion form ───────────────────────────
+    const profileForm = document.getElementById("profileForm") as HTMLFormElement | null;
+    profileForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById("profileSaveBtn") as HTMLButtonElement;
+      const errorEl = document.getElementById("profileError") as HTMLElement;
+      const successEl = document.getElementById("profileSuccess") as HTMLElement;
+      const formData = new FormData(profileForm);
+
+      const firstName = (formData.get("firstName") as string)?.trim();
+      const lastName = (formData.get("lastName") as string)?.trim();
+      const prefix = (formData.get("prefix") as string)?.trim();
+
+      if (!firstName || !lastName) {
+        errorEl.textContent = "Both first and last name are required.";
+        errorEl.classList.remove("hidden");
+        successEl.classList.add("hidden");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+      errorEl.classList.add("hidden");
+      successEl.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/auth/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firstName, lastName, prefix }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to save profile");
+
+        // Reload to show updated greeting
+        window.location.reload();
+      } catch (err: any) {
+        errorEl.textContent = err.message || "Failed to save profile";
+        errorEl.classList.remove("hidden");
+        btn.disabled = false;
+        btn.textContent = "Save";
+      }
+    });
+
+    // ── Contract signing ──────────────────────────────────
     document.querySelectorAll(".sign-contract-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
