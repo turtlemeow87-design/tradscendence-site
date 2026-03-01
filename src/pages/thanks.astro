@@ -13,7 +13,7 @@ const title = "Thank you — Tradscendence";
           Thank you so much for reaching out!
         </h1>
         <p class="opacity-80 text-base sm:text-lg">
-          I received your message and I’ll reply as soon as I can. In the meantime, feel free to keep exploring the instruments and recordings.
+          I received your message and I'll reply as soon as I can. In the meantime, feel free to keep exploring the instruments and recordings.
         </p>
 
         <!-- Your custom sentences / disclaimers -->
@@ -35,9 +35,30 @@ const title = "Thank you — Tradscendence";
       <nav aria-label="Next steps" class="flex flex-col items-center gap-3 md:gap-4">
         <!-- Small logo above links -->
         <div class="logo-fade shrink-0 w-[104px] h-[104px] sm:w-[160px] sm:h-[160px] md:max-w-[200px] aspect-square frame flex items-center justify-center opacity-70">
-  <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover" />
-</div>
+          <img src="/media/logo.png" alt="Logo" class="w-full h-full object-cover" />
+        </div>
 
+        <!-- Register / Login nudge -->
+        <div class="w-full rounded-xl frame border border-[var(--accent-gold)]/30 bg-black/20 p-4 text-center space-y-2">
+          <p class="font-display text-sm text-[var(--accent-gold)] leading-snug">
+            Track your booking documents
+          </p>
+          <p class="text-xs opacity-70 leading-relaxed">
+            Register for a free account to view any contracts, invoices, and receipts I send your way.
+          </p>
+          <a
+            href="/register"
+            class="mt-1 inline-block w-full rounded-lg px-3 py-2 bg-[var(--accent-gold)] text-[var(--charcoal)] font-semibold text-sm hover:bg-[var(--accent-gold-dark)] transition"
+          >
+            Create an account →
+          </a>
+          <p class="text-xs opacity-50">
+            Already registered?
+            <a href="/login" class="underline decoration-[var(--accent-gold)] underline-offset-2 hover:opacity-80">
+              Log in here
+            </a>
+          </p>
+        </div>
 
         <a
           href="/instruments"
