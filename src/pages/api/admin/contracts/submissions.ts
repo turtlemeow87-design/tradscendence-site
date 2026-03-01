@@ -12,13 +12,11 @@ function json(status: number, body: Record<string, unknown>) {
 }
 
 export const GET: APIRoute = async ({ request }) => {
-  // Auth check
   const adminKey = request.headers.get("x-admin-key");
   if (adminKey !== import.meta.env.ADMIN_API_KEY) {
     return json(401, { error: "Unauthorized" });
   }
 
-  // Dev mode guard
   if (import.meta.env.DEV || !import.meta.env.DATABASE_URL) {
     return json(200, {
       submissions: [
@@ -31,6 +29,7 @@ export const GET: APIRoute = async ({ request }) => {
           instruments: ["Oud", "Handpan"],
           status: "Pending",
           created_at: new Date().toISOString(),
+          last_reminded_at: null,
           contract: null,
         },
       ],
@@ -40,9 +39,8 @@ export const GET: APIRoute = async ({ request }) => {
   const sql = neon(import.meta.env.DATABASE_URL);
 
   try {
-    // Get all submissions with their contract status
     const submissions = await sql`
-      SELECT 
+      SELECT
         cs.id,
         cs.name,
         cs.first_name,
@@ -53,6 +51,7 @@ export const GET: APIRoute = async ({ request }) => {
         cs.instruments,
         cs.status,
         cs.created_at,
+        cs.last_reminded_at,
         c.id as contract_id,
         c.file_url,
         c.uploaded_at,
@@ -65,7 +64,6 @@ export const GET: APIRoute = async ({ request }) => {
       ORDER BY cs.created_at DESC
     `;
 
-    // Transform data to include contract as nested object
     const formatted = submissions.map(sub => ({
       id: sub.id,
       name: sub.name || [sub.first_name, sub.last_name].filter(Boolean).join(' '),
@@ -76,6 +74,7 @@ export const GET: APIRoute = async ({ request }) => {
       instruments: sub.instruments,
       status: sub.status,
       created_at: sub.created_at,
+      last_reminded_at: sub.last_reminded_at || null,
       contract: sub.contract_id ? {
         id: sub.contract_id,
         file_url: sub.file_url,

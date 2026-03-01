@@ -9,7 +9,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 >
   <div class="min-h-screen bg-charcoal text-ivory px-4 py-8">
     <div class="max-w-6xl mx-auto">
-      
+
       <!-- Auth Panel -->
       <div id="authPanel" class="mb-8">
         <div class="bg-charcoal/80 frame rounded-xl p-6 max-w-md mx-auto">
@@ -32,7 +32,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       <!-- Admin Panel (hidden until unlocked) -->
       <div id="adminContent" class="hidden">
-        
+
         <div class="flex items-center justify-between mb-8">
           <h1 class="font-display text-3xl text-gold">Document Management</h1>
           <button
@@ -62,7 +62,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       "Declined",
     ];
 
-    // Status badge styling map (matches dashboard)
     const STATUS_STYLES: Record<string, string> = {
       "Pending":          "bg-gold/20 text-gold border-gold/40",
       "Reviewing":        "bg-blue-500/20 text-blue-400 border-blue-500/40",
@@ -121,6 +120,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
     }
 
+    function formatRemindedAt(isoString: string | null): string {
+      if (!isoString) return '';
+      const d = new Date(isoString);
+      return d.toLocaleString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: true,
+      });
+    }
+
     function renderSubmissions(submissions: any[], invoiceMap: Record<number, any[]>) {
       const listEl = document.getElementById('submissionsList');
       if (!listEl) return;
@@ -134,6 +142,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const invoices = invoiceMap[sub.id] || [];
         const currentStatus = sub.status || 'Pending';
         const badgeClass = STATUS_STYLES[currentStatus] || STATUS_STYLES['Pending'];
+        const remindedAt = formatRemindedAt(sub.last_reminded_at);
 
         return `
         <article
@@ -142,7 +151,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             ? 'background: #1a1a1a; border: 1px solid #333; opacity: 0.55;'
             : 'background: rgba(17,17,17,0.85); border: 2px solid #C2A45F;'}"
           data-submission-id="${sub.id}">
-          
+
           <!-- Header row -->
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
@@ -194,7 +203,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             </div>
           </div>
 
-          <!-- Contract Section -->
+          <!-- ── Reminder Control ── -->
+          <div class="mt-4 pt-4 border-t border-gold/20">
+            <h4 class="font-display text-gold mb-3 text-sm uppercase tracking-wide">Client Reminder</h4>
+            <div class="flex items-center gap-3 flex-wrap">
+              <button
+                class="send-reminder-btn px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold frame transition"
+                data-submission-id="${sub.id}"
+                data-email="${sub.email}"
+              >
+                Send Reminder
+              </button>
+              <span class="remind-timestamp text-ivory/40 text-xs italic">${remindedAt ? `Last sent: ${remindedAt}` : 'Never sent'}</span>
+            </div>
+          </div>
+
+          <!-- ── Contract Section ── -->
           <div class="mt-6 pt-6 border-t border-gold/20">
             <h4 class="font-display text-gold mb-3">Contract</h4>
             ${sub.contract ? `
@@ -246,7 +270,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             `}
           </div>
 
-          <!-- Invoice Section -->
+          <!-- ── Invoice Section ── -->
           <div class="mt-6 pt-6 border-t border-gold/20">
             <h4 class="font-display text-gold mb-3">Invoices & Receipts</h4>
 
@@ -330,6 +354,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       document.querySelectorAll('.delete-invoice-btn').forEach(btn => {
         btn.addEventListener('click', handleInvoiceDelete);
       });
+      document.querySelectorAll('.send-reminder-btn').forEach(btn => {
+        btn.addEventListener('click', handleSendReminder);
+      });
     }
 
     // ── Status save handler ──────────────────────────────
@@ -339,7 +366,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       const article = btn.closest('article') as HTMLElement;
       const select = article.querySelector('.status-select') as HTMLSelectElement;
       const feedback = article.querySelector('.status-feedback') as HTMLElement;
-
       const newStatus = select.value;
 
       btn.disabled = true;
@@ -349,10 +375,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       try {
         const res = await fetch('/api/admin/status/update', {
           method: 'PATCH',
-          headers: {
-            'x-admin-key': ADMIN_KEY,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ submission_id: submissionId, status: newStatus }),
         });
 
@@ -360,7 +383,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to update status');
 
-        // Update badge in place without reloading
         const badge = article.querySelector('.status-badge') as HTMLElement;
         const STATUS_STYLES: Record<string, string> = {
           "Pending":          "bg-gold/20 text-gold border-gold/40",
@@ -390,15 +412,59 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
     }
 
+    // ── Send reminder handler ────────────────────────────
+    async function handleSendReminder(e: Event) {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const submissionId = Number(btn.dataset.submissionId);
+      const email = btn.dataset.email || 'this client';
+      const article = btn.closest('article') as HTMLElement;
+      const timestampEl = article.querySelector('.remind-timestamp') as HTMLElement;
+
+      if (!confirm(`Send a reminder email to ${email}?`)) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const res = await fetch('/api/admin/remind', {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submission_id: submissionId }),
+        });
+
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to send reminder');
+
+        // Update timestamp in place without full reload
+        if (data.lastRemindedAt && timestampEl) {
+          const d = new Date(data.lastRemindedAt);
+          const formatted = d.toLocaleString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric',
+            hour: 'numeric', minute: '2-digit', hour12: true,
+          });
+          timestampEl.textContent = `Last sent: ${formatted}`;
+        }
+
+        btn.textContent = '✓ Sent';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = 'Send Reminder';
+        }, 2500);
+      } catch (err: any) {
+        alert(err.message || 'Failed to send reminder');
+        btn.disabled = false;
+        btn.textContent = 'Send Reminder';
+      }
+    }
+
     // ── Delete submission handler ────────────────────────
     async function handleDeleteSubmission(e: Event) {
       const btn = e.currentTarget as HTMLButtonElement;
       const submissionId = Number(btn.dataset.submissionId);
       const name = btn.dataset.name || 'this submission';
 
-      if (!confirm(`Delete "${name}"?\n\nThis will permanently remove the inquiry and all associated contracts and invoices. This cannot be undone.`)) {
-        return;
-      }
+      if (!confirm(`Delete "${name}"?\n\nThis will permanently remove the inquiry and all associated contracts and invoices. This cannot be undone.`)) return;
 
       btn.disabled = true;
       btn.textContent = 'Deleting...';
@@ -406,10 +472,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       try {
         const res = await fetch('/api/admin/submissions/delete', {
           method: 'DELETE',
-          headers: {
-            'x-admin-key': ADMIN_KEY,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ submission_id: submissionId }),
         });
 
@@ -435,14 +498,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       const isSigned = btn.dataset.signed === 'true';
       const signerName = btn.dataset.signer;
 
-      if (!confirm('Delete this contract?\n\nThis will remove the PDF from storage and clear the contract from the client\'s dashboard.')) {
-        return;
-      }
+      if (!confirm('Delete this contract?\n\nThis will remove the PDF from storage and clear the contract from the client\'s dashboard.')) return;
 
       if (isSigned) {
-        if (!confirm(`⚠️ This contract was digitally signed by "${signerName}".\n\nDeleting it will permanently destroy the signed record and the database audit trail.\n\nAre you absolutely sure you want to delete a signed contract?`)) {
-          return;
-        }
+        if (!confirm(`⚠️ This contract was digitally signed by "${signerName}".\n\nDeleting it will permanently destroy the signed record and the database audit trail.\n\nAre you absolutely sure you want to delete a signed contract?`)) return;
       }
 
       btn.disabled = true;
@@ -451,10 +510,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       try {
         const res = await fetch('/api/admin/contracts/delete', {
           method: 'DELETE',
-          headers: {
-            'x-admin-key': ADMIN_KEY,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ contract_id: contractId }),
         });
 
@@ -476,9 +532,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       const invoiceId = Number(btn.dataset.invoiceId);
       const label = btn.dataset.label || 'this document';
 
-      if (!confirm(`Delete "${label}"?\n\nThis will remove the PDF from storage and the client will no longer see it in their dashboard.`)) {
-        return;
-      }
+      if (!confirm(`Delete "${label}"?\n\nThis will remove the PDF from storage and the client will no longer see it in their dashboard.`)) return;
 
       btn.disabled = true;
       btn.textContent = 'Deleting...';
@@ -486,10 +540,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       try {
         const res = await fetch('/api/admin/invoices/delete', {
           method: 'DELETE',
-          headers: {
-            'x-admin-key': ADMIN_KEY,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ invoice_id: invoiceId }),
         });
 
