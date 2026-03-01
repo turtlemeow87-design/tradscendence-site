@@ -136,7 +136,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const badgeClass = STATUS_STYLES[currentStatus] || STATUS_STYLES['Pending'];
 
         return `
-        <article class="${currentStatus === 'Complete' ? 'bg-charcoal/30 border border-ivory/5 opacity-50' : 'bg-charcoal/80 border border-ivory/10'} rounded-xl p-6 transition-opacity" data-submission-id="${sub.id}">
+        <article
+          class="rounded-xl p-6"
+          style="${currentStatus === 'Complete'
+            ? 'background: #1a1a1a; border: 1px solid #333; opacity: 0.55;'
+            : 'background: rgba(17,17,17,0.85); border: 2px solid #C2A45F;'}"
+          data-submission-id="${sub.id}">
           
           <!-- Header row -->
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
