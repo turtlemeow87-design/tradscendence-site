@@ -156,10 +156,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
               <h3 class="font-display text-xl text-gold">${sub.name}${sub.preferred_name ? ` <span class="text-ivory/50 text-sm font-sans">(Preferred: ${sub.preferred_name})</span>` : ''}</h3>
-              // FIND:
-              <p class="text-ivory/60 text-sm">${sub.email}</p>
-
-// REPLACE with:
               <p class="text-ivory/60 text-sm flex items-center gap-2">
                 ${sub.email}
                 ${sub.is_registered
