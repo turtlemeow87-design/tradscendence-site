@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { neon } from '@neondatabase/serverless';
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
+import crypto from 'node:crypto';
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
@@ -15,14 +16,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return json(415, { ok: false, error: 'Content-Type must be application/json' });
   }
 
-  let body: { email?: string; code?: string };
+  let body: { email?: string; code?: string; rememberDevice?: boolean };
   try {
     body = await request.json();
   } catch {
     return json(400, { ok: false, error: 'Invalid JSON' });
   }
 
-  const { email, code } = body;
+  const { email, code, rememberDevice } = body;
 
   if (!email || typeof email !== 'string') {
     return json(400, { ok: false, error: 'Email is required.' });
@@ -36,7 +37,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   // ── Dev mode guard ──────────────────────────────────────
   if (import.meta.env.DEV || !import.meta.env.DATABASE_URL) {
-    // In dev, accept any code and set a dummy cookie
     cookies.set('auth_token', 'dev-token', {
       httpOnly: true,
       secure: false,
@@ -95,14 +95,37 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     .setExpirationTime('7d')
     .sign(secret);
 
-  // ── Set HttpOnly cookie ─────────────────────────────────
   cookies.set('auth_token', token, {
     httpOnly: true,
     secure: true,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * 7,
   });
+
+  // ── Remember this device (if requested) ─────────────────
+  if (rememberDevice) {
+    const deviceToken = crypto.randomBytes(32).toString('hex');
+    const deviceTokenHash = await bcrypt.hash(deviceToken, 10);
+    const deviceExpiry = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(); // 90 days
+
+    const userAgent = request.headers.get('user-agent') || 'Unknown device';
+    // Grab a short label from the user-agent
+    const label = userAgent.length > 100 ? userAgent.slice(0, 100) + '…' : userAgent;
+
+    await sql`
+      INSERT INTO trusted_devices (user_id, token_hash, label, expires_at)
+      VALUES (${user.id}, ${deviceTokenHash}, ${label}, ${deviceExpiry})
+    `;
+
+    cookies.set('trusted_device', deviceToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 90, // 90 days
+    });
+  }
 
   return json(200, { ok: true });
 };

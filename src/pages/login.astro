@@ -179,7 +179,14 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
         return;
       }
 
-      // Redirect to verify page with email
+      // ── Trusted device: skip OTP, go straight to dashboard ──
+      if (result.skipOtp) {
+        const redirectParam = (form.querySelector('[name="redirect"]') as HTMLInputElement)?.value || '/dashboard';
+        window.location.href = redirectParam;
+        return;
+      }
+
+      // ── Normal flow: redirect to verify page ────────────────
       const redirectParam = (form.querySelector('[name="redirect"]') as HTMLInputElement)?.value || '/dashboard';
       const email = encodeURIComponent(result.email || data.email);
       window.location.href = `/verify?email=${email}&redirect=${encodeURIComponent(redirectParam)}`;

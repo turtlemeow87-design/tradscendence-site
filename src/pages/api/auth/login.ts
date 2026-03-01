@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { neon } from '@neondatabase/serverless';
 import bcrypt from 'bcryptjs';
+import { SignJWT } from 'jose';
 import { Resend } from 'resend';
 
 function json(status: number, body: Record<string, unknown>) {
@@ -10,7 +11,7 @@ function json(status: number, body: Record<string, unknown>) {
   });
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   if (!request.headers.get('content-type')?.includes('application/json')) {
     return json(415, { ok: false, error: 'Content-Type must be application/json' });
   }
@@ -43,7 +44,6 @@ export const POST: APIRoute = async ({ request }) => {
   // ── Find user ───────────────────────────────────────────
   const [user] = await sql`SELECT id, email, password_hash FROM users WHERE email = ${cleanEmail}`;
   if (!user) {
-    // Generic message — don't reveal whether email exists
     return json(401, { ok: false, error: 'Invalid email or password.' });
   }
 
@@ -53,13 +53,51 @@ export const POST: APIRoute = async ({ request }) => {
     return json(401, { ok: false, error: 'Invalid email or password.' });
   }
 
-  // ── Invalidate any existing unused OTPs for this user ───
+  // ── Check for trusted device cookie ─────────────────────
+  const deviceToken = cookies.get('trusted_device')?.value;
+  if (deviceToken) {
+    const devices = await sql`
+      SELECT id, token_hash FROM trusted_devices
+      WHERE user_id = ${user.id}
+        AND expires_at > now()
+      ORDER BY created_at DESC
+      LIMIT 10
+    `;
+
+    for (const device of devices) {
+      const match = await bcrypt.compare(deviceToken, device.token_hash);
+      if (match) {
+        // Trusted device found — skip OTP, issue JWT directly
+        const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET);
+        const token = await new SignJWT({ email: user.email })
+          .setProtectedHeader({ alg: 'HS256' })
+          .setSubject(String(user.id))
+          .setIssuedAt()
+          .setExpirationTime('7d')
+          .sign(secret);
+
+        cookies.set('auth_token', token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7,
+        });
+
+        return json(200, { ok: true, skipOtp: true });
+      }
+    }
+
+    // Token didn't match any valid device — clear stale cookie
+    cookies.delete('trusted_device', { path: '/' });
+  }
+
+  // ── No trusted device — send OTP as usual ───────────────
   await sql`
     UPDATE otp_codes SET used = true
     WHERE user_id = ${user.id} AND used = false
   `;
 
-  // ── Generate & store new OTP ────────────────────────────
   const code = String(Math.floor(100000 + Math.random() * 900000));
   const codeHash = await bcrypt.hash(code, 10);
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
@@ -69,7 +107,6 @@ export const POST: APIRoute = async ({ request }) => {
     VALUES (${user.id}, ${codeHash}, ${expiresAt})
   `;
 
-  // ── Send OTP email ──────────────────────────────────────
   try {
     const resend = new Resend(import.meta.env.RESEND_API_KEY);
     await resend.emails.send({

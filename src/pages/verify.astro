@@ -41,6 +41,16 @@ if (!email) {
         />
       </label>
 
+      <!-- Remember this device checkbox -->
+      <label class="flex items-center gap-3 cursor-pointer select-none mt-1">
+        <input
+          type="checkbox"
+          name="rememberDevice"
+          class="w-4 h-4 rounded border-gold/40 bg-ebony/60 text-gold focus:ring-gold/40 focus:ring-offset-charcoal accent-[var(--accent-gold)]"
+        />
+        <span class="text-ivory/60 text-sm">Remember this device for 90 days</span>
+      </label>
+
       <button
         id="verifyBtn"
         type="submit"
@@ -72,6 +82,7 @@ if (!email) {
   const resendBtn = document.getElementById('resendBtn') as HTMLButtonElement;
   const cooldownSpan = document.getElementById('cooldown')!;
   const codeInput = form.querySelector('[name="code"]') as HTMLInputElement;
+  const rememberCheckbox = form.querySelector('[name="rememberDevice"]') as HTMLInputElement;
 
   // ── Resend cooldown ──────────────────────────────────
   let cooldownSeconds = 30;
@@ -94,7 +105,7 @@ if (!email) {
     }, 1000);
   }
 
-  startCooldown(); // Start on page load
+  startCooldown();
 
   function showStatus(msg: string, isError = false) {
     statusMsg.textContent = msg;
@@ -110,7 +121,6 @@ if (!email) {
 
   // ── Auto-submit on 6 digits ─────────────────────────
   codeInput.addEventListener('input', () => {
-    // Strip non-digits
     codeInput.value = codeInput.value.replace(/\D/g, '').slice(0, 6);
     if (codeInput.value.length === 6) {
       form.requestSubmit();
@@ -128,7 +138,11 @@ if (!email) {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email, code: data.code }),
+        body: JSON.stringify({
+          email: data.email,
+          code: data.code,
+          rememberDevice: rememberCheckbox.checked,
+        }),
       });
 
       const result = await res.json();
