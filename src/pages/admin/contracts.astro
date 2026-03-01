@@ -115,7 +115,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id="${sub.id}">
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
-              <h3 class="font-display text-xl text-gold">${sub.name}</h3>
+              <h3 class="font-display text-xl text-gold">${sub.name}${sub.preferred_name ? ` <span class="text-ivory/50 text-sm font-sans">(Preferred name: ${sub.preferred_name})</span>` : ''}</h3>
               <p class="text-ivory/60 text-sm">${sub.email}</p>
               ${sub.event_date ? `<p class="text-ivory/60 text-sm">Event: ${new Date(sub.event_date).toLocaleDateString()}</p>` : ''}
               <p class="text-ivory/60 text-sm">Submitted: ${new Date(sub.created_at).toLocaleDateString()}</p>

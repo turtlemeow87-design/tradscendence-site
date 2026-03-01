@@ -45,6 +45,8 @@ export const GET: APIRoute = async ({ request }) => {
       SELECT 
         cs.id,
         cs.name,
+        cs.first_name,
+        cs.last_name,
         cs.email,
         cs.event_date,
         cs.location,
@@ -55,16 +57,19 @@ export const GET: APIRoute = async ({ request }) => {
         c.file_url,
         c.uploaded_at,
         c.signed_at,
-        c.signature_name
+        c.signature_name,
+        u.preferred_name
       FROM contact_submissions cs
       LEFT JOIN contracts c ON cs.id = c.submission_id
+      LEFT JOIN users u ON cs.email = u.email
       ORDER BY cs.created_at DESC
     `;
 
     // Transform data to include contract as nested object
     const formatted = submissions.map(sub => ({
       id: sub.id,
-      name: sub.name,
+      name: sub.name || [sub.first_name, sub.last_name].filter(Boolean).join(' '),
+      preferred_name: sub.preferred_name || null,
       email: sub.email,
       event_date: sub.event_date,
       location: sub.location,
