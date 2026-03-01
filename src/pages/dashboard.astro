@@ -165,19 +165,19 @@ const statusColors: Record<string, string> = {
 
                 {!userProfile.prefix && (
                   <label class="flex flex-col gap-1">
-                    <span class="text-ivory/80 text-sm font-display">How would you like to be addressed?</span>
-                    <select
-                      name="prefix"
-                      required
-                      class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory focus:outline-none focus:border-gold"
-                    >
-                      <option value="" disabled selected>Select a prefix</option>
-                      <option value="Mr.">Mr.</option>
-                      <option value="Mrs.">Mrs.</option>
-                      <option value="Ms.">Ms.</option>
-                      <option value="none">Prefer not to disclose</option>
-                    </select>
-                  </label>
+  <span class="text-ivory/80 text-sm font-display">How would you like to be addressed?</span>
+  <select
+    name="prefix"
+    required
+    class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory focus:outline-none focus:border-gold"
+  >
+    <option value="" disabled selected>Select a prefix</option>
+    <option value="Mr.">Mr.</option>
+    <option value="Mrs.">Mrs.</option>
+    <option value="Ms.">Ms.</option>
+    <option value="none">Prefer not to disclose</option>
+  </select>
+</label>
                 )}
 
                 <div class="flex items-center gap-4">
