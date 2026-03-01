@@ -32,7 +32,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return json(415, { ok: false, error: 'Content-Type must be application/json' });
   }
 
-  let body: { firstName?: string; lastName?: string; prefix?: string };
+  let body: { firstName?: string; lastName?: string; prefix?: string; preferredName?: string };
   try {
     body = await request.json();
   } catch {
@@ -42,6 +42,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const firstName = typeof body.firstName === 'string' ? body.firstName.trim().slice(0, 80) : '';
   const lastName = typeof body.lastName === 'string' ? body.lastName.trim().slice(0, 80) : '';
   const prefix = typeof body.prefix === 'string' ? body.prefix.trim() : '';
+  const preferredName = typeof body.preferredName === 'string' ? body.preferredName.trim().slice(0, 80) : '';
 
   if (!firstName) return json(400, { ok: false, error: 'First name is required.' });
   if (!lastName) return json(400, { ok: false, error: 'Last name is required.' });
@@ -62,14 +63,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Prefix already locked — only allow name updates
     await sql`
       UPDATE users
-      SET first_name = ${firstName}, last_name = ${lastName}
+      SET first_name = ${firstName}, last_name = ${lastName}, preferred_name = ${preferredName || null}
       WHERE id = ${userId}
     `;
   } else {
     // First time — save everything including prefix
     await sql`
       UPDATE users
-      SET first_name = ${firstName}, last_name = ${lastName}, prefix = ${prefix}
+      SET first_name = ${firstName}, last_name = ${lastName}, prefix = ${prefix}, preferred_name = ${preferredName || null}
       WHERE id = ${userId}
     `;
   }

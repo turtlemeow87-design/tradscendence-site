@@ -162,6 +162,16 @@ const statusColors: Record<string, string> = {
                     />
                   </label>
                 </div>
+                <label class="flex flex-col gap-1">
+                  <span class="text-ivory/80 text-sm font-display">Preferred Name <span class="text-ivory/40 font-sans text-xs">(optional)</span></span>
+                  <p class="text-ivory/40 text-xs mb-1">This is only so I know how to refer to you in future messages or phone calls.</p>
+                  <input
+                    type="text"
+                    name="preferredName"
+                    class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+                    placeholder="e.g., Bobby, Liz, etc."
+                  />
+                </label>
 
                 {!userProfile.prefix && (
                   <label class="flex flex-col gap-1 max-w-[220px]">
@@ -392,6 +402,7 @@ const statusColors: Record<string, string> = {
       const firstName = (formData.get("firstName") as string)?.trim();
       const lastName = (formData.get("lastName") as string)?.trim();
       const prefix = (formData.get("prefix") as string)?.trim();
+      const preferredName = (formData.get("preferredName") as string)?.trim() || '';
 
       if (!firstName || !lastName) {
         errorEl.textContent = "Both first and last name are required.";
@@ -409,7 +420,7 @@ const statusColors: Record<string, string> = {
         const res = await fetch("/api/auth/profile", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ firstName, lastName, prefix }),
+          body: JSON.stringify({ firstName, lastName, prefix, preferredName }),
         });
 
         const data = await res.json();
