@@ -20,7 +20,6 @@ let userProfile: { first_name: string | null; last_name: string | null; prefix: 
 if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
   const sql = neon(import.meta.env.DATABASE_URL);
 
-  // Fetch user profile + submissions + contracts + invoices in parallel
   const [profileResult, submissionResult] = await Promise.all([
     sql`SELECT first_name, last_name, prefix FROM users WHERE id = ${user.id}`,
     sql`
@@ -73,7 +72,6 @@ let greeting = '';
 
 if (userProfile.prefix && userProfile.last_name) {
   if (userProfile.prefix === 'none') {
-    // "Prefer not to disclose" → first initial
     const initial = (userProfile.first_name || user.email)[0].toUpperCase();
     greeting = `Welcome back, ${initial}. ${userProfile.last_name}`;
   } else {
@@ -85,13 +83,22 @@ if (userProfile.prefix && userProfile.last_name) {
   greeting = `Welcome back`;
 }
 
-const statusColors: Record<string, string> = {
-  Pending: "bg-gold/20 text-gold border-gold/40",
-  Reviewing: "bg-blue-500/20 text-blue-400 border-blue-500/40",
-  "Offer Sent": "bg-purple-500/20 text-purple-400 border-purple-500/40",
-  Confirmed: "bg-green-500/20 text-green-400 border-green-500/40",
-  Declined: "bg-rosewood/20 text-rosewood border-rosewood/40",
+// ── Status display config ───────────────────────────────
+// statusLabel: what the client sees (Payment Received → Booking Confirmed)
+const statusConfig: Record<string, { label: string; classes: string }> = {
+  "Pending":          { label: "Pending",           classes: "bg-gold/20 text-gold border-gold/40" },
+  "Reviewing":        { label: "Reviewing",          classes: "bg-blue-500/20 text-blue-400 border-blue-500/40" },
+  "Contract Sent":    { label: "Contract Sent",      classes: "bg-purple-500/20 text-purple-400 border-purple-500/40" },
+  "Contract Signed":  { label: "Contract Signed",    classes: "bg-cyan-500/20 text-cyan-400 border-cyan-500/40" },
+  "Invoice Sent":     { label: "Invoice Sent",       classes: "bg-orange-500/20 text-orange-400 border-orange-500/40" },
+  "Payment Received": { label: "Booking Confirmed",  classes: "bg-green-500/20 text-green-400 border-green-500/40" },
+  "Complete":         { label: "Complete",           classes: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" },
+  "Declined":         { label: "Declined",           classes: "bg-rosewood/20 text-rosewood border-rosewood/40" },
 };
+
+function getStatusConfig(status: string) {
+  return statusConfig[status] ?? statusConfig["Pending"];
+}
 ---
 
 <BaseLayout
@@ -132,7 +139,7 @@ const statusColors: Record<string, string> = {
             <p class="text-ivory/70">Manage your booking inquiries and documents</p>
           </div>
 
-          <!-- Profile Completion Card (shown only if name/prefix missing) -->
+          <!-- Profile Completion Card -->
           {needsProfile && (
             <section id="profileCard" class="mb-8 bg-gold/5 border border-gold/40 rounded-xl p-6 frame">
               <h2 class="font-display text-xl text-gold mb-2">Complete Your Profile</h2>
@@ -175,20 +182,20 @@ const statusColors: Record<string, string> = {
 
                 {!userProfile.prefix && (
                   <label class="flex flex-col gap-1 max-w-[220px]">
-  <span class="text-ivory/80 text-sm font-display">How would you like to be addressed?</span>
-  <select
-    name="prefix"
-    required
-    class="bg-charcoal frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory focus:outline-none focus:border-gold appearance-none"
-    style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23C2A45F%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center;"
-  >
-    <option value="" disabled selected class="bg-[#111] text-ivory">Select a prefix</option>
-    <option value="Mr." class="bg-[#111] text-ivory">Mr.</option>
-    <option value="Mrs." class="bg-[#111] text-ivory">Mrs.</option>
-    <option value="Ms." class="bg-[#111] text-ivory">Ms.</option>
-    <option value="none" class="bg-[#111] text-ivory">Prefer not to disclose</option>
-  </select>
-</label>
+                    <span class="text-ivory/80 text-sm font-display">How would you like to be addressed?</span>
+                    <select
+                      name="prefix"
+                      required
+                      class="bg-charcoal frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory focus:outline-none focus:border-gold appearance-none"
+                      style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23C2A45F%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center;"
+                    >
+                      <option value="" disabled selected class="bg-[#111] text-ivory">Select a prefix</option>
+                      <option value="Mr." class="bg-[#111] text-ivory">Mr.</option>
+                      <option value="Mrs." class="bg-[#111] text-ivory">Mrs.</option>
+                      <option value="Ms." class="bg-[#111] text-ivory">Ms.</option>
+                      <option value="none" class="bg-[#111] text-ivory">Prefer not to disclose</option>
+                    </select>
+                  </label>
                 )}
 
                 <div class="flex items-center gap-4">
@@ -222,7 +229,7 @@ const statusColors: Record<string, string> = {
               submissions.map((sub) => {
                 const contract = contracts[sub.id];
                 const subInvoices = invoices[sub.id] || [];
-                const displayName = [sub.first_name, sub.last_name].filter(Boolean).join(' ') || sub.email;
+                const { label: statusLabel, classes: statusClasses } = getStatusConfig(sub.status);
                 return (
                   <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id={sub.id}>
                     <!-- Submission Header -->
@@ -240,8 +247,8 @@ const statusColors: Record<string, string> = {
                           Submitted: {new Date(sub.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <span class={`px-3 py-1 rounded-lg border text-sm font-semibold ${statusColors[sub.status] || statusColors.Pending}`}>
-                        {sub.status}
+                      <span class={`px-3 py-1 rounded-lg border text-sm font-semibold ${statusClasses}`}>
+                        {statusLabel}
                       </span>
                     </div>
 
@@ -426,7 +433,6 @@ const statusColors: Record<string, string> = {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to save profile");
 
-        // Reload to show updated greeting
         window.location.href = '/dashboard';
       } catch (err: any) {
         errorEl.textContent = err.message || "Failed to save profile";

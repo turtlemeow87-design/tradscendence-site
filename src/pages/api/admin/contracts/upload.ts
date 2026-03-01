@@ -28,13 +28,11 @@ export const POST: APIRoute = async ({ request }) => {
       return json(400, { error: "Missing submission_id or file" });
     }
 
-    // Validate file type
     if (file.type !== "application/pdf") {
       return json(400, { error: "Only PDF files are allowed" });
     }
 
-    // Validate file size (10MB max)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       return json(400, { error: "File too large (max 10MB)" });
     }
@@ -71,6 +69,14 @@ export const POST: APIRoute = async ({ request }) => {
       INSERT INTO contracts (submission_id, file_url)
       VALUES (${submissionId}, ${blob.url})
       RETURNING id
+    `;
+
+    // Auto-advance status to "Contract Sent" (only if not already further along)
+    await sql`
+      UPDATE contact_submissions
+      SET status = 'Contract Sent'
+      WHERE id = ${submissionId}
+      AND status IN ('Pending', 'Reviewing')
     `;
 
     return json(200, {

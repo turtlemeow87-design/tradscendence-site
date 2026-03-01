@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request }) => {
       return json(404, { error: "Submission not found" });
     }
 
-    // Check for duplicate label on this submission (enforce one per type)
+    // Check for duplicate label (one per type per booking)
     const existing = await sql`
       SELECT id FROM invoices
       WHERE submission_id = ${submissionId} AND label = ${label}
@@ -82,6 +82,14 @@ export const POST: APIRoute = async ({ request }) => {
       INSERT INTO invoices (submission_id, file_url, label)
       VALUES (${submissionId}, ${blob.url}, ${label})
       RETURNING id
+    `;
+
+    // Auto-advance status to "Invoice Sent" (only if not already further along)
+    await sql`
+      UPDATE contact_submissions
+      SET status = 'Invoice Sent'
+      WHERE id = ${submissionId}
+      AND status IN ('Pending', 'Reviewing', 'Contract Sent', 'Contract Signed')
     `;
 
     return json(200, {
