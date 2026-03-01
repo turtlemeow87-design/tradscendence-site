@@ -151,9 +151,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               ${sub.event_date ? `<p class="text-ivory/60 text-sm">Event: ${new Date(sub.event_date).toLocaleDateString()}</p>` : ''}
               <p class="text-ivory/60 text-sm">Submitted: ${new Date(sub.created_at).toLocaleDateString()}</p>
             </div>
-            <span class="status-badge px-3 py-1 rounded-lg border text-sm font-semibold ${badgeClass}">
-              ${currentStatus}
-            </span>
+            <div class="flex items-center gap-3">
+              <span class="status-badge px-3 py-1 rounded-lg border text-sm font-semibold ${badgeClass}">
+                ${currentStatus}
+              </span>
+              <button
+                class="delete-submission-btn px-3 py-1 rounded-lg border border-rosewood/60 text-rosewood hover:bg-rosewood hover:text-ivory text-sm font-semibold transition"
+                data-submission-id="${sub.id}"
+                data-name="${sub.name}"
+              >
+                Delete
+              </button>
+            </div>
           </div>
 
           ${sub.location ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Location:</span> ${sub.location}</p>` : ''}
@@ -291,6 +300,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       document.querySelectorAll('.save-status-btn').forEach(btn => {
         btn.addEventListener('click', handleStatusSave);
       });
+      document.querySelectorAll('.delete-submission-btn').forEach(btn => {
+        btn.addEventListener('click', handleDeleteSubmission);
+      });
     }
 
     // ── Status save handler ──────────────────────────────
@@ -349,6 +361,45 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       } finally {
         btn.disabled = false;
         btn.textContent = 'Save Status';
+      }
+    }
+
+    // ── Delete submission handler ────────────────────────
+    async function handleDeleteSubmission(e: Event) {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const submissionId = Number(btn.dataset.submissionId);
+      const name = btn.dataset.name || 'this submission';
+
+      if (!confirm(`Delete "${name}"?\n\nThis will permanently remove the inquiry and all associated contracts and invoices. This cannot be undone.`)) {
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+
+      try {
+        const res = await fetch('/api/admin/submissions/delete', {
+          method: 'DELETE',
+          headers: {
+            'x-admin-key': ADMIN_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ submission_id: submissionId }),
+        });
+
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete');
+
+        // Remove the card from the DOM immediately without a full reload
+        const article = btn.closest('article') as HTMLElement;
+        article.style.transition = 'opacity 0.3s ease';
+        article.style.opacity = '0';
+        setTimeout(() => article.remove(), 300);
+      } catch (err: any) {
+        alert(err.message || 'Failed to delete submission');
+        btn.disabled = false;
+        btn.textContent = 'Delete';
       }
     }
 
