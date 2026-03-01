@@ -416,7 +416,7 @@ const statusColors: Record<string, string> = {
         if (!res.ok) throw new Error(data.error || "Failed to save profile");
 
         // Reload to show updated greeting
-        window.location.reload();
+        window.location.href = '/dashboard';
       } catch (err: any) {
         errorEl.textContent = err.message || "Failed to save profile";
         errorEl.classList.remove("hidden");
