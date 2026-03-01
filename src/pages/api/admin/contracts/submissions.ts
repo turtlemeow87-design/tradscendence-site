@@ -30,6 +30,7 @@ export const GET: APIRoute = async ({ request }) => {
           status: "Pending",
           created_at: new Date().toISOString(),
           last_reminded_at: null,
+          is_registered: false,
           contract: null,
         },
       ],

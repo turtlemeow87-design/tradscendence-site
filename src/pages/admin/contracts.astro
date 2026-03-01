@@ -156,7 +156,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
               <h3 class="font-display text-xl text-gold">${sub.name}${sub.preferred_name ? ` <span class="text-ivory/50 text-sm font-sans">(Preferred: ${sub.preferred_name})</span>` : ''}</h3>
+              // FIND:
               <p class="text-ivory/60 text-sm">${sub.email}</p>
+
+// REPLACE with:
+              <p class="text-ivory/60 text-sm flex items-center gap-2">
+                ${sub.email}
+                ${sub.is_registered
+                  ? '<span class="px-2 py-0.5 rounded-md bg-green-500/20 text-green-400 border border-green-500/40 text-xs font-semibold">Registered</span>'
+                  : '<span class="px-2 py-0.5 rounded-md bg-gold/20 text-gold border border-gold/40 text-xs font-semibold">No Account</span>'}
+              </p>
               ${sub.event_date ? `<p class="text-ivory/60 text-sm">Event: ${new Date(sub.event_date).toLocaleDateString()}</p>` : ''}
               <p class="text-ivory/60 text-sm">Submitted: ${new Date(sub.created_at).toLocaleDateString()}</p>
             </div>
