@@ -294,7 +294,7 @@ function getStatusConfig(status: string) {
                           </div>
                           
                           <a
-                            href={contract.file_url}
+                            href={`/api/contracts/${contract.id}/view`}
                             target="_blank"
                             rel="noopener noreferrer"
                             class="shrink-0 px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold transition"
