@@ -225,6 +225,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
         const data = await res.json();
 
+        if (res.status === 401) {
+          throw new Error('Session expired — please refresh the page and re-enter your admin key');
+        }
+
         if (!res.ok) {
           throw new Error(data.error || 'Upload failed');
         }

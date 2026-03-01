@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Auth check
   const adminKey = request.headers.get("x-admin-key");
   if (adminKey !== import.meta.env.ADMIN_API_KEY) {
-    return json(401, { error: "Unauthorized" });
+    return json(401, { error: "Session expired — please refresh and re-enter your admin key" });
   }
 
   try {
