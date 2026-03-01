@@ -50,8 +50,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <!-- ─── Register Form (shown by default) ───────────── -->
     <form id="registerForm" class="flex flex-col gap-4" novalidate>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1">
+          <span class="text-ivory/80 text-sm font-display">First Name *</span>
+          <input
+            type="text"
+            name="firstName"
+            required
+            autocomplete="given-name"
+            class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+            placeholder="Hunter"
+          />
+        </label>
+
+        <label class="flex flex-col gap-1">
+          <span class="text-ivory/80 text-sm font-display">Last Name</span>
+          <input
+            type="text"
+            name="lastName"
+            autocomplete="family-name"
+            class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+            placeholder="Eastland"
+          />
+        </label>
+      </div>
+
       <label class="flex flex-col gap-1">
-        <span class="text-ivory/80 text-sm font-display">Email</span>
+        <span class="text-ivory/80 text-sm font-display">Email *</span>
         <input
           type="email"
           name="email"
@@ -63,7 +88,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </label>
 
       <label class="flex flex-col gap-1">
-        <span class="text-ivory/80 text-sm font-display">Password</span>
+        <span class="text-ivory/80 text-sm font-display">Password *</span>
         <input
           type="password"
           name="password"
@@ -76,7 +101,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </label>
 
       <label class="flex flex-col gap-1">
-        <span class="text-ivory/80 text-sm font-display">Confirm Password</span>
+        <span class="text-ivory/80 text-sm font-display">Confirm Password *</span>
         <input
           type="password"
           name="confirmPassword"
@@ -159,10 +184,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     btn.textContent = isLogin ? 'Signing in…' : 'Creating account…';
 
     try {
+      const payload: Record<string, unknown> = { email: data.email, password: data.password };
+
+      // Include name fields for registration
+      if (!isLogin) {
+        payload.firstName = data.firstName;
+        payload.lastName = data.lastName || '';
+      }
+
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email, password: data.password }),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
@@ -190,4 +223,4 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   loginForm.addEventListener('submit', (e) => handleSubmit(e, '/api/auth/login'));
   registerForm.addEventListener('submit', (e) => handleSubmit(e, '/api/auth/register'));
-</script>     
+</script>
