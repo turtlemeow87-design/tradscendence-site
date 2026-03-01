@@ -96,7 +96,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const hasUnsignedContract = !!sub.contract_id && !sub.contract_signed_at;
     const hasInvoices = invoices.length > 0;
-    const invoiceLabels = invoices.map((i: { label: string }) => i.label.toLowerCase()).join(" and ");
+    const invoiceLabels = invoices.map((i: any) => i.label.toLowerCase()).join(" and ");
     const invoicePlural = invoices.length > 1 ? "are" : "is";
 
     // ── Build context-aware email ────────────────────────
