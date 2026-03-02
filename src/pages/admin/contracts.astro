@@ -720,8 +720,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         clearMemoryForm();
       }
 
-      // Scroll form into view inside the drawer
-      wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll the drawer panel to the top so the form isn't clipped
+      const drawerPanel = document.getElementById('memoriesDrawer') as HTMLElement;
+      drawerPanel.scrollTop = 0;
     }
 
     function clearMemoryForm() {
