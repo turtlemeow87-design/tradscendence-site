@@ -378,7 +378,10 @@ function getStatusConfig(status: string) {
                                 </p>
                               </div>
                               <a
-                                href={`/api/invoices/${inv.id}/view`}
+                                href={inv.file_url}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 class="px-4 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood border border-gold/40 text-sm font-semibold frame transition"
                               >
                                 Download
@@ -584,7 +587,6 @@ function getStatusConfig(status: string) {
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Failed to submit review');
 
-          // Replace the form with a thank-you state inline
           formEl.innerHTML = `
             <div class="bg-gold/10 border border-gold/40 rounded-lg px-4 py-3">
               <p class="text-gold font-semibold mb-1">⏳ Review Pending Approval</p>
