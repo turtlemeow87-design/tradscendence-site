@@ -43,31 +43,300 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           </button>
         </div>
 
-        <!-- Submissions list -->
         <div id="submissionsList" class="space-y-10">
           <p class="text-ivory/60 text-center py-8">Loading submissions...</p>
-        </div>
-
-        <!-- ── Reviews Moderation ── -->
-        <div class="mt-16 pt-10 border-t-2 border-gold/30">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="font-display text-2xl text-gold">Client Reviews</h2>
-            <button
-              id="refreshReviewsBtn"
-              class="px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold frame transition text-sm"
-            >
-              Refresh
-            </button>
-          </div>
-          <div id="reviewsList" class="space-y-4">
-            <p class="text-ivory/60 text-center py-8">Loading reviews...</p>
-          </div>
         </div>
 
       </div>
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════
+       FLOATING DRAWER BUTTONS — stacked top-right after unlock
+  ════════════════════════════════════════════════════════ -->
+  <div id="drawerButtonStack" class="hidden fixed top-24 right-4 z-50 flex flex-col gap-2">
+
+    <!-- Reviews button -->
+    <button
+      id="reviewsDrawerBtn"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-charcoal/90 border border-gold/50 text-gold font-semibold font-display text-sm shadow-lg hover:bg-gold hover:text-ivory transition backdrop-blur-sm frame"
+      aria-label="Open reviews panel"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Reviews
+      <span
+        id="pendingBadge"
+        class="hidden px-1.5 py-0.5 rounded-full bg-rosewood text-ivory text-xs font-bold min-w-[1.25rem] text-center"
+      ></span>
+    </button>
+
+    <!-- Memories button -->
+    <button
+      id="memoriesDrawerBtn"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-charcoal/90 border border-gold/50 text-gold font-semibold font-display text-sm shadow-lg hover:bg-gold hover:text-ivory transition backdrop-blur-sm frame"
+      aria-label="Open memories panel"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+        <line x1="4" y1="22" x2="4" y2="15"/>
+      </svg>
+      Memories
+    </button>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       REVIEWS DRAWER
+  ════════════════════════════════════════════════════════ -->
+
+  <!-- Backdrop -->
+  <div
+    id="reviewsBackdrop"
+    class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Panel -->
+  <div
+    id="reviewsDrawer"
+    class="fixed top-0 right-0 h-full w-full max-w-md z-50 bg-charcoal border-l border-gold/30 shadow-2xl flex flex-col"
+    style="transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);"
+    aria-label="Client reviews panel"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="flex items-center justify-between px-6 py-5 border-b border-gold/20 shrink-0">
+      <div class="flex items-center gap-3">
+        <h2 class="font-display text-xl text-gold">Client Reviews</h2>
+        <span
+          id="drawerPendingCount"
+          class="hidden px-2 py-0.5 rounded-full bg-rosewood/20 text-rosewood border border-rosewood/40 text-xs font-semibold"
+        ></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          id="refreshReviewsBtn"
+          class="px-3 py-1.5 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-xs font-semibold transition"
+        >
+          Refresh
+        </button>
+        <button
+          id="closeReviewsDrawerBtn"
+          class="w-8 h-8 rounded-lg flex items-center justify-center text-ivory/60 hover:text-ivory hover:bg-white/10 transition"
+          aria-label="Close reviews panel"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-6 py-5">
+      <div id="reviewsList">
+        <p class="text-ivory/60 text-center py-8">Loading reviews...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MEMORIES DRAWER
+  ════════════════════════════════════════════════════════ -->
+
+  <!-- Backdrop -->
+  <div
+    id="memoriesBackdrop"
+    class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Panel -->
+  <div
+    id="memoriesDrawer"
+    class="fixed top-0 right-0 h-full w-full max-w-lg z-50 bg-charcoal border-l border-gold/30 shadow-2xl flex flex-col"
+    style="transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);"
+    aria-label="Memories panel"
+    role="dialog"
+    aria-modal="true"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-gold/20 shrink-0">
+      <h2 class="font-display text-xl text-gold">Memories</h2>
+      <div class="flex items-center gap-2">
+        <button
+          id="addMemoryBtn"
+          class="px-3 py-1.5 rounded-lg bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood text-xs font-semibold transition"
+        >
+          + Add New
+        </button>
+        <button
+          id="refreshMemoriesBtn"
+          class="px-3 py-1.5 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-xs font-semibold transition"
+        >
+          Refresh
+        </button>
+        <button
+          id="closeMemoriesDrawerBtn"
+          class="w-8 h-8 rounded-lg flex items-center justify-center text-ivory/60 hover:text-ivory hover:bg-white/10 transition"
+          aria-label="Close memories panel"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Collapsible form -->
+    <div id="memoryFormWrap" class="hidden border-b border-gold/20 px-6 py-5 shrink-0 overflow-y-auto" style="max-height: 60vh;">
+      <h3 id="memoryFormTitle" class="font-display text-gold text-base mb-4">New Memory</h3>
+
+      <!-- Hidden editing id -->
+      <input type="hidden" id="memoryEditingId" value="" />
+
+      <div class="space-y-3">
+
+        <!-- Title -->
+        <div>
+          <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">
+            Title <span class="text-rosewood">*</span>
+          </label>
+          <input
+            type="text"
+            id="memoryTitle"
+            placeholder="e.g. Palestinian-Style Wedding"
+            class="w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory"
+          />
+        </div>
+
+        <!-- Event Date + Location side by side -->
+        <div class="flex gap-3">
+          <div class="flex-1">
+            <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">Event Date</label>
+            <input
+              type="date"
+              id="memoryEventDate"
+              class="w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory"
+              style="color-scheme: dark;"
+            />
+          </div>
+          <div class="flex-1">
+            <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">Location</label>
+            <input
+              type="text"
+              id="memoryLocation"
+              placeholder="e.g. Wintergreen, VA"
+              class="w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory"
+            />
+          </div>
+        </div>
+
+        <!-- Reflection -->
+        <div>
+          <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">Reflection</label>
+          <textarea
+            id="memoryReflection"
+            rows="3"
+            placeholder="A short narrative about the performance..."
+            class="w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Video Path -->
+        <div>
+          <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">Video Path</label>
+          <input
+            type="text"
+            id="memoryVideoSrc"
+            placeholder="/media/PalestinianOud.mp4"
+            class="w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory"
+          />
+          <p class="text-ivory/30 text-xs mt-1">Path relative to /public — leave blank if none</p>
+        </div>
+
+        <!-- Photo Paths -->
+        <div>
+          <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">Photo Paths</label>
+          <textarea
+            id="memoryPhotoPaths"
+            rows="3"
+            placeholder="/media/photo1.jpg&#10;/media/photo2.jpg"
+            class="w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory font-mono resize-none"
+          ></textarea>
+          <p class="text-ivory/30 text-xs mt-1">One path per line — up to 4 shown on the page</p>
+        </div>
+
+        <!-- Link to Booking -->
+        <div>
+          <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">Link to Booking</label>
+          <select
+            id="memorySubmissionId"
+            class="w-full bg-charcoal frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory appearance-none"
+            style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23C2A45F%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center;"
+          >
+            <option value="">— None (predates booking system) —</option>
+          </select>
+          <p class="text-ivory/30 text-xs mt-1">Only Complete bookings shown — links client review to this entry</p>
+        </div>
+
+        <!-- Display Order + Visible -->
+        <div class="flex gap-3 items-end">
+          <div class="w-28">
+            <label class="block text-ivory/70 text-xs font-semibold mb-1 font-display uppercase tracking-wide">Display Order</label>
+            <input
+              type="number"
+              id="memoryDisplayOrder"
+              value="0"
+              min="0"
+              class="w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory"
+            />
+          </div>
+          <label class="flex items-center gap-2 pb-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              id="memoryVisible"
+              checked
+              class="w-4 h-4 accent-gold cursor-pointer"
+            />
+            <span class="text-ivory/70 text-sm">Visible on site</span>
+          </label>
+        </div>
+
+        <!-- Form error -->
+        <p id="memoryFormError" class="text-rosewood text-sm hidden"></p>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pt-1">
+          <button
+            id="saveMemoryBtn"
+            class="px-5 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition text-sm"
+          >
+            Save Memory
+          </button>
+          <button
+            id="cancelMemoryBtn"
+            class="px-4 py-2 rounded-xl border border-gold/40 text-gold hover:bg-gold/10 text-sm font-semibold transition"
+          >
+            Cancel
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Memories list (scrollable) -->
+    <div class="flex-1 overflow-y-auto px-6 py-5">
+      <div id="memoriesList">
+        <p class="text-ivory/60 text-center py-8">Loading memories...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════════════════════════ -->
   <script>
     const VALID_STATUSES = [
       "Pending",
@@ -92,7 +361,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     };
 
     let ADMIN_KEY = '';
+    let allSubmissions: any[] = [];
 
+    // ── Auth ─────────────────────────────────────────────
     document.getElementById('unlockBtn')?.addEventListener('click', () => {
       const input = document.getElementById('adminKeyInput') as HTMLInputElement;
       ADMIN_KEY = input.value;
@@ -103,15 +374,72 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       if (e.key === 'Enter') document.getElementById('unlockBtn')?.click();
     });
 
+    // ── Generic drawer helpers ────────────────────────────
+    function openDrawer(drawerId: string, backdropId: string) {
+      const drawer   = document.getElementById(drawerId)   as HTMLElement;
+      const backdrop = document.getElementById(backdropId) as HTMLElement;
+      if (!drawer || !backdrop) return;
+      backdrop.classList.remove('hidden');
+      drawer.style.transform = 'translateX(0)';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer(drawerId: string, backdropId: string) {
+      const drawer   = document.getElementById(drawerId)   as HTMLElement;
+      const backdrop = document.getElementById(backdropId) as HTMLElement;
+      if (!drawer || !backdrop) return;
+      drawer.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        backdrop.classList.add('hidden');
+        document.body.style.overflow = '';
+      }, 300);
+    }
+
+    function isDrawerOpen(drawerId: string) {
+      const drawer = document.getElementById(drawerId) as HTMLElement | null;
+      return drawer?.style.transform === 'translateX(0px)';
+    }
+
+    // Reviews drawer wiring
+    document.getElementById('reviewsDrawerBtn')?.addEventListener('click', () => {
+      openDrawer('reviewsDrawer', 'reviewsBackdrop');
+    });
+    document.getElementById('closeReviewsDrawerBtn')?.addEventListener('click', () => {
+      closeDrawer('reviewsDrawer', 'reviewsBackdrop');
+    });
+    document.getElementById('reviewsBackdrop')?.addEventListener('click', () => {
+      closeDrawer('reviewsDrawer', 'reviewsBackdrop');
+    });
+
+    // Memories drawer wiring
+    document.getElementById('memoriesDrawerBtn')?.addEventListener('click', () => {
+      openDrawer('memoriesDrawer', 'memoriesBackdrop');
+      loadMemories();
+      populateSubmissionDropdown();
+    });
+    document.getElementById('closeMemoriesDrawerBtn')?.addEventListener('click', () => {
+      closeDrawer('memoriesDrawer', 'memoriesBackdrop');
+    });
+    document.getElementById('memoriesBackdrop')?.addEventListener('click', () => {
+      closeDrawer('memoriesDrawer', 'memoriesBackdrop');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (isDrawerOpen('reviewsDrawer'))  closeDrawer('reviewsDrawer',  'reviewsBackdrop');
+      if (isDrawerOpen('memoriesDrawer')) closeDrawer('memoriesDrawer', 'memoriesBackdrop');
+    });
+
+    // ── Load all ──────────────────────────────────────────
     async function loadAll() {
       const authError = document.getElementById('authError');
-      const listEl = document.getElementById('submissionsList');
+      const listEl    = document.getElementById('submissionsList');
       if (!listEl) return;
 
       try {
         const [subRes, invRes] = await Promise.all([
           fetch('/api/admin/contracts/submissions', { headers: { 'x-admin-key': ADMIN_KEY } }),
-          fetch('/api/admin/invoices/list', { headers: { 'x-admin-key': ADMIN_KEY } }),
+          fetch('/api/admin/invoices/list',          { headers: { 'x-admin-key': ADMIN_KEY } }),
         ]);
 
         if (!subRes.ok) {
@@ -121,9 +449,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
         document.getElementById('authPanel')?.classList.add('hidden');
         document.getElementById('adminContent')?.classList.remove('hidden');
+        document.getElementById('drawerButtonStack')?.classList.remove('hidden');
 
         const { submissions } = await subRes.json();
-        const { invoices } = invRes.ok ? await invRes.json() : { invoices: [] };
+        const { invoices }    = invRes.ok ? await invRes.json() : { invoices: [] };
+
+        // Store submissions globally for memories dropdown
+        allSubmissions = submissions;
 
         const invoiceMap: Record<number, any[]> = {};
         for (const inv of invoices) {
@@ -139,11 +471,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
     }
 
-    // ── Load & render reviews ────────────────────────────
+    // ── Reviews ───────────────────────────────────────────
     async function loadReviews() {
       const reviewsEl = document.getElementById('reviewsList');
       if (!reviewsEl) return;
-
       reviewsEl.innerHTML = '<p class="text-ivory/60 text-center py-8">Loading reviews...</p>';
 
       try {
@@ -153,35 +484,44 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         if (!res.ok) throw new Error('Failed to load reviews');
         const { reviews } = await res.json();
         renderReviews(reviews);
-      } catch (err) {
+      } catch {
         reviewsEl.innerHTML = '<p class="text-rosewood text-center py-8">Failed to load reviews</p>';
       }
     }
 
     function renderReviews(reviews: any[]) {
-      const reviewsEl = document.getElementById('reviewsList');
+      const reviewsEl   = document.getElementById('reviewsList');
+      const badge       = document.getElementById('pendingBadge');
+      const drawerCount = document.getElementById('drawerPendingCount');
       if (!reviewsEl) return;
 
+      const pending  = reviews.filter(r => !r.approved);
+      const approved = reviews.filter(r =>  r.approved);
+
+      if (pending.length > 0) {
+        badge?.classList.remove('hidden');
+        if (badge) badge.textContent = String(pending.length);
+        drawerCount?.classList.remove('hidden');
+        if (drawerCount) drawerCount.textContent = `${pending.length} pending`;
+      } else {
+        badge?.classList.add('hidden');
+        drawerCount?.classList.add('hidden');
+      }
+
       if (reviews.length === 0) {
-        reviewsEl.innerHTML = '<p class="text-ivory/60 text-center py-8">No reviews yet</p>';
+        reviewsEl.innerHTML = '<p class="text-ivory/60 text-center py-12">No reviews yet</p>';
         return;
       }
 
-      const pending = reviews.filter(r => !r.approved);
-      const approved = reviews.filter(r => r.approved);
-
       let html = '';
-
       if (pending.length > 0) {
-        html += `<h3 class="font-display text-gold text-lg mb-3">Pending Approval (${pending.length})</h3>`;
+        html += `<h3 class="font-display text-gold text-sm mb-3 uppercase tracking-wide">Pending (${pending.length})</h3>`;
         html += pending.map(r => reviewCard(r)).join('');
       }
-
       if (approved.length > 0) {
-        html += `<h3 class="font-display text-ivory/60 text-lg mb-3 mt-8">Published (${approved.length})</h3>`;
+        html += `<h3 class="font-display text-ivory/40 text-sm mb-3 mt-8 uppercase tracking-wide">Published (${approved.length})</h3>`;
         html += approved.map(r => reviewCard(r)).join('');
       }
-
       reviewsEl.innerHTML = html;
 
       reviewsEl.querySelectorAll('.approve-review-btn').forEach(btn => {
@@ -196,80 +536,314 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       const date = new Date(r.created_at).toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
       });
-
       return `
-        <div
-          class="rounded-xl p-5 border ${r.approved ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-gold/40 bg-gold/5'} mb-4"
-          data-review-id="${r.id}"
-        >
-          <div class="flex items-start justify-between gap-4 mb-3">
+        <div class="rounded-xl p-4 border mb-3 ${r.approved
+          ? 'border-emerald-500/20 bg-emerald-500/5'
+          : 'border-gold/30 bg-gold/5'}" data-review-id="${r.id}">
+          <div class="flex items-start justify-between gap-3 mb-2">
             <div>
-              <p class="font-display text-gold">${r.reviewer_name}</p>
-              ${r.submission_location ? `<p class="text-ivory/50 text-xs">${r.submission_location}</p>` : ''}
-              <p class="text-ivory/40 text-xs">${date}</p>
+              <p class="font-display text-gold text-sm">${r.reviewer_name}</p>
+              ${r.submission_location ? `<p class="text-ivory/40 text-xs">${r.submission_location}</p>` : ''}
+              <p class="text-ivory/30 text-xs">${date}</p>
             </div>
-            <span class="px-2 py-0.5 rounded-full text-xs font-semibold border ${r.approved
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold border shrink-0 ${r.approved
               ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
               : 'bg-gold/20 text-gold border-gold/40'}">
               ${r.approved ? '✓ Published' : '⏳ Pending'}
             </span>
           </div>
-
-          <p class="text-ivory/80 text-sm leading-relaxed mb-4 italic">"${r.body}"</p>
-
-          <div class="flex gap-3">
-            ${!r.approved ? `
-              <button
-                class="approve-review-btn px-4 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-ivory border border-emerald-500/40 text-sm font-semibold transition"
-                data-review-id="${r.id}"
-              >
-                Approve
-              </button>
-            ` : `
-              <button
-                class="reject-review-btn px-4 py-1.5 rounded-lg bg-rosewood/20 text-rosewood hover:bg-rosewood hover:text-ivory border border-rosewood/40 text-sm font-semibold transition"
-                data-review-id="${r.id}"
-              >
-                Unpublish
-              </button>
-            `}
-          </div>
+          <p class="text-ivory/70 text-sm leading-relaxed mb-3 italic">"${r.body}"</p>
+          ${!r.approved
+            ? `<button class="approve-review-btn px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-ivory border border-emerald-500/40 text-xs font-semibold transition" data-review-id="${r.id}">Approve</button>`
+            : `<button class="reject-review-btn px-3 py-1.5 rounded-lg bg-rosewood/20 text-rosewood hover:bg-rosewood hover:text-ivory border border-rosewood/40 text-xs font-semibold transition" data-review-id="${r.id}">Unpublish</button>`
+          }
         </div>
       `;
     }
 
     async function handleReviewAction(btn: HTMLButtonElement, approved: boolean) {
       const reviewId = Number(btn.dataset.reviewId);
-      const action = approved ? 'approve' : 'unpublish';
-
       if (!confirm(`${approved ? 'Approve' : 'Unpublish'} this review?`)) return;
-
       btn.disabled = true;
       btn.textContent = approved ? 'Approving...' : 'Unpublishing...';
-
       try {
         const res = await fetch('/api/admin/reviews/approve', {
           method: 'PATCH',
           headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ review_id: reviewId, approved }),
         });
-
         if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || `Failed to ${action} review`);
-
+        if (!res.ok) throw new Error(data.error || 'Failed to update review');
         loadReviews();
       } catch (err: any) {
-        alert(err.message || `Failed to ${action} review`);
+        alert(err.message || 'Failed to update review');
         btn.disabled = false;
         btn.textContent = approved ? 'Approve' : 'Unpublish';
       }
     }
 
+    // ── Memories ──────────────────────────────────────────
+    async function loadMemories() {
+      const listEl = document.getElementById('memoriesList');
+      if (!listEl) return;
+      listEl.innerHTML = '<p class="text-ivory/60 text-center py-8">Loading memories...</p>';
+      try {
+        const res = await fetch('/api/admin/memories/list', {
+          headers: { 'x-admin-key': ADMIN_KEY },
+        });
+        if (res.status === 401) throw new Error('unauthorized');
+        if (!res.ok) throw new Error('Failed to load memories');
+        const { memories } = await res.json();
+        renderMemories(memories);
+      } catch {
+        listEl.innerHTML = '<p class="text-rosewood text-center py-8">Failed to load memories</p>';
+      }
+    }
+
+    function renderMemories(memories: any[]) {
+      const listEl = document.getElementById('memoriesList');
+      if (!listEl) return;
+
+      if (memories.length === 0) {
+        listEl.innerHTML = '<p class="text-ivory/60 text-center py-12">No memory entries yet</p>';
+        return;
+      }
+
+      listEl.innerHTML = memories.map(m => {
+        const dateStr = m.event_date
+          ? new Date(m.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+          : '';
+        const photoCount = Array.isArray(m.photo_urls) ? m.photo_urls.length : 0;
+        return `
+          <div class="rounded-xl p-4 border mb-3 ${m.visible
+            ? 'border-gold/25 bg-gold/5'
+            : 'border-white/10 bg-white/3 opacity-50'}"
+            data-memory-id="${m.id}">
+            <div class="flex items-start justify-between gap-3 mb-1">
+              <div class="flex-1 min-w-0">
+                <p class="font-display text-gold text-sm leading-snug">${m.title}</p>
+                ${(dateStr || m.location) ? `
+                  <p class="text-ivory/50 text-xs mt-0.5">
+                    ${[dateStr, m.location].filter(Boolean).join(' · ')}
+                  </p>
+                ` : ''}
+                ${m.linked_submission_label ? `
+                  <p class="text-cyan-400/70 text-xs mt-0.5 truncate">↗ ${m.linked_submission_label}</p>
+                ` : ''}
+                <p class="text-ivory/30 text-xs mt-0.5">
+                  ${[
+                    m.video_src           ? '▶ video'           : '',
+                    photoCount > 0        ? `${photoCount} photo${photoCount > 1 ? 's' : ''}` : '',
+                    !m.visible            ? '🔒 hidden'          : '',
+                  ].filter(Boolean).join(' · ')}
+                </p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-xs border shrink-0 ${m.visible
+                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                : 'bg-white/5 text-ivory/30 border-white/10'}">
+                ${m.visible ? 'Visible' : 'Hidden'}
+              </span>
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button
+                class="edit-memory-btn px-3 py-1.5 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-xs font-semibold transition"
+                data-memory-id="${m.id}"
+              >Edit</button>
+              <button
+                class="delete-memory-btn px-3 py-1.5 rounded-lg bg-rosewood/20 text-rosewood hover:bg-rosewood hover:text-ivory border border-rosewood/40 text-xs font-semibold transition"
+                data-memory-id="${m.id}"
+                data-title="${m.title.replace(/"/g, '&quot;')}"
+              >Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Wire edit buttons
+      listEl.querySelectorAll('.edit-memory-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const memId = Number((btn as HTMLButtonElement).dataset.memoryId);
+          const mem   = memories.find(m => m.id === memId);
+          if (mem) openMemoryForm(mem);
+        });
+      });
+
+      // Wire delete buttons
+      listEl.querySelectorAll('.delete-memory-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleMemoryDelete(btn as HTMLButtonElement));
+      });
+    }
+
+    function populateSubmissionDropdown() {
+      const sel = document.getElementById('memorySubmissionId') as HTMLSelectElement | null;
+      if (!sel) return;
+
+      // Keep the "None" option, rebuild the rest
+      while (sel.options.length > 1) sel.remove(1);
+
+      const complete = allSubmissions.filter(s => s.status === 'Complete');
+      for (const s of complete) {
+        const label = [
+          s.name || `${s.first_name ?? ''} ${s.last_name ?? ''}`.trim(),
+          s.event_date ? new Date(s.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+          s.location || '',
+        ].filter(Boolean).join(' · ');
+
+        const opt = document.createElement('option');
+        opt.value       = String(s.id);
+        opt.textContent = label;
+        opt.className   = 'bg-[#111] text-ivory';
+        sel.appendChild(opt);
+      }
+    }
+
+    function openMemoryForm(mem?: any) {
+      const wrap  = document.getElementById('memoryFormWrap') as HTMLElement;
+      const title = document.getElementById('memoryFormTitle') as HTMLElement;
+      wrap.classList.remove('hidden');
+
+      if (mem) {
+        title.textContent = 'Edit Memory';
+        (document.getElementById('memoryEditingId')     as HTMLInputElement).value   = String(mem.id);
+        (document.getElementById('memoryTitle')         as HTMLInputElement).value   = mem.title         || '';
+        (document.getElementById('memoryEventDate')     as HTMLInputElement).value   = mem.event_date ? mem.event_date.slice(0, 10) : '';
+        (document.getElementById('memoryLocation')      as HTMLInputElement).value   = mem.location      || '';
+        (document.getElementById('memoryReflection')    as HTMLTextAreaElement).value= mem.reflection    || '';
+        (document.getElementById('memoryVideoSrc')      as HTMLInputElement).value   = mem.video_src     || '';
+        (document.getElementById('memoryPhotoPaths')    as HTMLTextAreaElement).value= Array.isArray(mem.photo_urls) ? mem.photo_urls.join('\n') : '';
+        (document.getElementById('memoryDisplayOrder')  as HTMLInputElement).value   = String(mem.display_order ?? 0);
+        (document.getElementById('memoryVisible')       as HTMLInputElement).checked = mem.visible !== false;
+        (document.getElementById('memorySubmissionId')  as HTMLSelectElement).value  = mem.submission_id ? String(mem.submission_id) : '';
+      } else {
+        title.textContent = 'New Memory';
+        clearMemoryForm();
+      }
+
+      // Scroll form into view inside the drawer
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function clearMemoryForm() {
+      (document.getElementById('memoryEditingId')    as HTMLInputElement).value    = '';
+      (document.getElementById('memoryTitle')        as HTMLInputElement).value    = '';
+      (document.getElementById('memoryEventDate')    as HTMLInputElement).value    = '';
+      (document.getElementById('memoryLocation')     as HTMLInputElement).value    = '';
+      (document.getElementById('memoryReflection')   as HTMLTextAreaElement).value = '';
+      (document.getElementById('memoryVideoSrc')     as HTMLInputElement).value    = '';
+      (document.getElementById('memoryPhotoPaths')   as HTMLTextAreaElement).value = '';
+      (document.getElementById('memoryDisplayOrder') as HTMLInputElement).value    = '0';
+      (document.getElementById('memoryVisible')      as HTMLInputElement).checked  = true;
+      (document.getElementById('memorySubmissionId') as HTMLSelectElement).value   = '';
+      const errEl = document.getElementById('memoryFormError') as HTMLElement;
+      errEl.classList.add('hidden');
+      errEl.textContent = '';
+    }
+
+    async function handleMemorySave() {
+      const btn       = document.getElementById('saveMemoryBtn')    as HTMLButtonElement;
+      const errEl     = document.getElementById('memoryFormError')  as HTMLElement;
+      const editingId = (document.getElementById('memoryEditingId') as HTMLInputElement).value.trim();
+
+      const title = (document.getElementById('memoryTitle') as HTMLInputElement).value.trim();
+      if (!title) {
+        errEl.textContent = 'Title is required';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      const payload: Record<string, unknown> = {
+        title,
+        event_date:    (document.getElementById('memoryEventDate')   as HTMLInputElement).value    || null,
+        location:      (document.getElementById('memoryLocation')    as HTMLInputElement).value.trim()    || null,
+        reflection:    (document.getElementById('memoryReflection')  as HTMLTextAreaElement).value.trim() || null,
+        video_src:     (document.getElementById('memoryVideoSrc')    as HTMLInputElement).value.trim()    || null,
+        photo_urls:    (document.getElementById('memoryPhotoPaths')  as HTMLTextAreaElement).value,
+        display_order: Number((document.getElementById('memoryDisplayOrder') as HTMLInputElement).value),
+        visible:       (document.getElementById('memoryVisible')     as HTMLInputElement).checked,
+        submission_id: (document.getElementById('memorySubmissionId') as HTMLSelectElement).value || null,
+      };
+
+      if (editingId) payload.id = Number(editingId);
+
+      try {
+        const res = await fetch('/api/admin/memories/save', {
+          method: 'POST',
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save');
+
+        // Collapse form and reload list
+        const wrap = document.getElementById('memoryFormWrap') as HTMLElement;
+        wrap.classList.add('hidden');
+        clearMemoryForm();
+        loadMemories();
+      } catch (err: any) {
+        errEl.textContent = err.message || 'Failed to save';
+        errEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Memory';
+      }
+    }
+
+    async function handleMemoryDelete(btn: HTMLButtonElement) {
+      const memoryId = Number(btn.dataset.memoryId);
+      const memTitle = btn.dataset.title || 'this memory';
+
+      if (!confirm(`Delete "${memTitle}"?\n\nThis will permanently remove the entry from the Memories page.`)) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+
+      try {
+        const res = await fetch('/api/admin/memories/delete', {
+          method: 'DELETE',
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ memory_id: memoryId }),
+        });
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete');
+
+        // Fade out card
+        const card = btn.closest('[data-memory-id]') as HTMLElement;
+        if (card) {
+          card.style.transition = 'opacity 0.3s ease';
+          card.style.opacity = '0';
+          setTimeout(() => card.remove(), 300);
+        }
+      } catch (err: any) {
+        alert(err.message || 'Failed to delete');
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+      }
+    }
+
+    // Memories form button wiring
+    document.getElementById('addMemoryBtn')?.addEventListener('click', () => {
+      populateSubmissionDropdown();
+      openMemoryForm();
+    });
+    document.getElementById('cancelMemoryBtn')?.addEventListener('click', () => {
+      const wrap = document.getElementById('memoryFormWrap') as HTMLElement;
+      wrap.classList.add('hidden');
+      clearMemoryForm();
+    });
+    document.getElementById('saveMemoryBtn')?.addEventListener('click', handleMemorySave);
+    document.getElementById('refreshMemoriesBtn')?.addEventListener('click', loadMemories);
+
+    // ── Submissions / documents ───────────────────────────
     function formatRemindedAt(isoString: string | null): string {
       if (!isoString) return '';
-      const d = new Date(isoString);
-      return d.toLocaleString('en-US', {
+      return new Date(isoString).toLocaleString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
         hour: 'numeric', minute: '2-digit', hour12: true,
       });
@@ -285,10 +859,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
 
       listEl.innerHTML = submissions.map(sub => {
-        const invoices = invoiceMap[sub.id] || [];
+        const invoices     = invoiceMap[sub.id] || [];
         const currentStatus = sub.status || 'Pending';
-        const badgeClass = STATUS_STYLES[currentStatus] || STATUS_STYLES['Pending'];
-        const remindedAt = formatRemindedAt(sub.last_reminded_at);
+        const badgeClass   = STATUS_STYLES[currentStatus] || STATUS_STYLES['Pending'];
+        const remindedAt   = formatRemindedAt(sub.last_reminded_at);
 
         return `
         <article
@@ -298,7 +872,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             : 'background: rgba(17,17,17,0.85); border: 2px solid #C2A45F;'}"
           data-submission-id="${sub.id}">
 
-          <!-- Header row -->
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
               <h3 class="font-display text-xl text-gold">${sub.name}${sub.preferred_name ? ` <span class="text-ivory/50 text-sm font-sans">(Preferred: ${sub.preferred_name})</span>` : ''}</h3>
@@ -319,42 +892,34 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 class="delete-submission-btn px-3 py-1 rounded-lg border border-rosewood/60 text-rosewood hover:bg-rosewood hover:text-ivory text-sm font-semibold transition"
                 data-submission-id="${sub.id}"
                 data-name="${sub.name}"
-              >
-                Delete
-              </button>
+              >Delete</button>
             </div>
           </div>
 
-          ${sub.location ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Location:</span> ${sub.location}</p>` : ''}
+          ${sub.location   ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Location:</span> ${sub.location}</p>` : ''}
           ${sub.instruments?.length ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Instruments:</span> ${sub.instruments.join(', ')}</p>` : ''}
 
-          <!-- Status Control -->
+          <!-- Status -->
           <div class="mt-4 pt-4 border-t border-gold/20">
             <h4 class="font-display text-gold mb-3 text-sm uppercase tracking-wide">Booking Status</h4>
             <div class="flex items-center gap-3 flex-wrap">
-              <div class="relative">
-                <select
-                  class="status-select bg-charcoal frame rounded-xl px-3 py-2 border border-gold/40 text-ivory text-sm focus:outline-none focus:border-gold appearance-none pr-8"
-                  data-submission-id="${sub.id}"
-                  data-current-status="${currentStatus}"
-                  style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23C2A45F%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center;"
-                >
-                  ${VALID_STATUSES.map(s => `
-                    <option value="${s}" ${s === currentStatus ? 'selected' : ''} class="bg-[#111] text-ivory">${s}</option>
-                  `).join('')}
-                </select>
-              </div>
-              <button
-                class="save-status-btn px-4 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood text-sm font-semibold frame transition"
+              <select
+                class="status-select bg-charcoal frame rounded-xl px-3 py-2 border border-gold/40 text-ivory text-sm focus:outline-none focus:border-gold appearance-none pr-8"
                 data-submission-id="${sub.id}"
+                style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23C2A45F%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center;"
               >
+                ${VALID_STATUSES.map(s => `
+                  <option value="${s}" ${s === currentStatus ? 'selected' : ''} class="bg-[#111] text-ivory">${s}</option>
+                `).join('')}
+              </select>
+              <button class="save-status-btn px-4 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood text-sm font-semibold frame transition" data-submission-id="${sub.id}">
                 Save Status
               </button>
               <span class="status-feedback text-sm hidden"></span>
             </div>
           </div>
 
-          <!-- Reminder Control -->
+          <!-- Reminder -->
           <div class="mt-4 pt-4 border-t border-gold/20">
             <h4 class="font-display text-gold mb-3 text-sm uppercase tracking-wide">Client Reminder</h4>
             <div class="flex items-center gap-3 flex-wrap">
@@ -362,14 +927,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 class="send-reminder-btn px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold frame transition"
                 data-submission-id="${sub.id}"
                 data-email="${sub.email}"
-              >
-                Send Reminder
-              </button>
+              >Send Reminder</button>
               <span class="remind-timestamp text-ivory/40 text-xs italic">${remindedAt ? `Last sent: ${remindedAt}` : 'Never sent'}</span>
             </div>
           </div>
 
-          <!-- Contract Section -->
+          <!-- Contract -->
           <div class="mt-6 pt-6 border-t border-gold/20">
             <h4 class="font-display text-gold mb-3">Contract</h4>
             ${sub.contract ? `
@@ -382,12 +945,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     : '<p class="text-gold text-sm mt-1">Awaiting client signature</p>'}
                 </div>
                 <div class="flex gap-2">
-                  <a
-                    href="${sub.contract.file_url}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold transition"
-                  >
+                  <a href="${sub.contract.file_url}" target="_blank" rel="noopener noreferrer"
+                    class="px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold transition">
                     View PDF
                   </a>
                   <button
@@ -396,24 +955,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     data-submission-id="${sub.id}"
                     data-signed="${sub.contract.signed_at ? 'true' : 'false'}"
                     data-signer="${sub.contract.signature_name || ''}"
-                  >
-                    Delete
-                  </button>
+                  >Delete</button>
                 </div>
               </div>
             ` : `
               <form class="upload-contract-form space-y-3" data-submission-id="${sub.id}">
-                <input
-                  type="file"
-                  name="file"
-                  accept=".pdf"
-                  required
-                  class="w-full text-ivory/80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-gold/20 file:text-gold hover:file:bg-gold hover:file:text-ivory file:cursor-pointer file:font-semibold"
-                />
-                <button
-                  type="submit"
-                  class="px-6 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
-                >
+                <input type="file" name="file" accept=".pdf" required
+                  class="w-full text-ivory/80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-gold/20 file:text-gold hover:file:bg-gold hover:file:text-ivory file:cursor-pointer file:font-semibold" />
+                <button type="submit" class="px-6 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition">
                   Upload Contract
                 </button>
                 <p class="error-message text-rosewood text-sm hidden"></p>
@@ -421,33 +970,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             `}
           </div>
 
-          <!-- Invoice Section -->
+          <!-- Invoices -->
           <div class="mt-6 pt-6 border-t border-gold/20">
             <h4 class="font-display text-gold mb-3">Invoices & Receipts</h4>
-
             ${invoices.length > 0 ? `
               <div class="space-y-2 mb-4">
-                ${invoices.map(inv => `
+                ${invoices.map((inv: any) => `
                   <div class="flex items-center justify-between bg-charcoal/60 rounded-lg px-4 py-3 border border-gold/20">
                     <div>
                       <p class="text-ivory/90 font-semibold text-sm">${inv.label}</p>
                       <p class="text-ivory/50 text-xs">Uploaded: ${new Date(inv.uploaded_at).toLocaleDateString()}</p>
                     </div>
                     <div class="flex gap-2">
-                      <a
-                        href="${inv.file_url}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="px-3 py-1 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold transition"
-                      >
+                      <a href="${inv.file_url}" target="_blank" rel="noopener noreferrer"
+                        class="px-3 py-1 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold transition">
                         View PDF
                       </a>
                       <button
                         class="delete-invoice-btn px-3 py-1 rounded-lg border border-rosewood/60 text-rosewood hover:bg-rosewood hover:text-ivory text-sm font-semibold transition"
-                        data-invoice-id="${inv.id}"
-                        data-label="${inv.label}"
-                        data-submission-id="${sub.id}"
-                      >
+                        data-invoice-id="${inv.id}" data-label="${inv.label}" data-submission-id="${sub.id}">
                         Delete
                       </button>
                     </div>
@@ -455,73 +996,45 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 `).join('')}
               </div>
             ` : ''}
-
             <form class="upload-invoice-form space-y-3" data-submission-id="${sub.id}">
               <div class="flex gap-3">
-                <select
-                  name="label"
-                  class="bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory"
-                >
+                <select name="label" class="bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory">
                   <option value="Invoice">Invoice</option>
                   <option value="Receipt">Receipt</option>
                   <option value="Quote">Quote</option>
                 </select>
-                <input
-                  type="file"
-                  name="file"
-                  accept=".pdf"
-                  required
-                  class="flex-1 text-ivory/80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-gold/20 file:text-gold hover:file:bg-gold hover:file:text-ivory file:cursor-pointer file:font-semibold"
-                />
+                <input type="file" name="file" accept=".pdf" required
+                  class="flex-1 text-ivory/80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-gold/20 file:text-gold hover:file:bg-gold hover:file:text-ivory file:cursor-pointer file:font-semibold" />
               </div>
-              <button
-                type="submit"
-                class="px-6 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
-              >
+              <button type="submit" class="px-6 py-2 rounded-xl bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition">
                 Upload Document
               </button>
               <p class="error-message text-rosewood text-sm hidden"></p>
             </form>
           </div>
         </article>
-      `}).join('');
+        `;
+      }).join('');
 
-      // Attach all event handlers
-      document.querySelectorAll('.upload-contract-form').forEach(form => {
-        form.addEventListener('submit', handleContractUpload);
-      });
-      document.querySelectorAll('.upload-invoice-form').forEach(form => {
-        form.addEventListener('submit', handleInvoiceUpload);
-      });
-      document.querySelectorAll('.save-status-btn').forEach(btn => {
-        btn.addEventListener('click', handleStatusSave);
-      });
-      document.querySelectorAll('.delete-submission-btn').forEach(btn => {
-        btn.addEventListener('click', handleDeleteSubmission);
-      });
-      document.querySelectorAll('.delete-contract-btn').forEach(btn => {
-        btn.addEventListener('click', handleContractDelete);
-      });
-      document.querySelectorAll('.delete-invoice-btn').forEach(btn => {
-        btn.addEventListener('click', handleInvoiceDelete);
-      });
-      document.querySelectorAll('.send-reminder-btn').forEach(btn => {
-        btn.addEventListener('click', handleSendReminder);
-      });
+      document.querySelectorAll('.upload-contract-form').forEach(f  => f.addEventListener('submit', handleContractUpload));
+      document.querySelectorAll('.upload-invoice-form').forEach(f   => f.addEventListener('submit', handleInvoiceUpload));
+      document.querySelectorAll('.save-status-btn').forEach(b       => b.addEventListener('click',  handleStatusSave));
+      document.querySelectorAll('.delete-submission-btn').forEach(b => b.addEventListener('click',  handleDeleteSubmission));
+      document.querySelectorAll('.delete-contract-btn').forEach(b   => b.addEventListener('click',  handleContractDelete));
+      document.querySelectorAll('.delete-invoice-btn').forEach(b    => b.addEventListener('click',  handleInvoiceDelete));
+      document.querySelectorAll('.send-reminder-btn').forEach(b     => b.addEventListener('click',  handleSendReminder));
     }
 
-    // ── Status save ──────────────────────────────────────
     async function handleStatusSave(e: Event) {
-      const btn = e.currentTarget as HTMLButtonElement;
+      const btn          = e.currentTarget as HTMLButtonElement;
       const submissionId = Number(btn.dataset.submissionId);
-      const article = btn.closest('article') as HTMLElement;
-      const select = article.querySelector('.status-select') as HTMLSelectElement;
-      const feedback = article.querySelector('.status-feedback') as HTMLElement;
-      const newStatus = select.value;
+      const article      = btn.closest('article') as HTMLElement;
+      const select       = article.querySelector('.status-select')   as HTMLSelectElement;
+      const feedback     = article.querySelector('.status-feedback') as HTMLElement;
+      const newStatus    = select.value;
 
-      btn.disabled = true;
+      btn.disabled    = true;
       btn.textContent = 'Saving...';
-      feedback.classList.add('hidden');
 
       try {
         const res = await fetch('/api/admin/status/update', {
@@ -529,51 +1042,37 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ submission_id: submissionId, status: newStatus }),
         });
-
         if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to update status');
+        if (!res.ok) throw new Error(data.error || 'Failed');
 
         const badge = article.querySelector('.status-badge') as HTMLElement;
-        const STATUS_STYLES: Record<string, string> = {
-          "Pending":          "bg-gold/20 text-gold border-gold/40",
-          "Reviewing":        "bg-blue-500/20 text-blue-400 border-blue-500/40",
-          "Contract Sent":    "bg-purple-500/20 text-purple-400 border-purple-500/40",
-          "Contract Signed":  "bg-cyan-500/20 text-cyan-400 border-cyan-500/40",
-          "Invoice Sent":     "bg-orange-500/20 text-orange-400 border-orange-500/40",
-          "Payment Received": "bg-green-500/20 text-green-400 border-green-500/40",
-          "Complete":         "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
-          "Declined":         "bg-rosewood/20 text-rosewood border-rosewood/40",
-        };
         badge.className = `status-badge px-3 py-1 rounded-lg border text-sm font-semibold ${STATUS_STYLES[newStatus] || STATUS_STYLES['Pending']}`;
         badge.textContent = newStatus;
-        select.dataset.currentStatus = newStatus;
 
         feedback.textContent = '✓ Saved';
-        feedback.className = 'status-feedback text-green-400 text-sm';
+        feedback.className   = 'status-feedback text-green-400 text-sm';
         feedback.classList.remove('hidden');
         setTimeout(() => feedback.classList.add('hidden'), 2500);
       } catch (err: any) {
-        feedback.textContent = err.message || 'Failed to save';
-        feedback.className = 'status-feedback text-rosewood text-sm';
+        feedback.textContent = err.message || 'Failed';
+        feedback.className   = 'status-feedback text-rosewood text-sm';
         feedback.classList.remove('hidden');
       } finally {
-        btn.disabled = false;
+        btn.disabled    = false;
         btn.textContent = 'Save Status';
       }
     }
 
-    // ── Send reminder ────────────────────────────────────
     async function handleSendReminder(e: Event) {
-      const btn = e.currentTarget as HTMLButtonElement;
+      const btn          = e.currentTarget as HTMLButtonElement;
       const submissionId = Number(btn.dataset.submissionId);
-      const email = btn.dataset.email || 'this client';
-      const article = btn.closest('article') as HTMLElement;
-      const timestampEl = article.querySelector('.remind-timestamp') as HTMLElement;
+      const email        = btn.dataset.email || 'this client';
+      const article      = btn.closest('article') as HTMLElement;
+      const timestampEl  = article.querySelector('.remind-timestamp') as HTMLElement;
 
       if (!confirm(`Send a reminder email to ${email}?`)) return;
-
-      btn.disabled = true;
+      btn.disabled    = true;
       btn.textContent = 'Sending...';
 
       try {
@@ -582,41 +1081,30 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ submission_id: submissionId }),
         });
-
         if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to send reminder');
+        if (!res.ok) throw new Error(data.error || 'Failed');
 
         if (data.lastRemindedAt && timestampEl) {
           const d = new Date(data.lastRemindedAt);
-          const formatted = d.toLocaleString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true,
-          });
-          timestampEl.textContent = `Last sent: ${formatted}`;
+          timestampEl.textContent = `Last sent: ${d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}`;
         }
-
         btn.textContent = '✓ Sent';
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.textContent = 'Send Reminder';
-        }, 2500);
+        setTimeout(() => { btn.disabled = false; btn.textContent = 'Send Reminder'; }, 2500);
       } catch (err: any) {
-        alert(err.message || 'Failed to send reminder');
-        btn.disabled = false;
+        alert(err.message || 'Failed');
+        btn.disabled    = false;
         btn.textContent = 'Send Reminder';
       }
     }
 
-    // ── Delete submission ────────────────────────────────
     async function handleDeleteSubmission(e: Event) {
-      const btn = e.currentTarget as HTMLButtonElement;
+      const btn          = e.currentTarget as HTMLButtonElement;
       const submissionId = Number(btn.dataset.submissionId);
-      const name = btn.dataset.name || 'this submission';
+      const name         = btn.dataset.name || 'this submission';
 
-      if (!confirm(`Delete "${name}"?\n\nThis will permanently remove the inquiry and all associated contracts and invoices. This cannot be undone.`)) return;
-
-      btn.disabled = true;
+      if (!confirm(`Delete "${name}"?\n\nThis will permanently remove the inquiry and all associated contracts and invoices.`)) return;
+      btn.disabled    = true;
       btn.textContent = 'Deleting...';
 
       try {
@@ -625,36 +1113,31 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ submission_id: submissionId }),
         });
-
         if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to delete');
+        if (!res.ok) throw new Error(data.error || 'Failed');
 
         const article = btn.closest('article') as HTMLElement;
         article.style.transition = 'opacity 0.3s ease';
-        article.style.opacity = '0';
+        article.style.opacity    = '0';
         setTimeout(() => article.remove(), 300);
       } catch (err: any) {
-        alert(err.message || 'Failed to delete submission');
-        btn.disabled = false;
+        alert(err.message || 'Failed');
+        btn.disabled    = false;
         btn.textContent = 'Delete';
       }
     }
 
-    // ── Contract delete ──────────────────────────────────
     async function handleContractDelete(e: Event) {
-      const btn = e.currentTarget as HTMLButtonElement;
+      const btn        = e.currentTarget as HTMLButtonElement;
       const contractId = Number(btn.dataset.contractId);
-      const isSigned = btn.dataset.signed === 'true';
+      const isSigned   = btn.dataset.signed === 'true';
       const signerName = btn.dataset.signer;
 
-      if (!confirm('Delete this contract?\n\nThis will remove the PDF from storage and clear the contract from the client\'s dashboard.')) return;
+      if (!confirm('Delete this contract? This will remove the PDF from storage.')) return;
+      if (isSigned && !confirm(`⚠️ Signed by "${signerName}". This destroys the audit trail. Are you absolutely sure?`)) return;
 
-      if (isSigned) {
-        if (!confirm(`⚠️ This contract was digitally signed by "${signerName}".\n\nDeleting it will permanently destroy the signed record and the database audit trail.\n\nAre you absolutely sure you want to delete a signed contract?`)) return;
-      }
-
-      btn.disabled = true;
+      btn.disabled    = true;
       btn.textContent = 'Deleting...';
 
       try {
@@ -663,28 +1146,24 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ contract_id: contractId }),
         });
-
         if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to delete contract');
-
+        if (!res.ok) throw new Error(data.error || 'Failed');
         loadAll();
       } catch (err: any) {
-        alert(err.message || 'Failed to delete contract');
-        btn.disabled = false;
+        alert(err.message || 'Failed');
+        btn.disabled    = false;
         btn.textContent = 'Delete';
       }
     }
 
-    // ── Invoice delete ───────────────────────────────────
     async function handleInvoiceDelete(e: Event) {
-      const btn = e.currentTarget as HTMLButtonElement;
+      const btn       = e.currentTarget as HTMLButtonElement;
       const invoiceId = Number(btn.dataset.invoiceId);
-      const label = btn.dataset.label || 'this document';
+      const label     = btn.dataset.label || 'this document';
 
-      if (!confirm(`Delete "${label}"?\n\nThis will remove the PDF from storage and the client will no longer see it in their dashboard.`)) return;
-
-      btn.disabled = true;
+      if (!confirm(`Delete "${label}"? The client will no longer see it.`)) return;
+      btn.disabled    = true;
       btn.textContent = 'Deleting...';
 
       try {
@@ -693,44 +1172,32 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
           body: JSON.stringify({ invoice_id: invoiceId }),
         });
-
         if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to delete document');
-
+        if (!res.ok) throw new Error(data.error || 'Failed');
         loadAll();
       } catch (err: any) {
-        alert(err.message || 'Failed to delete document');
-        btn.disabled = false;
+        alert(err.message || 'Failed');
+        btn.disabled    = false;
         btn.textContent = 'Delete';
       }
     }
 
-    // ── Contract upload ──────────────────────────────────
     async function handleContractUpload(e: Event) {
       e.preventDefault();
-      const formEl = e.target as HTMLFormElement;
+      const formEl       = e.target as HTMLFormElement;
       const submissionId = formEl.dataset.submissionId;
-      const fileInput = formEl.querySelector('input[type="file"]') as HTMLInputElement;
-      const errorEl = formEl.querySelector('.error-message') as HTMLElement;
-      const submitBtn = formEl.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const fileInput    = formEl.querySelector('input[type="file"]') as HTMLInputElement;
+      const errorEl      = formEl.querySelector('.error-message')     as HTMLElement;
+      const submitBtn    = formEl.querySelector('button[type="submit"]') as HTMLButtonElement;
 
       if (!fileInput.files?.length) return;
       const file = fileInput.files[0];
-
-      if (file.type !== 'application/pdf') {
-        errorEl.textContent = 'Only PDF files are allowed';
-        errorEl.classList.remove('hidden');
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        errorEl.textContent = 'File too large (max 10MB)';
-        errorEl.classList.remove('hidden');
-        return;
-      }
+      if (file.type !== 'application/pdf') { errorEl.textContent = 'Only PDF files are allowed'; errorEl.classList.remove('hidden'); return; }
+      if (file.size > 10 * 1024 * 1024)    { errorEl.textContent = 'File too large (max 10MB)';  errorEl.classList.remove('hidden'); return; }
 
       errorEl.classList.add('hidden');
-      submitBtn.disabled = true;
+      submitBtn.disabled    = true;
       submitBtn.textContent = 'Uploading...';
 
       try {
@@ -739,50 +1206,36 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         formData.append('file', file);
 
         const res = await fetch('/api/admin/contracts/upload', {
-          method: 'POST',
-          headers: { 'x-admin-key': ADMIN_KEY },
-          body: formData,
+          method: 'POST', headers: { 'x-admin-key': ADMIN_KEY }, body: formData,
         });
-
-        if (res.status === 401) throw new Error('Session expired — please refresh the page and re-enter your admin key');
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Upload failed');
-
         loadAll();
       } catch (err: any) {
         errorEl.textContent = err.message || 'Upload failed';
         errorEl.classList.remove('hidden');
-        submitBtn.disabled = false;
+        submitBtn.disabled    = false;
         submitBtn.textContent = 'Upload Contract';
       }
     }
 
-    // ── Invoice upload ───────────────────────────────────
     async function handleInvoiceUpload(e: Event) {
       e.preventDefault();
-      const formEl = e.target as HTMLFormElement;
+      const formEl       = e.target as HTMLFormElement;
       const submissionId = formEl.dataset.submissionId;
-      const fileInput = formEl.querySelector('input[type="file"]') as HTMLInputElement;
-      const labelSelect = formEl.querySelector('select[name="label"]') as HTMLSelectElement;
-      const errorEl = formEl.querySelector('.error-message') as HTMLElement;
-      const submitBtn = formEl.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const fileInput    = formEl.querySelector('input[type="file"]')      as HTMLInputElement;
+      const labelSelect  = formEl.querySelector('select[name="label"]')   as HTMLSelectElement;
+      const errorEl      = formEl.querySelector('.error-message')          as HTMLElement;
+      const submitBtn    = formEl.querySelector('button[type="submit"]')   as HTMLButtonElement;
 
       if (!fileInput.files?.length) return;
       const file = fileInput.files[0];
-
-      if (file.type !== 'application/pdf') {
-        errorEl.textContent = 'Only PDF files are allowed';
-        errorEl.classList.remove('hidden');
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        errorEl.textContent = 'File too large (max 10MB)';
-        errorEl.classList.remove('hidden');
-        return;
-      }
+      if (file.type !== 'application/pdf') { errorEl.textContent = 'Only PDF files are allowed'; errorEl.classList.remove('hidden'); return; }
+      if (file.size > 10 * 1024 * 1024)    { errorEl.textContent = 'File too large (max 10MB)';  errorEl.classList.remove('hidden'); return; }
 
       errorEl.classList.add('hidden');
-      submitBtn.disabled = true;
+      submitBtn.disabled    = true;
       submitBtn.textContent = 'Uploading...';
 
       try {
@@ -792,24 +1245,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         formData.append('label', labelSelect.value);
 
         const res = await fetch('/api/admin/invoices/upload', {
-          method: 'POST',
-          headers: { 'x-admin-key': ADMIN_KEY },
-          body: formData,
+          method: 'POST', headers: { 'x-admin-key': ADMIN_KEY }, body: formData,
         });
-
-        if (res.status === 401) throw new Error('Session expired — please refresh the page and re-enter your admin key');
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Upload failed');
-
         loadAll();
       } catch (err: any) {
         errorEl.textContent = err.message || 'Upload failed';
         errorEl.classList.remove('hidden');
-        submitBtn.disabled = false;
+        submitBtn.disabled    = false;
         submitBtn.textContent = 'Upload Document';
       }
     }
 
+    // ── Top-level event listeners ─────────────────────────
     document.getElementById('refreshBtn')?.addEventListener('click', loadAll);
     document.getElementById('refreshReviewsBtn')?.addEventListener('click', loadReviews);
   </script>

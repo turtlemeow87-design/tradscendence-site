@@ -4,216 +4,575 @@ import { neon } from "@neondatabase/serverless";
 
 const title = "Memories — Tradscendence | Sound Beyond Borders";
 const description =
-  "Reflections from clients and collaborators — hear what it was like to have Tradscendence perform at their event.";
+  "A living journal of performances — reflections, images, and the words of those who were there.";
 
-let approvedReviews: Array<{
+type MemoryRow = {
   id: number;
-  body: string;
-  reviewer_name: string;
-  submission_location: string | null;
-  created_at: string;
-}> = [];
+  title: string;
+  event_date: string | null;
+  location: string | null;
+  reflection: string | null;
+  photo_urls: string[];
+  video_src: string | null;
+  review_body: string | null;
+  reviewer_name: string | null;
+};
+
+let memoryRows: MemoryRow[] = [];
 
 if (!import.meta.env.DEV && import.meta.env.DATABASE_URL) {
   const sql = neon(import.meta.env.DATABASE_URL);
   try {
     const rows = await sql`
       SELECT
-        r.id,
-        r.body,
-        r.created_at,
-        cs.location AS submission_location,
+        m.id,
+        m.title,
+        m.event_date,
+        m.location,
+        m.reflection,
+        m.photo_urls,
+        m.video_src,
+        r.body AS review_body,
         COALESCE(
           u.preferred_name,
           CONCAT(LEFT(u.first_name, 1), '. ', u.last_name)
         ) AS reviewer_name
-      FROM reviews r
-      JOIN contact_submissions cs ON r.submission_id = cs.id
-      JOIN users u ON r.user_id = u.id
-      WHERE r.approved = true
-      ORDER BY r.created_at DESC
+      FROM memories m
+      LEFT JOIN reviews r
+        ON m.submission_id = r.submission_id
+        AND r.approved = true
+      LEFT JOIN users u ON r.user_id = u.id
+      WHERE m.visible = true
+      ORDER BY m.event_date DESC NULLS LAST, m.display_order ASC
     `;
-    approvedReviews = rows as typeof approvedReviews;
+    memoryRows = rows as MemoryRow[];
   } catch (err) {
-    console.error("Failed to load reviews:", err);
+    console.error("Failed to load memories:", err);
   }
 }
 
-// Also keep the original performance memory for the timeline
-type Media = { src?: string; poster?: string; youtubeId?: string };
-type Photo = { src: string; alt?: string };
-type Memory = {
-  title: string;
-  date: string;
-  location?: string;
-  reflection: string;
-  video?: Media;
-  photos?: Photo[];
-};
+// Dev fallback
+if (import.meta.env.DEV && memoryRows.length === 0) {
+  memoryRows = [
+    {
+      id: 1,
+      title: "Palestinian-Style Wedding",
+      event_date: "2024-09-13",
+      location: "Wintergreen, VA",
+      reflection: "This was a beautiful wedding in the mountains, where I took the opportunity to enhance the atmosphere with some Arabic-style taqsim. The entire trip was a pleasure, the couple and their family were very warm, and I am proud to have this as my first professional memory with music.",
+      photo_urls: ["/media/BrideandGroom1.jpg"],
+      video_src: "/media/PalestinianOud.mp4",
+      review_body: null,
+      reviewer_name: null,
+    },
+  ];
+}
 
-const memories: Memory[] = [
-  {
-    title: "Palestinian-Style Wedding",
-    date: "2024-09-13",
-    location: "Wintergreen, VA",
-    reflection:
-      "This was a beautiful wedding in the mountains, where I took the opportunity to enhance the atmosphere with some Arabic-style taqsim. The entire trip was a pleasure, the couple and their family were very warm, and I am proud to have this as my first professional memory with music.",
-    video: { youtubeId: "dQw4w9WgXcQ" },
-    photos: [
-      { src: "/media/BrideandGroom1.jpg", alt: "" },
-    ],
-  },
-];
+function formatDate(d: string | null) {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString("en-US", {
+    year: "numeric", month: "long", day: "numeric",
+  });
+}
 
-const sorted = [...memories].sort((a, b) => (a.date < b.date ? 1 : -1));
+function truncate(text: string, len = 120) {
+  if (text.length <= len) return text;
+  return text.slice(0, len).trimEnd() + "…";
+}
 ---
 
 <BaseLayout {title} description={description}>
-  <section class="mx-auto max-w-6xl px-4 py-10 space-y-16 text-ivory">
+  <!-- GLightbox -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/css/glightbox.min.css" />
 
-    <!-- ── Verified Client Reviews ── -->
-    {approvedReviews.length > 0 && (
-      <div>
-        <header class="space-y-2 mb-10">
-          <h1 class="font-display text-3xl text-gold">What Clients Are Saying</h1>
-          <p class="opacity-70">Words from verified clients — unedited, timeless.</p>
-        </header>
+  <!-- Page-scoped dreamy styles -->
+  <style>
+    /* ── Starfield background ─────────────────────────── */
+    .memories-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(110,42,42,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(194,164,95,0.05) 0%, transparent 55%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, rgba(30,20,40,0.4) 0%, transparent 70%);
+    }
 
-        <div class="grid gap-6 md:grid-cols-2">
-          {approvedReviews.map((review) => (
-            <blockquote
-              class="relative bg-charcoal/80 frame rounded-xl p-6 border border-gold/20"
-            >
-              <!-- Decorative quote mark -->
-              <span
-                class="absolute top-4 right-5 font-display text-5xl leading-none select-none pointer-events-none"
-                style="color: var(--accent-gold); opacity: 0.15;"
-                aria-hidden="true"
-              >"</span>
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(245,241,232,0.6);
+      animation: twinkle var(--dur, 4s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
 
-              <p class="text-ivory/90 leading-relaxed mb-5 relative z-10">
-                {review.body}
-              </p>
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--min-op, 0.1); transform: scale(1); }
+      50%       { opacity: var(--max-op, 0.6); transform: scale(1.3); }
+    }
 
-              <footer class="flex items-center justify-between gap-4">
-                <div>
-                  <p class="font-display text-gold text-sm">{review.reviewer_name}</p>
-                  {review.submission_location && (
-                    <p class="text-ivory/40 text-xs">{review.submission_location}</p>
+    /* ── Timeline ─────────────────────────────────────── */
+    .timeline-line {
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        var(--accent-gold) 8%,
+        var(--accent-gold) 92%,
+        transparent
+      );
+      box-shadow: 0 0 8px rgba(194,164,95,0.25);
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -1px;
+      top: 6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      box-shadow: 0 0 0 3px rgba(17,17,17,0.9), 0 0 10px rgba(194,164,95,0.5);
+      flex-shrink: 0;
+    }
+
+    /* ── Memory entry fade-in ─────────────────────────── */
+    .memory-entry {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .memory-entry.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Frosted glass card ───────────────────────────── */
+    .glass-card {
+      background: rgba(17,17,17,0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(194,164,95,0.18);
+      border-radius: 1rem;
+    }
+
+    /* ── Media hover glow ─────────────────────────────── */
+    .media-thumb {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .media-thumb:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(194,164,95,0.25);
+    }
+    .media-thumb img,
+    .media-thumb video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .media-thumb .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .media-thumb:hover .play-overlay { opacity: 1; }
+
+    /* ── Review sidebar (desktop) ─────────────────────── */
+    .review-aside {
+      display: none;
+    }
+    @media (min-width: 768px) {
+      .review-aside {
+        display: block;
+        width: 260px;
+        flex-shrink: 0;
+        align-self: flex-start;
+        position: sticky;
+        top: 6rem;
+      }
+    }
+
+    /* ── Review pill (mobile) ─────────────────────────── */
+    .review-mobile {
+      display: block;
+    }
+    @media (min-width: 768px) {
+      .review-mobile { display: none; }
+    }
+
+    /* ── Expand/collapse review ───────────────────────── */
+    .review-full {
+      display: none;
+    }
+    .review-full.open {
+      display: block;
+    }
+
+    /* ── Decorative quote glyph ───────────────────────── */
+    .review-quote-glyph {
+      font-family: 'Cinzel', serif;
+      font-size: 3rem;
+      line-height: 1;
+      color: var(--accent-gold);
+      opacity: 0.2;
+      user-select: none;
+      pointer-events: none;
+      display: block;
+      margin-bottom: -0.75rem;
+    }
+
+    /* ── Page header shimmer ──────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+    .shimmer-text {
+      background: linear-gradient(
+        90deg,
+        var(--accent-gold) 0%,
+        #f5e9c8 40%,
+        var(--accent-gold) 60%,
+        var(--accent-gold-dark) 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 5s linear infinite;
+    }
+
+    /* ── Mobile: treat entry like desktop mini (scale down, tap media to expand) ── */
+    @media (max-width: 767px) {
+      .entry-media-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+      }
+      .entry-media-grid .video-cell {
+        grid-column: 1 / -1;
+      }
+    }
+
+    /* ── Subtle page grain overlay ───────────────────── */
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px;
+    }
+  </style>
+
+  <!-- Atmospheric background layers -->
+  <div class="memories-bg" aria-hidden="true"></div>
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <!-- Starfield (generated by JS below) -->
+  <div id="starfield" class="memories-bg" aria-hidden="true"></div>
+
+  <section class="relative z-10 mx-auto max-w-5xl px-4 py-12 text-ivory">
+
+    <!-- Page Header -->
+    <header class="mb-16 text-center">
+      <h1 class="font-display text-4xl sm:text-5xl shimmer-text mb-3">Memories</h1>
+      <p class="text-ivory/50 text-sm tracking-widest uppercase font-display">
+        A living journal of performances
+      </p>
+      <div class="hr-gothic mt-6 max-w-xs mx-auto"></div>
+    </header>
+
+    {memoryRows.length === 0 ? (
+      <p class="text-ivory/30 text-center italic py-24">
+        No memories yet — check back soon.
+      </p>
+    ) : (
+      <!-- Timeline -->
+      <ol class="relative pl-8">
+        <div class="timeline-line" aria-hidden="true"></div>
+
+        {memoryRows.map((m, i) => (
+          <li
+            class="memory-entry relative mb-16 last:mb-0"
+            style={`transition-delay: ${i * 80}ms`}
+          >
+            <div class="timeline-dot" aria-hidden="true"></div>
+
+            <!-- Entry wrapper: flex row on desktop for sidebar review -->
+            <div class="ml-6 flex gap-6 items-start">
+
+              <!-- ── Main content column ── -->
+              <div class="flex-1 min-w-0">
+
+                <!-- Review snippet: mobile only, top of entry -->
+                {m.review_body && (
+                  <div class="review-mobile mb-4">
+                    <button
+                      class="review-toggle-mobile w-full text-left glass-card px-4 py-3 group"
+                      aria-expanded="false"
+                    >
+                      <span class="review-quote-glyph">"</span>
+                      <p class="text-ivory/70 text-sm italic leading-relaxed review-preview">
+                        {truncate(m.review_body, 100)}
+                      </p>
+                      <p class="review-full text-ivory/70 text-sm italic leading-relaxed mt-2">
+                        {m.review_body}
+                      </p>
+                      <div class="flex items-center justify-between mt-2">
+                        <span class="text-gold font-display text-xs">{m.reviewer_name}</span>
+                        <span class="review-toggle-label text-ivory/30 text-xs group-hover:text-gold transition">
+                          read more ↓
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+
+                <!-- Entry header -->
+                <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
+                  <h2 class="font-display text-xl text-gold leading-snug">{m.title}</h2>
+                  {m.event_date && (
+                    <span
+                      class="text-xs px-2 py-0.5 rounded-full font-display"
+                      style="background: rgba(194,164,95,0.12); color: rgba(245,241,232,0.65); border: 1px solid rgba(194,164,95,0.25);"
+                    >
+                      {formatDate(m.event_date)}
+                    </span>
+                  )}
+                  {m.location && (
+                    <span class="text-ivory/50 text-sm">· {m.location}</span>
                   )}
                 </div>
-                <span
-                  class="px-2 py-0.5 rounded-full text-xs font-semibold border"
-                  style="background: color-mix(in oklab, var(--accent-gold) 15%, transparent); color: var(--ivory); border-color: rgba(194,164,95,0.3);"
-                >
-                  Verified Client
-                </span>
-              </footer>
-            </blockquote>
-          ))}
-        </div>
-      </div>
-    )}
 
-    <!-- ── Performance Timeline ── -->
-    <div>
-      <header class="space-y-2 mb-10">
-        <h2 class="font-display text-3xl {approvedReviews.length > 0 ? 'text-ivory' : 'text-gold'}">
-          {approvedReviews.length > 0 ? 'Performance Timeline' : 'Memories'}
-        </h2>
-        <p class="opacity-80">
-          A living timeline of performances — brief reflections, sounds, and images. Newest first.
-        </p>
-      </header>
-
-      <ol class="relative pl-6 sm:pl-8">
-        <div
-          class="absolute left-2 sm:left-3 top-0 bottom-0"
-          style="width:2px;background:var(--accent-gold);"
-          aria-hidden="true"
-        ></div>
-
-        {sorted.map((m) => (
-          <li class="relative mb-10 last:mb-0">
-            <span
-              class="absolute -left-0.5 sm:-left-1 top-1.5 inline-block rounded-full"
-              style="width:14px;height:14px;background:var(--accent-gold);box-shadow:0 0 0 2px rgba(0,0,0,0.5);"
-              aria-hidden="true"
-            ></span>
-
-            <article class="ml-6 sm:ml-8 grid gap-4">
-              <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h3 class="font-display text-xl leading-snug">{m.title}</h3>
-                <span
-                  class="text-xs px-2 py-0.5 rounded-full"
-                  style="background:color-mix(in oklab, var(--accent-gold) 20%, transparent); color:var(--ivory); border:1px solid rgba(0,0,0,.35);"
-                >
-                  {new Date(m.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </span>
-                {m.location && (
-                  <span class="text-sm opacity-80">• {m.location}</span>
+                <!-- Reflection -->
+                {m.reflection && (
+                  <p class="text-ivory/80 leading-relaxed mb-5 text-sm sm:text-base">
+                    {m.reflection}
+                  </p>
                 )}
+
+                <!-- Media grid -->
+                {(m.video_src || (m.photo_urls && m.photo_urls.length > 0)) && (
+                  <div class="entry-media-grid">
+
+                    {m.video_src && (
+                      <div class="video-cell">
+                        <a
+                          href={m.video_src}
+                          class="media-thumb glightbox block aspect-video"
+                          data-gallery={`memory-${m.id}`}
+                          data-type="video"
+                          data-description={m.title}
+                          aria-label={`Watch video: ${m.title}`}
+                        >
+                          <video
+                            src={m.video_src}
+                            muted
+                            preload="metadata"
+                            class="w-full aspect-video object-cover rounded-xl"
+                            aria-hidden="true"
+                          ></video>
+                          <div class="play-overlay rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="rgba(194,164,95,0.9)">
+                              <circle cx="12" cy="12" r="11" fill="rgba(0,0,0,0.5)" stroke="rgba(194,164,95,0.6)" stroke-width="1"/>
+                              <polygon points="10,8 18,12 10,16" fill="rgba(194,164,95,0.95)"/>
+                            </svg>
+                          </div>
+                        </a>
+                      </div>
+                    )}
+
+                    {m.photo_urls && m.photo_urls.slice(0, 4).map((src, pi) => (
+                      <a
+                        href={src}
+                        class="media-thumb glightbox block aspect-square"
+                        data-gallery={`memory-${m.id}`}
+                        data-type="image"
+                        aria-label={`Photo ${pi + 1}: ${m.title}`}
+                      >
+                        <img
+                          src={src}
+                          alt={`${m.title} photo ${pi + 1}`}
+                          class="w-full h-full object-cover rounded-xl"
+                          loading="lazy"
+                        />
+                      </a>
+                    ))}
+
+                  </div>
+                )}
+
               </div>
 
-              <p class="opacity-90">{m.reflection}</p>
+              <!-- ── Review sidebar: desktop only ── -->
+              {m.review_body && (
+                <aside class="review-aside">
+                  <div class="glass-card p-5 relative overflow-hidden">
+                    <!-- Soft glow behind quote mark -->
+                    <div
+                      class="absolute -top-4 -right-2 text-8xl font-display leading-none select-none pointer-events-none"
+                      style="color: var(--accent-gold); opacity: 0.07;"
+                      aria-hidden="true"
+                    >"</div>
 
-              {(m.video || (m.photos && m.photos.length)) && (
-                <div class="grid gap-4 md:grid-cols-5">
-                  {m.video && (
-                    <div class="md:col-span-3 rounded-xl overflow-hidden frame bg-ebony/60">
-                      {m.video.youtubeId ? (
-                        <div class="aspect-video">
-                          <iframe
-                            class="w-full h-full"
-                            src="media/PalestinianOud.mp4"
-                            title={`${m.title} video`}
-                            loading="lazy"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen
-                          ></iframe>
-                        </div>
-                      ) : (
-                        <video
-                          class="w-full h-auto block"
-                          controls
-                          preload="metadata"
-                          poster={m.video.poster}
-                        >
-                          <source src={m.video.src} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                      )}
-                    </div>
-                  )}
+                    <p
+                      class="text-ivory/70 text-sm italic leading-relaxed mb-4 relative z-10 review-desktop-preview"
+                    >
+                      {truncate(m.review_body, 120)}
+                    </p>
 
-                  {m.photos && m.photos.length > 0 && (
-                    <div class={`grid gap-3 ${m.video ? 'md:col-span-2' : 'md:col-span-5 md:grid-cols-2'}`}>
-                      {m.photos.slice(0, 4).map((p) => (
-                        <figure class="rounded-xl overflow-hidden frame bg-ebony/40">
-                          <img
-                            src={p.src}
-                            alt={p.alt || m.title}
-                            class="w-full h-100 object-cover"
-                            loading="lazy"
-                          />
-                        </figure>
-                      ))}
+                    <p class="review-full text-ivory/70 text-sm italic leading-relaxed mb-4 relative z-10">
+                      {m.review_body}
+                    </p>
+
+                    {m.review_body.length > 120 && (
+                      <button
+                        class="review-toggle-desktop text-gold/60 hover:text-gold text-xs font-display tracking-wide transition mb-3"
+                        aria-expanded="false"
+                      >
+                        read more ↓
+                      </button>
+                    )}
+
+                    <div class="border-t border-gold/20 pt-3 flex items-center justify-between gap-2">
+                      <span class="font-display text-gold text-xs">{m.reviewer_name}</span>
+                      <span
+                        class="px-2 py-0.5 rounded-full text-xs"
+                        style="background: rgba(194,164,95,0.1); color: rgba(245,241,232,0.5); border: 1px solid rgba(194,164,95,0.2);"
+                      >
+                        Verified Client
+                      </span>
                     </div>
-                  )}
-                </div>
+                  </div>
+                </aside>
               )}
-            </article>
+
+            </div>
           </li>
         ))}
       </ol>
-    </div>
-
-    <!-- ── Empty state for reviews ── -->
-    {approvedReviews.length === 0 && (
-      <p class="text-ivory/30 text-sm text-center italic">
-        Client reviews will appear here once submitted and approved.
-      </p>
     )}
 
+    <!-- Bottom note -->
+    <p class="text-ivory/20 text-xs text-center mt-20 font-display tracking-widest uppercase">
+      More to come
+    </p>
+
   </section>
+
+  <!-- GLightbox JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/js/glightbox.min.js"></script>
+
+  <script>
+    // ── Starfield ─────────────────────────────────────────
+    const starfield = document.getElementById('starfield');
+    if (starfield) {
+      const count = 80;
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 2 + 1;
+        star.style.cssText = `
+          width: ${size}px;
+          height: ${size}px;
+          left: ${Math.random() * 100}%;
+          top: ${Math.random() * 100}%;
+          --dur: ${3 + Math.random() * 5}s;
+          --delay: ${Math.random() * 6}s;
+          --min-op: ${0.05 + Math.random() * 0.1};
+          --max-op: ${0.3 + Math.random() * 0.4};
+        `;
+        starfield.appendChild(star);
+      }
+    }
+
+    // ── IntersectionObserver fade-in ──────────────────────
+    const entries = document.querySelectorAll('.memory-entry');
+    const observer = new IntersectionObserver(
+      (obs) => {
+        obs.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08 }
+    );
+    entries.forEach(el => observer.observe(el));
+
+    // ── GLightbox init ────────────────────────────────────
+    // @ts-ignore
+    if (typeof GLightbox !== 'undefined') {
+      // @ts-ignore
+      GLightbox({
+        selector: '.glightbox',
+        touchNavigation: true,
+        loop: false,
+        autoplayVideos: true,
+        skin: 'clean',
+      });
+    }
+
+    // ── Desktop review expand/collapse ───────────────────
+    document.querySelectorAll('.review-toggle-desktop').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const aside = btn.closest('aside') as HTMLElement;
+        const preview = aside.querySelector('.review-desktop-preview') as HTMLElement;
+        const full = aside.querySelector('.review-full') as HTMLElement;
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+
+        if (expanded) {
+          preview.style.display = '';
+          full.classList.remove('open');
+          btn.textContent = 'read more ↓';
+          btn.setAttribute('aria-expanded', 'false');
+        } else {
+          preview.style.display = 'none';
+          full.classList.add('open');
+          btn.textContent = 'show less ↑';
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+
+    // ── Mobile review expand/collapse ────────────────────
+    document.querySelectorAll('.review-toggle-mobile').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preview = btn.querySelector('.review-preview') as HTMLElement;
+        const full = btn.querySelector('.review-full') as HTMLElement;
+        const label = btn.querySelector('.review-toggle-label') as HTMLElement;
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+
+        if (expanded) {
+          preview.style.display = '';
+          full.classList.remove('open');
+          label.textContent = 'read more ↓';
+          btn.setAttribute('aria-expanded', 'false');
+        } else {
+          preview.style.display = 'none';
+          full.classList.add('open');
+          label.textContent = 'show less ↑';
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
 </BaseLayout>
