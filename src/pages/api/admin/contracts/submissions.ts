@@ -53,12 +53,13 @@ export const GET: APIRoute = async ({ request }) => {
         cs.status,
         cs.created_at,
         cs.last_reminded_at,
-        c.id as contract_id,
+        c.id            AS contract_id,
         c.file_url,
         c.uploaded_at,
         c.signed_at,
         c.signature_name,
-        u.preferred_name
+        u.preferred_name,
+        CASE WHEN u.id IS NOT NULL THEN true ELSE false END AS is_registered
       FROM contact_submissions cs
       LEFT JOIN contracts c ON cs.id = c.submission_id
       LEFT JOIN users u ON cs.email = u.email
@@ -67,7 +68,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     const formatted = submissions.map(sub => ({
       id: sub.id,
-      name: sub.name || [sub.first_name, sub.last_name].filter(Boolean).join(' '),
+      name: sub.name || [sub.first_name, sub.last_name].filter(Boolean).join(" "),
       preferred_name: sub.preferred_name || null,
       email: sub.email,
       event_date: sub.event_date,
@@ -76,13 +77,16 @@ export const GET: APIRoute = async ({ request }) => {
       status: sub.status,
       created_at: sub.created_at,
       last_reminded_at: sub.last_reminded_at || null,
-      contract: sub.contract_id ? {
-        id: sub.contract_id,
-        file_url: sub.file_url,
-        uploaded_at: sub.uploaded_at,
-        signed_at: sub.signed_at,
-        signature_name: sub.signature_name,
-      } : null,
+      is_registered: sub.is_registered,
+      contract: sub.contract_id
+        ? {
+            id: sub.contract_id,
+            file_url: sub.file_url,
+            uploaded_at: sub.uploaded_at,
+            signed_at: sub.signed_at,
+            signature_name: sub.signature_name,
+          }
+        : null,
     }));
 
     return json(200, { submissions: formatted });
