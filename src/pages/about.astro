@@ -5,27 +5,77 @@ const title = "About Hunter Eastland — Tradscendence";
 const description =
   "About Hunter Eastland (Tradscendence) — a world/folk multi-instrumentalist in Richmond, VA exploring music across cultures. Story, ethos, instruments, mission.";
 ---
+
 <BaseLayout {title} description={description}>
+  <!-- Dream layers (behind content) -->
+  <div class="about-dream-bg" aria-hidden="true"></div>
+  <div class="about-grain" aria-hidden="true"></div>
+  <div id="about-starfield" class="about-dream-bg" aria-hidden="true"></div>
 
   <section
-    class="mx-auto max-w-4xl px-4 py-10 space-y-6 text-[17px] sm:text-[18px] leading-relaxed md:leading-loose break-words hyphens-auto"
+    id="about-stage"
+    class="about-stage relative z-10 mx-auto max-w-4xl px-4 py-10 space-y-6 text-[17px] sm:text-[18px] leading-relaxed md:leading-loose break-words hyphens-auto"
   >
     <h1 class="font-display text-3xl md:text-4xl">A Little About Me</h1>
 
     <h2 class="mt-6 font-display text-xl md:text-2xl text-gold/90">In the beginning…</h2>
 
-    <p>Ever since I was a kid, growing up, and even before I realized it, I have always seen the world as a collective set of different "flavors", if you will, of different cultures, colors, smells, sounds, etc., and I've always been intrigued the most by those who are different than me, or, more generally, by the unknown.  In my child brain, being in a different enviornment meant a new adventure, and a sensory experience.    </p>
-    <p>Growing up the way I did and having parents who loved more than anything to travel and meet people, I had never seen the world from any sort of "us" vs. "them" perspective, and I was taught to respect people for who they are, and to stay curious, rather than to judge and to compare.  Having this as a basis for what eventually became my natural way of thinking, as I got older, as you could imagine, I became quite confused when I realized how many people were not like me.  In fact, something didn't feel right about how much social groups around me tended to isolate themselves, and moreover, tended to enforce this isolation upon themselves in order to fit in.  If you didn't look like this, believe that, dress like this, etc., then, well, you needed to find where you fit in...  </p>
+    <p>
+      Ever since I was a kid, growing up, and even before I realized it, I have always seen the world as a collective
+      set of different "flavors", if you will, of different cultures, colors, smells, sounds, etc., and I've always been
+      intrigued the most by those who are different than me, or, more generally, by the unknown. In my child brain,
+      being in a different environment meant a new adventure, and a sensory experience.
+    </p>
 
-    <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">Forming an idealogy…</h2>
+    <p>
+      Growing up the way I did and having parents who loved more than anything to travel and meet people, I had never
+      seen the world from any sort of "us" vs. "them" perspective, and I was taught to respect people for who they are,
+      and to stay curious, rather than to judge and to compare. Having this as a basis for what eventually became my
+      natural way of thinking, as I got older, as you could imagine, I became quite confused when I realized how many
+      people were not like me. In fact, something didn't feel right about how much social groups around me tended to
+      isolate themselves, and moreover, tended to enforce this isolation upon themselves in order to fit in. If you
+      didn't look like this, believe that, dress like this, etc., then, well, you needed to find where you fit in...
+    </p>
 
-    <p>... Fast forward to nearing my adult years.  High school happened.  Media happened.  Big personal choices needed to happen.  Where would I fit in?  Well, as you can probably guess... I placed myself in what was considered the "alternative" community.  The way I looked?  Why not modify it to my liking.  The music I listend to?  Why not the Enya, the Sounds of the Andes, "Desert Rose" by Sting, Technical Death Metal, and Flamenco.. and, as you can imagine, everything and anything in between... Just keep mainstream away from me.  Too many loops and passages into my brain to trigger the "repeat" button that would, if anything, become an annoyance that I couldn't feel anything from.  I wanted to stay in a world where music was something I could communicate with accurately, and not just something to listen to because others listened to it to fit in.  Besides... I wasn't much of a dancer anyway.  Too socially awkward.  Ah!  I wanted to play my <i>own</i> music ...   </p>
+    <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">Forming an ideology…</h2>
 
-    <p>Lucky for me, here came the advent of the world wide web, and access to explore what music was out there in the world, and not just what was on the radio.  I stuck with my theme of metal music-- it was an ever-changing and ever-growing community, never too repetitive, and was enough to keep the creative part of my mind occupied... so many notes to learn!!  I also stuck with my theme of, I suppose then what they would have called "exotic music".  What can I say?  It took me somewhere else.  Wherever I wanted to go whilst not having to leave the room. Naturelly... I picked up trumpet first (wait, what?!).. I know, I know..  I just wanted to play music and so band class was the way to go.  I went through jazz band and all of that stuff.  Okay, moving on, not my cup of tea --although I did come to appreciate jazz more later in life.  Aside from that, I picked up guitar and played (guess what?) metal music... and flamenco... and such.  Now let's fast forward to adult life :   </p>
+    <p>
+      ... Fast forward to nearing my adult years. High school happened. Media happened. Big personal choices needed to
+      happen. Where would I fit in? Well, as you can probably guess... I placed myself in what was considered the
+      "alternative" community. The way I looked? Why not modify it to my liking. The music I listened to? Why not Enya,
+      the Sounds of the Andes, "Desert Rose" by Sting, technical death metal, and flamenco — and, as you can imagine,
+      everything and anything in between. Just keep mainstream away from me. Too many loops and passages into my brain to
+      trigger the "repeat" button that would, if anything, become an annoyance that I couldn't feel anything from. I
+      wanted to stay in a world where music was something I could communicate with accurately, and not just something to
+      listen to because others listened to it to fit in. Besides... I wasn't much of a dancer anyway. Too socially
+      awkward. I wanted to play my <i>own</i> music...
+    </p>
 
-    <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">Making sense of my idealogy…</h2>
+    <p>
+      Lucky for me, here came the advent of the world wide web, and access to explore what music was out there in the
+      world, and not just what was on the radio. I stuck with my theme of metal — it was an ever-changing and
+      ever-growing community, never too repetitive, and was enough to keep the creative part of my mind occupied... so
+      many notes to learn. I also stuck with my theme of what people might have called "exotic music". What can I say?
+      It took me somewhere else — wherever I wanted to go while not having to leave the room. Naturally... I picked up
+      trumpet first (wait, what?). I just wanted to play music and band class was the way to go. I went through jazz band
+      and all of that stuff. Okay, moving on — not my cup of tea, although I did come to appreciate jazz more later in
+      life. Aside from that, I picked up guitar and played (guess what?) metal music... and flamenco... and such. Now
+      let's fast forward to adult life:
+    </p>
 
-    <p>Metal music continued to change and grow.  And in fact, I began noticing some of these "exotic" scale patterns and notest coming from some of the most notable guitarists in my world --one quick example: Mark Morton from Lamb of God's use of the blues pentatonic crossed with... Harmonic Minor?!!  Whoa.  I was intrigued.  And then youtube came along, and fast.  ALL of the music that I wanted to hear before not only became available, but they started crossbreeding (in a sense)!!  But wait!!  I wanted to do MORE with this.  What I came across was amazing, and at the rate I was discovering new music from around the world, I couldn't keep up with myself anymore.  However... I needed to play more than just the guitar.  I needed to produce different sounds!  Would if I could -- Okay, we'll get there.  But next, I bought a cello.  Yes, a cello.  Fretless --allowing for any of these "exotic" expressions and mictrotones that I was burning to play and compose with.  And then it hit me... I can now order instruments from around the world!!  COVID was a curse, of course, right?  But being out of work for a few months... It gave me time to think (and maybe a few extra bucks), and research, and learn... </p>
+    <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">Making sense of my ideology…</h2>
+
+    <p>
+      Metal continued to change and grow. And I started noticing some of these "exotic" scale patterns coming from some
+      of the most notable guitarists in my world — one quick example: Mark Morton from Lamb of God's use of blues
+      pentatonic crossed with... harmonic minor? Whoa. I was intrigued. Then YouTube came along, and fast. ALL of the
+      music that I wanted to hear became available — and artists started crossbreeding (in a sense). But I wanted to do
+      more with it. At the rate I was discovering new music from around the world, I couldn't keep up with myself
+      anymore. However... I needed to play more than just the guitar. I needed to produce different sounds. Next, I
+      bought a cello. Yes, a cello. Fretless — allowing for any of these "exotic" expressions and microtones that I was
+      burning to play and compose with. And then it hit me... I can now order instruments from around the world. COVID
+      was a curse, of course, but being out of work for a few months gave me time to think, research, and learn.
+    </p>
 
     <figure class="memory-figure">
       <img
@@ -37,12 +87,21 @@ const description =
         loading="lazy"
         decoding="async"
       />
-      <figcaption class="memory-caption">My first cello, I still have it (Strobel).</figcaption>
+      <figcaption class="memory-caption">My first cello — I still have it (Strobel).</figcaption>
     </figure>
 
     <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">The beginning of a new era…</h2>
 
-    <p>So, next, I bought an Oud.  My first instrument from across the world -- A Turkish Oud FROM Turkey!!  Whoa.  I was in paradise.  What next??  Got an Erhu for my birthday.  Super cool!  Wait, how am I able to learn how to play these instruments so fast??  Ah!   Passion (right?), that's right!  What's next??  Then I got a Sitar.  Then a Baglama Saz.  And then a Divan Saz.  And then a Rabab.  And -- you get the idea.  I was learning, playing all of the different sounds, and bringing the world to ME.  This world of music, I realized is something that even if I can't afford to travel regularly yet, it can <i>always</i> be here with me, no matter where I am.  Oh!  And what I was hearing??  Everything!  Metal music matured --and immatured, depending on the subgenre, sometimes both.  It started crossing borders and exploring new limits.  Everything else?  Well, it also matured, and became more readily accessible.  The world of music, and all of its beauty, and emotions, all at my fingertips --both in a technological sense, and, of course, in my ability to play it!!</p>
+    <p>
+      Next, I bought an oud — my first instrument from across the world. A Turkish oud, FROM Turkey. Whoa. I was in
+      paradise. What next? An erhu for my birthday. Then a sitar. Then a bağlama saz. Then a divan saz. Then a rabab.
+      And — you get the idea. I was learning, playing all the different sounds, and bringing the world to me. This world
+      of music became something that, even if I couldn't afford to travel regularly yet, could always be with me, no
+      matter where I was. And what I was hearing? Everything. Metal matured (and sometimes immatured, depending on the
+      subgenre). It started crossing borders and exploring new limits. Everything else matured too — and became more
+      accessible. The world of music, and all of its beauty and emotions, at my fingertips — both technologically and in
+      my ability to play it.
+    </p>
 
     <figure class="memory-figure">
       <img
@@ -54,12 +113,24 @@ const description =
         loading="lazy"
         decoding="async"
       />
-      <figcaption class="memory-caption">My first instrument from across the world. My Turkish Oud by EthnicMusical (Istanbul)</figcaption>
+      <figcaption class="memory-caption">
+        My first instrument from across the world — my Turkish oud by EthnicMusical (Istanbul).
+      </figcaption>
     </figure>
 
     <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">Making sense of the world…</h2>
 
-    <p>So, naturally... I ended up with more instruments than I can count.  But I matured, too!  I promise.  My supportive fiance helped with that, of course, but also calmly breaking the realistic news to me that :  We cannot possibly, sanely, fit anymore instruments in this small apartment.  Fair!  Okay, but seriously, I did mature.  My "taste" in music has expanded to the point where I no longer care.  And I mean, yes, there ARE some mainstream songs that I will listen to now.  I DO appreciate jazz music (and how difficult it is to master).  In fact, when asked "whak kind of music do you like?", I cannot simply answer "pretty much everything", becasue also as I got older I realized that what most people mean by "everything" is Rap, Pop, Rock, and sometimes Country (just as an exmaple).  NO, I mean EVERYTHING.  So many genres that both do and don't exist (but do in my mind) that some days I want to play something Arabic on a bluegrass (resonator) banjo, for example.  But wait, is this possible??  Is it now.  Okay, let's get to that.  More briefly, let's get to my entire purpose in being inspired to build this website, and <b>where I want my journey to go next </b> (<i>also, as an aside, there are technically "banjo"-like instruments made specifically to play Arabic and Turkish scales on</i>):</p>
+    <p>
+      Naturally... I ended up with more instruments than I can count. But I matured, too. I promise. My supportive fiancé
+      helped with that — along with calmly breaking the realistic news: we cannot possibly, sanely, fit any more
+      instruments in a small apartment. Fair. But seriously, I did mature. My taste expanded to the point where I no
+      longer care about labels. Yes, there are mainstream songs I'll listen to now. I appreciate jazz (and how difficult
+      it is to master). And when someone asks, "What kind of music do you like?", I can't just say "pretty much
+      everything", because I learned most people mean rap, pop, rock, and maybe country. No — I mean everything. Some
+      days I want to play something Arabic on a bluegrass resonator banjo. But wait — is that possible? It is now. More
+      briefly, this brings me to why I built this website, and <b>where I want my journey to go next</b>
+      (<i>also: there are technically "banjo"-like instruments designed to play Arabic and Turkish scales</i>):
+    </p>
 
     <figure class="memory-figure">
       <img
@@ -71,44 +142,109 @@ const description =
         loading="lazy"
         decoding="async"
       />
-      <figcaption class="memory-caption">My Turkish Cümbüş Tanbur from SalaMuzik, Istanbul</figcaption>
+      <figcaption class="memory-caption">My Turkish Cümbüş tanbur from SalaMuzik, Istanbul.</figcaption>
     </figure>
 
-    <p>The truth is... when people say "music is a universal language", even now, I don't feel that I agree with the masses in terms of what is meant by that.  Why?  Because if this were the case, then why must I go to Julliard (for example) to be respected as a classical musician?  Why must I have a guru (for example) to be respected as a Hindustani Classical musician?  Well, the truth is... this is how it tends to work for these particular cultures of music.  Which is fine, in fact, wonderful, for those who aspire to be like their predecessors of the same genre, or for whom may have set-in-stone religious reasons, or whatever the case may be.  I respect that.  However, to me "music as a universal language" has always meant so much more to me.  After all... How is it that I can feel just as many emotions from a Maqam on an Armenian Duduk (an acoustic, double-reeded woodwind) and a daft drum, as I can feel from a heavily distorted guitar in a Western metal song with accompanying jazz-inspired metal drumming?  Hmmm... there must be something to be said here...  </p>
+    <p>
+      When people say "music is a universal language", I don’t fully agree with what the phrase usually implies. If it
+      were truly universal in that sense, why must I go to Juilliard to be respected as a classical musician? Why must I
+      have a guru to be respected as a Hindustani classical musician? The truth is: traditions often come with lineage,
+      context, and standards — and that’s good. I respect it. But to me, "universal" means something else: how can I feel
+      just as much emotion from a maqam on an Armenian duduk (a double-reeded woodwind) and a daf drum, as I can feel
+      from a heavily distorted guitar in a Western metal song with jazz-inspired drumming? There’s something deeper going
+      on.
+    </p>
 
     <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">Universal spokesperson of music…</h2>
-    <p>So, this is where I come in.  Yes, some day I would like a house and to be able to keep collecting instruments.  In that house I would also like more time, and studio space so that I can finally record and produce compositions in their entirety. But right now, I work a full-time job, and I spend a lot of spare time focusing on playing my instruments.  Last year, just out of nowhere, I came across my first gig.  Somebody in a Facebook group had asked "Does anybody around here play Oud?", and I answered.  From there I was met with an offer.  Meeting them, practicing up to the event, and the experience itself turned out to be thoroughly rewarding to me (the first and only event posted in my "Memories" page on this website). </p>
 
-    <p>But how can I find more gigs like this?  I can advertise on websites where I pay to have my name on it, etc., yes.  Social media?  Yes, but what a dog-eat-dog world that is, no?  Well, it finally dawned on me recently that I could, if I worked hard enough on it, build my own website.  And so here we are!  A place where I can share my journey, and the instruments I play, but also a starting ground where I can (hopefully) kick off a more professional career doing what I love most!  In the process, I thought, well, if I'm going to do this : Why not let others be a PART of this journey?  And so here I offer my services to join in and/or be the mood-setter in people's most special or emotional moments in life.  Why not, moreover, encourage music to actually be more universal? A place where you can play Arabic on banjo at a wedding, have a duduk fill the room with its mystical sound to help ease the passing of a close loved one (in America, not just in Armenia), get a real Pakistani Rabab sampled in a hip hop studio track with all of its organic nuances (as opposed to electronic engineering).  Why not have a gigantic, Bass-ranged Sitar (Surbahar) intrigue guests at a formal party?  Why not seduce your proposal with the exhilerating sound of the oud?  </p>
+    <p>
+      So, this is where I come in. Yes, someday I want a house so I can keep collecting instruments — and have a studio
+      where I can finally record and produce full compositions. But right now I work a full-time job, and I spend a lot
+      of spare time practicing. Last year, out of nowhere, I came across my first gig. Someone in a Facebook group asked,
+      "Does anybody around here play oud?" — and I answered. What followed was an offer, rehearsals, and an event that
+      turned out to be genuinely rewarding (and it’s the first memory posted on my Memories page).
+    </p>
+
+    <p>
+      But how do I find more gigs like that? I can pay for listings. I can fight for attention on social media. But it
+      finally dawned on me: if I worked hard enough, I could build my own home base — my own website. And so here we are.
+      A place where I can share my journey and the instruments I play, but also a starting ground to build a more
+      professional career doing what I love most. And if I’m going to do this — why not let others be part of the
+      journey? I offer my services to help shape the atmosphere of life’s most special and emotional moments. Why not
+      encourage music to be more universal? Arabic on banjo at a wedding. A duduk filling the room with something
+      mystical to help ease the passing of a loved one (in America, not just Armenia). A real Pakistani rabab sampled in
+      a hip hop track, with all its organic nuance. A bass-ranged sitar (surbahar) intriguing guests at a formal party.
+      An oud setting the mood for a proposal.
+    </p>
 
     <h2 class="mt-8 font-display text-xl md:text-2xl text-gold/90">My mission, and my dream…</h2>
 
-    <p>... Moreover.  Why not take the sound of any of these instruments, and cater it to the moment and the individual's liking --whether in a traditional sense, or not.  Why not even bring modern nuances into traditional patterns?  Why not make music truly UNIVERSAL?</p>
-
     <p>
-      I can not thank anybody enough who comes here and takes the time to even just be curious what my website is about, and to explore what I, and the many sounds from around the world would like to offer.  Feel free to keep exploring from here, or contact me with any questions and/or inquiries.  I'm an open book (within reason)! <p>I am based in Richmond, VA (US)</p>
-      <span class="block font-display text-2xl md:text-3xl font-bold text-gold mt-6">Thank you.</span>
+      Why not take the sound of any of these instruments and tailor it to the moment — whether traditional, modern, or
+      something in-between? Why not bring modern nuance into traditional patterns? Why not make music truly universal?
     </p>
 
-    <nav class="mt-2 space-y-2">
+    <p>
+      Thank you for taking the time to visit, to be curious, and to explore what I’m building here. Feel free to keep
+      exploring, or contact me with any questions and inquiries. I’m an open book (within reason).
+    </p>
+
+    <p>I am based in Richmond, VA (US).</p>
+
+    <span class="block font-display text-2xl md:text-3xl font-bold text-gold mt-6">Thank you.</span>
+
+    <nav class="mt-6 space-y-2">
       <a href="/contact" class="group inline-flex items-center gap-2 font-medium text-gold hover:text-gold/90">
         <span>Contact me</span>
-        <svg class="size-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        <svg
+          class="size-4 transition-transform group-hover:translate-x-0.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M5 12h14M13 5l7 7-7 7"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </a>
       <br />
       <a href="/" class="group inline-flex items-center gap-2 font-medium text-gold hover:text-gold/90">
         <span>Back home</span>
-        <svg class="size-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        <svg
+          class="size-4 transition-transform group-hover:translate-x-0.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M5 12h14M13 5l7 7-7 7"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </a>
       <br />
       <a href="/instruments" class="group inline-flex items-center gap-2 font-medium text-gold hover:text-gold/90">
         <span>Explore my instruments</span>
-        <svg class="size-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        <svg
+          class="size-4 transition-transform group-hover:translate-x-0.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M5 12h14M13 5l7 7-7 7"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </a>
     </nav>
@@ -116,17 +252,81 @@ const description =
     <div class="mt-8 grid grid-cols-2 items-center gap-4">
       <p class="font-display text-lg md:text-xl">~ Hunter Eastland ~</p>
       <div class="justify-self-end">
-        <img src="/media/logo.png" alt="Tradscendence logo" width="100" height="100" class="h-25 w-auto opacity-90" loading="lazy" decoding="async" />
+        <img
+          src="/media/logo.png"
+          alt="Tradscendence logo"
+          width="100"
+          height="100"
+          class="h-25 w-auto opacity-90"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     </div>
   </section>
 
   <style>
+    .about-stage {
+      --dream: 1;
+    }
+
+    .about-dream-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(110,42,42, calc(0.10 * var(--dream))) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(194,164,95, calc(0.07 * var(--dream))) 0%, transparent 55%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, rgba(30,20,40, calc(0.55 * var(--dream))) 0%, transparent 70%);
+    }
+
+    .about-grain {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: calc(0.03 * var(--dream));
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px;
+    }
+
+    .about-star {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(245,241,232, 0.6);
+      opacity: calc(var(--star-op, 0.35) * var(--dream));
+      animation: aboutTwinkle var(--dur, 4s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      transform: translateZ(0);
+    }
+
+    @keyframes aboutTwinkle {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.35); }
+    }
+
+    .about-stage {
+      filter:
+        saturate(calc(1 + (0.10 * var(--dream))))
+        contrast(calc(1 + (0.06 * var(--dream))))
+        blur(calc(0.6px * var(--dream)));
+      transition: filter 120ms linear;
+    }
+
+    .about-stage h1,
+    .about-stage h2 {
+      text-shadow: 0 0 calc(18px * var(--dream)) rgba(194,164,95, calc(0.22 * var(--dream)));
+      transition: text-shadow 120ms linear;
+    }
+
     .memory-figure {
       max-width: 34rem;
       margin-top: 0.5rem;
       margin-bottom: 1.25rem;
     }
+
     .memory-img {
       width: 100%;
       height: auto;
@@ -143,6 +343,7 @@ const description =
               mask-size: cover;
       filter: blur(0px) drop-shadow(0 0 8px rgba(0,0,0,0.35));
     }
+
     .memory-caption {
       margin-top: 0.5rem;
       font-size: 0.9rem;
@@ -151,5 +352,65 @@ const description =
       font-style: italic;
       text-align: center;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .about-star { animation: none !important; }
+      .about-stage { transition: none !important; }
+      .about-stage h1, .about-stage h2 { transition: none !important; }
+    }
   </style>
+
+  <script>
+    // Starfield (About)
+    const starfield = document.getElementById("about-starfield");
+    if (starfield) {
+      const count = 70;
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement("div");
+        star.className = "about-star";
+        const size = Math.random() * 2 + 1;
+
+        star.style.cssText =
+          "width:" + size + "px;" +
+          "height:" + size + "px;" +
+          "left:" + (Math.random() * 100) + "%;" +
+          "top:" + (Math.random() * 100) + "%;" +
+          "--dur:" + (3 + Math.random() * 6) + "s;" +
+          "--delay:" + (Math.random() * 6) + "s;" +
+          "--star-op:" + (0.18 + Math.random() * 0.35) + ";";
+
+        starfield.appendChild(star);
+      }
+    }
+
+    // Dream → Awake scroll driver
+    const stage = document.getElementById("about-stage");
+    if (stage) {
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+      const updateDream = () => {
+        const rect = stage.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+
+        const total = rect.height + vh;
+        const progressed = (vh - rect.top) / total;
+
+        const dream = clamp01(1 - (progressed * 1.35));
+
+        stage.style.setProperty("--dream", String(dream));
+        document.documentElement.style.setProperty("--dream", String(dream));
+      };
+
+      if (prefersReduced) {
+        stage.style.setProperty("--dream", "0.55");
+        document.documentElement.style.setProperty("--dream", "0.55");
+      } else {
+        updateDream();
+        window.addEventListener("scroll", updateDream, { passive: true });
+        window.addEventListener("resize", updateDream);
+      }
+    }
+  </script>
 </BaseLayout>
