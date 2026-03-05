@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:security": "newman run \"qa/Postman/Security Regression.postman_collection.json\" -e \"qa/Postman/tradscendence-runner.LOCAL.postman_environment.json\" --folder \"01 - Unauthenticated Access\" --folder \"02 - Admin - Missing Key\" --folder \"03 - Admin - Invalid Key\" --folder \"04 - IDOR - Read\" --folder \"05 - IDOR - Write\" --folder \"06 - Password Reset\" --folder \"07 - Input Validation\" --reporters cli,json --reporter-json-export qa/Postman/results/last-run.json",
+"test:security:ci": "newman run \"qa/Postman/Security Regression.postman_collection.json\" -e \"qa/Postman/tradscendence-runner.LOCAL.postman_environment.json\" --folder \"01 - Unauthenticated Access\" --folder \"02 - Admin - Missing Key\" --folder \"03 - Admin - Invalid Key\" --folder \"04 - IDOR - Read\" --folder \"05 - IDOR - Write\" --folder \"06 - Password Reset\" --folder \"07 - Input Validation\" --bail"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.6.0",

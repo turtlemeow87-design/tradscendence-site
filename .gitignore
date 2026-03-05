@@ -27,9 +27,14 @@ pnpm-debug.log*
 # My dagone host server I'll tell you hwut
 .vercel
 
+# Runner environment for Newman
+qa/Postman/*.LOCAL.*
+qa/Postman/results/
+
 # Playwright
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+ 
