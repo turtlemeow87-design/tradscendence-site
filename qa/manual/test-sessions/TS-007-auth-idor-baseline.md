@@ -59,7 +59,11 @@ Actual:
 - User A: Same URL returned 403. No file download occurred.
 
 TC-008-03 — Unauthenticated Access to Proxy Routes  
-Result: Not Executed in this session.
+Result: PASS  
+Actual:  
+- Unauthenticated (incognito/no cookies) request to /api/contracts/11/view was blocked (403) and did not stream PDF bytes.  
+- Unauthenticated (incognito/no cookies) request to /api/invoices/9/view was blocked (403) and did not stream PDF bytes or trigger a download.  
+
 
 TC-008-04 — User A Cannot Submit Review for User B Booking (IDOR)  
 Result: PASS  

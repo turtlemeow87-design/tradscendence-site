@@ -1,0 +1,221 @@
+{
+  "info": {
+    "_postman_id": "f1c1a4cd-036a-4c08-8511-a2128ccf84d5",
+    "name": "Security Regression",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51236303",
+    "_collection_link": "https://go.postman.co/collection/51236303-f1c1a4cd-036a-4c08-8511-a2128ccf84d5?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User B - Contracts - View (Owner)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Owner access allowed (200)\", () => pm.response.to.have.status(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "auth_token={{auth_token_user_b}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/contracts/{{contract_id_user_b}}/view",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "contracts",
+            "{{contract_id_user_b}}",
+            "view"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "User A - Contracts - View (IDOR Attempt)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Cross-account access blocked (403/404)\", () => {\r",
+              "  pm.expect([403,404]).to.include(pm.response.code);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "auth_token={{auth_token_user_a}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/contracts/{{contract_id_user_b}}/view",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "contracts",
+            "{{contract_id_user_b}}",
+            "view"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "User B - Invoices - View (Owner)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Owner access allowed (200)\", () => pm.response.to.have.status(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "auth_token={{auth_token_user_b}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/invoices/{{invoice_id_user_b}}/view",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "invoices",
+            "{{invoice_id_user_b}}",
+            "view"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "User A - Invoices - View (IDOR Attempt)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Cross-account access blocked (403/404)\", () => {\r",
+              "  pm.expect([403,404]).to.include(pm.response.code);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "auth_token={{auth_token_user_a}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/invoices/{{invoice_id_user_b}}/view",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "invoices",
+            "{{invoice_id_user_b}}",
+            "view"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin - Reviews - List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-admin-key",
+            "value": "{{admin_key}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/admin/reviews/list",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "reviews",
+            "list"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
