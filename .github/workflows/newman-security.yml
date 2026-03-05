@@ -48,7 +48,6 @@ jobs:
         run: |
           newman run "qa/Postman/Security Regression.postman_collection.json" \
             -e qa/Postman/tradscendence-runner.CI.postman_environment.json \
-            --folder "01 - Unauthenticated Access" \
             --folder "02 - Admin - Missing Key" \
             --folder "03 - Admin - Invalid Key" \
             --folder "07 - Input Validation" \

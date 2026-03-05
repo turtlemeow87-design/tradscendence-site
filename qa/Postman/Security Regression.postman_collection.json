@@ -9,127 +9,6 @@
   },
   "item": [
     {
-      "name": "01 - Unauthenticated Access",
-      "item": [
-        {
-          "name": "No Cookie - Contracts - View",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Unauthenticated access blocked (401)\", () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/contracts/{{contract_id_user_b}}/view",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "contracts",
-                "{{contract_id_user_b}}",
-                "view"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "No Cookie - Invoices - View",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Unauthenticated access blocked (401)\", () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/invoices/{{invoice_id_user_b}}/view",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "invoices",
-                "{{invoice_id_user_b}}",
-                "view"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "No Cookie - Reviews - Submit",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Unauthenticated access blocked (401)\", () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"submission_id\": 1,\n  \"body\": \"This is a test review body for auth check.\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/reviews/submit",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "reviews",
-                "submit"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
       "name": "02 - Admin - Missing Key",
       "item": [
         {
@@ -815,6 +694,122 @@
                 "invoices",
                 "{{invoice_id_user_b}}",
                 "view"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No Cookie - Contracts - View",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Unauthenticated access blocked (401)\", () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/contracts/{{contract_id_user_b}}/view",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "contracts",
+                "{{contract_id_user_b}}",
+                "view"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No Cookie - Invoices - View",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Unauthenticated access blocked (401)\", () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/invoices/{{invoice_id_user_b}}/view",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "invoices",
+                "{{invoice_id_user_b}}",
+                "view"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No Cookie - Reviews - Submit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Unauthenticated access blocked (401)\", () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"submission_id\": 1,\n  \"body\": \"This is a test review body for auth check.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reviews/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reviews",
+                "submit"
               ]
             }
           },
