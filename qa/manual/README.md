@@ -110,3 +110,28 @@ qa/
 - Mobile screen reader testing (TalkBack / VoiceOver)
 - GitHub Actions for automated API runs on push
 - Newman CLI for command-line Postman collection runs
+
+## CI Pipeline
+
+A GitHub Actions workflow runs the Newman security regression suite on every 
+push to `main`. The pipeline covers all stateless security boundaries that do 
+not require authenticated sessions:
+
+- Folder 02 — Admin: Missing Key
+- Folder 03 — Admin: Invalid Key
+- Folder 07 — Input Validation (admin endpoints only)
+
+**Auth-dependent tests (Folders 04, 05, 06, and review validation in Folder 08) 
+are run locally.** These tests require short-lived JWT tokens (7-day expiry) 
+that cannot be stored as static CI secrets without frequent manual rotation. 
+Local runs use a gitignored environment file with live token values.
+
+To run the full suite locally:
+```bash
+npm run test:security
+```
+
+To run CI-equivalent tests only:
+```bash
+npm run test:security:ci
+```
