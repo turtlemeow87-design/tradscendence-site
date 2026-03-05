@@ -1,0 +1,56 @@
+name: Security Regression (Newman)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  newman:
+    name: Run Newman Security Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Write environment file
+        run: |
+          cat > qa/Postman/tradscendence-runner.CI.postman_environment.json << 'EOF'
+          {
+            "id": "ci-environment",
+            "name": "Tradscendence CI Runner",
+            "values": [
+              { "key": "base_url", "value": "${{ secrets.BASE_URL }}", "type": "default", "enabled": true },
+              { "key": "admin_key", "value": "${{ secrets.ADMIN_KEY }}", "type": "default", "enabled": true },
+              { "key": "auth_token_user_a", "value": "", "type": "default", "enabled": true },
+              { "key": "auth_token_user_b", "value": "", "type": "default", "enabled": true },
+              { "key": "contract_id_user_b", "value": "", "type": "default", "enabled": true },
+              { "key": "invoice_id_user_b", "value": "", "type": "default", "enabled": true },
+              { "key": "submission_id_user_b", "value": "", "type": "default", "enabled": true },
+              { "key": "test_email_user_b", "value": "", "type": "default", "enabled": true }
+            ],
+            "_postman_variable_scope": "environment"
+          }
+          EOF
+
+      - name: Run stateless security tests
+        run: |
+          newman run "qa/Postman/Security Regression.postman_collection.json" \
+            -e qa/Postman/tradscendence-runner.CI.postman_environment.json \
+            --folder "01 - Unauthenticated Access" \
+            --folder "02 - Admin - Missing Key" \
+            --folder "03 - Admin - Invalid Key" \
+            --folder "07 - Input Validation" \
+            --reporters cli \
+            --bail
