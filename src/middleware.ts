@@ -2,7 +2,7 @@ import { defineMiddleware } from 'astro:middleware';
 import { jwtVerify } from 'jose';
 
 const PROTECTED_ROUTES = ['/dashboard'];
-const AUTH_PAGES = ['/login', '/verify', '/register'];
+const AUTH_PAGES = ['/login', '/verify', '/register', '/reset-password'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { cookies, redirect, url } = context;

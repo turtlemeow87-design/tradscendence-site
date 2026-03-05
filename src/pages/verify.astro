@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const email = Astro.url.searchParams.get('email') || '';
 const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
+const mode = Astro.url.searchParams.get('mode') || 'login';
+const isReset = mode === 'reset';
 
 // If no email param, redirect back to login
 if (!email) {
@@ -13,9 +15,14 @@ if (!email) {
 <BaseLayout title="Verify — Tradscendence" description="Enter your verification code.">
   <section class="mx-auto max-w-md px-4 py-16 sm:py-24">
 
-    <h1 class="font-display text-3xl text-gold text-center mb-2">Check Your Email</h1>
+    <h1 class="font-display text-3xl text-gold text-center mb-2">
+      {isReset ? 'Check Your Email' : 'Check Your Email'}
+    </h1>
     <p class="text-ivory/60 text-center text-sm mb-8">
-      We sent a 6-digit code to <span class="text-ivory">{email}</span>
+      {isReset
+        ? <>We sent a password reset code to <span class="text-ivory">{email}</span></>
+        : <>We sent a 6-digit code to <span class="text-ivory">{email}</span></>
+      }
     </p>
 
     <!-- Status message area -->
@@ -24,9 +31,12 @@ if (!email) {
     <form id="verifyForm" class="flex flex-col gap-4" novalidate>
       <input type="hidden" name="email" value={email} />
       <input type="hidden" name="redirect" value={redirect} />
+      <input type="hidden" name="mode" value={mode} />
 
       <label class="flex flex-col gap-1">
-        <span class="text-ivory/80 text-sm font-display">Verification Code</span>
+        <span class="text-ivory/80 text-sm font-display">
+          {isReset ? 'Reset Code' : 'Verification Code'}
+        </span>
         <input
           type="text"
           name="code"
@@ -41,22 +51,24 @@ if (!email) {
         />
       </label>
 
-      <!-- Remember this device checkbox -->
-      <label class="flex items-center gap-3 cursor-pointer select-none mt-1">
-        <input
-          type="checkbox"
-          name="rememberDevice"
-          class="w-4 h-4 rounded border-gold/40 bg-ebony/60 text-gold focus:ring-gold/40 focus:ring-offset-charcoal accent-[var(--accent-gold)]"
-        />
-        <span class="text-ivory/60 text-sm">Remember this device for 90 days</span>
-      </label>
+      <!-- Remember this device — hidden in reset mode -->
+      {!isReset && (
+        <label class="flex items-center gap-3 cursor-pointer select-none mt-1">
+          <input
+            type="checkbox"
+            name="rememberDevice"
+            class="w-4 h-4 rounded border-gold/40 bg-ebony/60 text-gold focus:ring-gold/40 focus:ring-offset-charcoal accent-[var(--accent-gold)]"
+          />
+          <span class="text-ivory/60 text-sm">Remember this device for 90 days</span>
+        </label>
+      )}
 
       <button
         id="verifyBtn"
         type="submit"
         class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors mt-2"
       >
-        Verify
+        {isReset ? 'Verify & Continue' : 'Verify'}
       </button>
     </form>
 
@@ -82,7 +94,9 @@ if (!email) {
   const resendBtn = document.getElementById('resendBtn') as HTMLButtonElement;
   const cooldownSpan = document.getElementById('cooldown')!;
   const codeInput = form.querySelector('[name="code"]') as HTMLInputElement;
-  const rememberCheckbox = form.querySelector('[name="rememberDevice"]') as HTMLInputElement;
+  const rememberCheckbox = form.querySelector('[name="rememberDevice"]') as HTMLInputElement | null;
+  const modeInput = form.querySelector('[name="mode"]') as HTMLInputElement;
+  const isReset = modeInput?.value === 'reset';
 
   // ── Resend cooldown ──────────────────────────────────
   let cooldownSeconds = 30;
@@ -141,7 +155,8 @@ if (!email) {
         body: JSON.stringify({
           email: data.email,
           code: data.code,
-          rememberDevice: rememberCheckbox.checked,
+          rememberDevice: rememberCheckbox ? rememberCheckbox.checked : false,
+          mode: data.mode,
         }),
       });
 
@@ -150,31 +165,40 @@ if (!email) {
       if (!res.ok) {
         showStatus(result.error || 'Verification failed.', true);
         verifyBtn.disabled = false;
-        verifyBtn.textContent = 'Verify';
+        verifyBtn.textContent = isReset ? 'Verify & Continue' : 'Verify';
         codeInput.value = '';
         codeInput.focus();
         return;
       }
 
-      // Success — redirect
+      // ── Reset mode: go to reset-password page ────────
+      if (isReset) {
+        window.location.href = '/reset-password';
+        return;
+      }
+
+      // ── Normal mode: go to dashboard / redirect ──────
       window.location.href = (data.redirect as string) || '/dashboard';
     } catch {
       showStatus('Network error — please try again.', true);
       verifyBtn.disabled = false;
-      verifyBtn.textContent = 'Verify';
+      verifyBtn.textContent = isReset ? 'Verify & Continue' : 'Verify';
     }
   });
 
   // ── Resend OTP ──────────────────────────────────────
   resendBtn.addEventListener('click', async () => {
-    const email = (form.querySelector('[name="email"]') as HTMLInputElement).value;
+    const emailVal = (form.querySelector('[name="email"]') as HTMLInputElement).value;
     resendBtn.disabled = true;
 
     try {
-      const res = await fetch('/api/auth/resend-otp', {
+      // Use the appropriate endpoint based on mode
+      const endpoint = isReset ? '/api/auth/forgot-password' : '/api/auth/resend-otp';
+
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: emailVal }),
       });
 
       const result = await res.json();

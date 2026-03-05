@@ -16,14 +16,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return json(415, { ok: false, error: 'Content-Type must be application/json' });
   }
 
-  let body: { email?: string; code?: string; rememberDevice?: boolean };
+  let body: { email?: string; code?: string; rememberDevice?: boolean; mode?: string };
   try {
     body = await request.json();
   } catch {
     return json(400, { ok: false, error: 'Invalid JSON' });
   }
 
-  const { email, code, rememberDevice } = body;
+  const { email, code, rememberDevice, mode } = body;
+  const isReset = mode === 'reset';
 
   if (!email || typeof email !== 'string') {
     return json(400, { ok: false, error: 'Email is required.' });
@@ -37,6 +38,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   // ── Dev mode guard ──────────────────────────────────────
   if (import.meta.env.DEV || !import.meta.env.DATABASE_URL) {
+    if (isReset) {
+      cookies.set('reset_token', 'dev-reset-token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 15,
+      });
+      return json(200, { ok: true, mode: 'reset' });
+    }
     cookies.set('auth_token', 'dev-token', {
       httpOnly: true,
       secure: false,
@@ -89,8 +100,29 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   // ── Mark OTP as used ────────────────────────────────────
   await sql`UPDATE otp_codes SET used = true WHERE id = ${matchedOtpId}`;
 
-  // ── Issue JWT (now with name fields) ────────────────────
   const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET);
+
+  // ── Password reset mode: issue short-lived reset token ──
+  if (isReset) {
+    const resetToken = await new SignJWT({ purpose: 'reset' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject(String(user.id))
+      .setIssuedAt()
+      .setExpirationTime('15m')
+      .sign(secret);
+
+    cookies.set('reset_token', resetToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 15,
+    });
+
+    return json(200, { ok: true, mode: 'reset' });
+  }
+
+  // ── Normal login mode: issue full auth JWT ───────────────
   const token = await new SignJWT({
     email: user.email,
     firstName: user.first_name || '',

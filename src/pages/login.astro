@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
+const resetSuccess = Astro.url.searchParams.get('reset') === 'success';
 ---
 
 <BaseLayout title="Login — Tradscendence" description="Log in or create your Tradscendence account.">
@@ -12,6 +13,13 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
     <p id="authSubtext" class="text-ivory/60 text-center text-sm mb-8">
       Enter your credentials to view your bookings.
     </p>
+
+    <!-- Reset success banner (server-rendered, shown once) -->
+    {resetSuccess && (
+      <div class="mb-6 rounded-xl px-4 py-3 text-sm border border-gold/40 bg-gold/10 text-ivory" role="alert">
+        ✓ Password updated successfully. Please sign in with your new password.
+      </div>
+    )}
 
     <!-- Status message area -->
     <div id="statusMsg" class="hidden mb-6 rounded-xl px-4 py-3 text-sm border border-gold/40 bg-gold/10 text-ivory" role="alert"></div>
@@ -33,7 +41,16 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
       </label>
 
       <label class="flex flex-col gap-1">
-        <span class="text-ivory/80 text-sm font-display">Password</span>
+        <div class="flex justify-between items-baseline">
+          <span class="text-ivory/80 text-sm font-display">Password</span>
+          <button
+            type="button"
+            id="forgotBtn"
+            class="text-xs text-ivory/40 hover:text-gold transition gothic-link"
+          >
+            Forgot password?
+          </button>
+        </div>
         <div class="relative">
           <input
             type="password"
@@ -55,6 +72,28 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
         class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors mt-2"
       >
         Sign In
+      </button>
+    </form>
+
+    <!-- ─── Forgot Password Form (hidden by default) ─────── -->
+    <form id="forgotForm" class="hidden flex flex-col gap-4" novalidate>
+      <label class="flex flex-col gap-1">
+        <span class="text-ivory/80 text-sm font-display">Email</span>
+        <input
+          type="email"
+          name="email"
+          required
+          autocomplete="email"
+          class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)] text-ivory placeholder:text-ivory/30 focus:outline-none focus:border-gold"
+          placeholder="you@example.com"
+        />
+      </label>
+
+      <button
+        type="submit"
+        class="rounded-xl px-4 py-2 bg-gold text-ivory hover:bg-golddark hover:text-rosewood font-semibold frame transition-colors mt-2"
+      >
+        Send Reset Code
       </button>
     </form>
 
@@ -155,25 +194,52 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
 <script>
   const loginForm = document.getElementById('loginForm') as HTMLFormElement;
   const registerForm = document.getElementById('registerForm') as HTMLFormElement;
+  const forgotForm = document.getElementById('forgotForm') as HTMLFormElement;
   const toggleBtn = document.getElementById('toggleBtn')!;
   const toggleText = document.getElementById('toggleText')!;
   const heading = document.getElementById('authHeading')!;
   const subtext = document.getElementById('authSubtext')!;
   const statusMsg = document.getElementById('statusMsg')!;
+  const forgotBtn = document.getElementById('forgotBtn')!;
 
-  let isLogin = true;
+  // 'login' | 'register' | 'forgot'
+  let mode: 'login' | 'register' | 'forgot' = 'login';
+
+  function setMode(newMode: 'login' | 'register' | 'forgot') {
+    mode = newMode;
+    loginForm.classList.toggle('hidden', mode !== 'login');
+    registerForm.classList.toggle('hidden', mode !== 'register');
+    forgotForm.classList.toggle('hidden', mode !== 'forgot');
+    forgotBtn.classList.toggle('hidden', mode !== 'login');
+    statusMsg.classList.add('hidden');
+
+    if (mode === 'login') {
+      heading.textContent = 'Sign In';
+      subtext.textContent = 'Enter your credentials to view your bookings.';
+      toggleText.textContent = "Don't have an account?";
+      toggleBtn.textContent = 'Create one';
+      toggleBtn.classList.remove('hidden');
+    } else if (mode === 'register') {
+      heading.textContent = 'Create Account';
+      subtext.textContent = 'Set up your account to track your booking inquiries.';
+      toggleText.textContent = 'Already have an account?';
+      toggleBtn.textContent = 'Sign in';
+      toggleBtn.classList.remove('hidden');
+    } else {
+      heading.textContent = 'Reset Password';
+      subtext.textContent = "Enter your email and we'll send you a reset code.";
+      toggleText.textContent = 'Remember your password?';
+      toggleBtn.textContent = 'Sign in';
+      toggleBtn.classList.remove('hidden');
+    }
+  }
 
   toggleBtn.addEventListener('click', () => {
-    isLogin = !isLogin;
-    loginForm.classList.toggle('hidden', !isLogin);
-    registerForm.classList.toggle('hidden', isLogin);
-    heading.textContent = isLogin ? 'Sign In' : 'Create Account';
-    subtext.textContent = isLogin
-      ? 'Enter your credentials to view your bookings.'
-      : 'Set up your account to track your booking inquiries.';
-    toggleText.textContent = isLogin ? "Don't have an account?" : 'Already have an account?';
-    toggleBtn.textContent = isLogin ? 'Create one' : 'Sign in';
-    statusMsg.classList.add('hidden');
+    setMode(mode === 'login' ? 'register' : 'login');
+  });
+
+  forgotBtn.addEventListener('click', () => {
+    setMode('forgot');
   });
 
   function showStatus(msg: string, isError = false) {
@@ -204,14 +270,14 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
     });
   });
 
-  async function handleSubmit(e: SubmitEvent, endpoint: string) {
+  // ── Login / Register submit ─────────────────────────────
+  async function handleAuthSubmit(e: SubmitEvent, endpoint: string) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const data = Object.fromEntries(new FormData(form));
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
 
-    // Client-side confirm-password check for register
-    if (!isLogin) {
+    if (mode === 'register') {
       if (data.password !== data.confirmPassword) {
         showStatus('Passwords do not match.', true);
         return;
@@ -219,13 +285,11 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
     }
 
     btn.disabled = true;
-    btn.textContent = isLogin ? 'Signing in…' : 'Creating account…';
+    btn.textContent = mode === 'login' ? 'Signing in…' : 'Creating account…';
 
     try {
       const payload: Record<string, unknown> = { email: data.email, password: data.password };
-
-      // Include name fields for registration
-      if (!isLogin) {
+      if (mode === 'register') {
         payload.firstName = data.firstName;
         payload.lastName = data.lastName || '';
       }
@@ -241,28 +305,62 @@ const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
       if (!res.ok) {
         showStatus(result.error || 'Something went wrong.', true);
         btn.disabled = false;
-        btn.textContent = isLogin ? 'Sign In' : 'Create Account';
+        btn.textContent = mode === 'login' ? 'Sign In' : 'Create Account';
         return;
       }
 
-      // ── Trusted device: skip OTP, go straight to dashboard ──
       if (result.skipOtp) {
         const redirectParam = (form.querySelector('[name="redirect"]') as HTMLInputElement)?.value || '/dashboard';
         window.location.href = redirectParam;
         return;
       }
 
-      // ── Normal flow: redirect to verify page ────────────────
       const redirectParam = (form.querySelector('[name="redirect"]') as HTMLInputElement)?.value || '/dashboard';
       const email = encodeURIComponent(result.email || data.email);
       window.location.href = `/verify?email=${email}&redirect=${encodeURIComponent(redirectParam)}`;
     } catch {
       showStatus('Network error — please try again.', true);
       btn.disabled = false;
-      btn.textContent = isLogin ? 'Sign In' : 'Create Account';
+      btn.textContent = mode === 'login' ? 'Sign In' : 'Create Account';
     }
   }
 
-  loginForm.addEventListener('submit', (e) => handleSubmit(e, '/api/auth/login'));
-  registerForm.addEventListener('submit', (e) => handleSubmit(e, '/api/auth/register'));
+  // ── Forgot password submit ──────────────────────────────
+  forgotForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = Object.fromEntries(new FormData(form));
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        showStatus(result.error || 'Something went wrong.', true);
+        btn.disabled = false;
+        btn.textContent = 'Send Reset Code';
+        return;
+      }
+
+      // Always redirect to verify — even if email not found, to prevent enumeration
+      const email = encodeURIComponent((result.email as string) || (data.email as string));
+      window.location.href = `/verify?email=${email}&mode=reset`;
+    } catch {
+      showStatus('Network error — please try again.', true);
+      btn.disabled = false;
+      btn.textContent = 'Send Reset Code';
+    }
+  });
+
+  loginForm.addEventListener('submit', (e) => handleAuthSubmit(e, '/api/auth/login'));
+  registerForm.addEventListener('submit', (e) => handleAuthSubmit(e, '/api/auth/register'));
 </script>
