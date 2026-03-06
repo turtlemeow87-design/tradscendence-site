@@ -309,9 +309,9 @@ function truncate(text: string, len = 120) {
     Without this, they persist into other pages (e.g. the About page gets
     the grain overlay, starfield bleeds over everything).
   -->
-  <div class="memories-bg" aria-hidden="true" transition:animate="none"></div>
-  <div class="grain-overlay" aria-hidden="true" transition:animate="none"></div>
-  <div id="starfield" class="memories-bg" aria-hidden="true" transition:animate="none"></div>
+  <div class="memories-bg" aria-hidden="true"></div>
+  <div class="grain-overlay" aria-hidden="true"></div>
+  <div id="starfield" class="memories-bg" aria-hidden="true"></div>
 
   <section class="relative z-10 mx-auto max-w-5xl px-4 py-12 text-ivory">
 
@@ -622,5 +622,13 @@ function truncate(text: string, len = 120) {
       initLightbox();
       initReviewToggles();
     });
+
+    // Nuke the fixed backgrounds the moment we navigate away,
+    // before the page swap happens — transition:animate="none" skips
+    // the animation but leaves elements in the DOM during the transition,
+    // which is enough for them to bleed onto the incoming page.
+    document.addEventListener('astro:before-swap', () => {
+      document.querySelectorAll('.memories-bg, .grain-overlay').forEach(el => el.remove());
+    }, { once: true });
   </script>
 </BaseLayout>
