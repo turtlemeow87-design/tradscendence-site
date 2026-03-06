@@ -199,7 +199,16 @@ const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL || '';
         <textarea class="bg-ebony/60 frame rounded-xl px-3 py-2 border border-[var(--accent-bronze)]"
                   rows="6" name="message" required></textarea>
       </label>
-
+<!-- Account nudge -->
+      <div class="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-sm text-ivory/70 leading-relaxed">
+        <span class="font-display text-gold text-xs uppercase tracking-wide">Track your booking</span>
+        <p class="mt-1">
+          Once your inquiry is received, you can
+          <a href="/register" class="gothic-link font-semibold text-gold">create an account</a>
+          to view your booking status, sign contracts, and download documents — all in one place.
+          <span class="text-ivory/40">Already registered? <a href="/login" class="gothic-link">Sign in</a>.</span>
+        </p>
+      </div>
       <!-- Honeypot (hidden spam trap) -->
       <input type="text" name="honeypot" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px" />
 
