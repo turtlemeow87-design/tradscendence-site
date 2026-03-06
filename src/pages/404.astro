@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page Not Found — Tradscendence"
+  description="The page you're looking for doesn't exist."
+  canonical="https://soundbeyondborders.com/404"
+>
+  <main class="min-h-[70vh] flex items-center justify-center px-4 py-20">
+    <div class="page-enter text-center max-w-lg mx-auto">
+
+      <!-- Decorative accent -->
+      <div class="mb-6 flex items-center justify-center gap-4 opacity-40">
+        <span class="block h-px w-12 bg-gradient-to-r from-transparent to-[var(--bronze)]"></span>
+        <span class="text-[var(--accent-gold)] font-display text-sm tracking-[0.3em] uppercase">404</span>
+        <span class="block h-px w-12 bg-gradient-to-l from-transparent to-[var(--bronze)]"></span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="font-display text-3xl sm:text-4xl text-ivory mb-4 leading-snug">
+        Nothing Here but Silence
+      </h1>
+
+      <!-- Body copy -->
+      <p class="text-ivory/60 text-base sm:text-lg leading-relaxed mb-3 max-w-md mx-auto">
+        The page you're looking for may have been moved, removed, or never existed.
+        Even the best musicians hit a wrong note.
+      </p>
+      <p class="text-ivory/40 text-sm mb-10">
+        If you followed a link here, something may be out of tune on our end.
+      </p>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/"
+          class="rounded-xl px-6 py-3 bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition-colors duration-200 text-sm tracking-wide"
+        >
+          Back to Home
+        </a>
+        <a
+          href="/instruments"
+          class="rounded-xl px-6 py-3 border border-[var(--accent-gold)]/40 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/10 font-semibold transition-colors duration-200 text-sm tracking-wide"
+        >
+          Explore Instruments
+        </a>
+      </div>
+
+      <!-- Subtle decorative footer line -->
+      <div class="mt-16 flex justify-center">
+        <span class="block h-px w-24 bg-gradient-to-r from-transparent via-[var(--bronze)] to-transparent opacity-30"></span>
+      </div>
+
+    </div>
+  </main>
+</BaseLayout>
