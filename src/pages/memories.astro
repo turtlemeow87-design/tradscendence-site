@@ -303,15 +303,11 @@ function truncate(text: string, len = 120) {
     }
   </style>
 
-  <!-- Page wrapper: position:relative so absolute backgrounds are scoped
-       to this page's DOM tree and get swapped out naturally by View Transitions.
-       This is the correct fix — position:fixed elements are viewport-scoped
-       and bleed onto other pages during transitions regardless of other guards. -->
   <div class="relative min-h-screen overflow-hidden">
 
-  <div class="memories-bg" aria-hidden="true" transition:name="memories-bg"></div>
-  <div class="grain-overlay" aria-hidden="true" transition:name="memories-grain"></div>
-  <div id="starfield" class="memories-bg" aria-hidden="true" transition:name="memories-starfield"></div>
+  <div class="memories-bg" aria-hidden="true"></div>
+  <div class="grain-overlay" aria-hidden="true"></div>
+  <div id="starfield" class="memories-bg" aria-hidden="true"></div>
 
   <section class="relative z-10 mx-auto max-w-5xl px-4 py-12 text-ivory">
 
@@ -616,13 +612,5 @@ function truncate(text: string, len = 120) {
     initMemoryObserver();
     initLightbox();
     initReviewToggles();
-
-    // Re-run everything after View Transitions navigation to this page
-    document.addEventListener('astro:page-load', () => {
-      initStarfield();
-      initMemoryObserver();
-      initLightbox();
-      initReviewToggles();
-    });
   </script>
 </BaseLayout>
