@@ -7,6 +7,15 @@ const description =
 ---
 
 <BaseLayout {title} description={description}>
+  <!--
+    Initialize --dream to 0 before ANY content renders so the fixed
+    backgrounds start invisible. The scroll driver sets the correct
+    value immediately on DOMContentLoaded — no visible flash.
+  -->
+  <script is:inline>
+    document.documentElement.style.setProperty("--dream", "0");
+  </script>
+
   <!-- Dream layers (behind content) -->
   <div class="about-dream-bg" aria-hidden="true"></div>
   <div class="about-grain" aria-hidden="true"></div>
@@ -149,12 +158,12 @@ const description =
       </figure>
 
       <p>
-        When people say "music is a universal language", I don’t fully agree with what the phrase usually implies. If it
+        When people say "music is a universal language", I don't fully agree with what the phrase usually implies. If it
         were truly universal in that sense, why must I go to Juilliard to be respected as a classical musician? Why must I
         have a guru to be respected as a Hindustani classical musician? The truth is: traditions often come with lineage,
-        context, and standards — and that’s good. I respect it. But to me, "universal" means something else: how can I feel
+        context, and standards — and that's good. I respect it. But to me, "universal" means something else: how can I feel
         just as much emotion from a maqam on an Armenian duduk (a double-reeded woodwind) and a daf drum, as I can feel
-        from a heavily distorted guitar in a Western metal song with jazz-inspired drumming? There’s something deeper going
+        from a heavily distorted guitar in a Western metal song with jazz-inspired drumming? There's something deeper going
         on.
       </p>
 
@@ -165,15 +174,15 @@ const description =
         where I can finally record and produce full compositions. But right now I work a full-time job, and I spend a lot
         of spare time practicing. Last year, out of nowhere, I came across my first gig. Someone in a Facebook group asked,
         "Does anybody around here play oud?" — and I answered. What followed was an offer, rehearsals, and an event that
-        turned out to be genuinely rewarding (and it’s the first memory posted on my Memories page).
+        turned out to be genuinely rewarding (and it's the first memory posted on my Memories page).
       </p>
 
       <p>
         But how do I find more gigs like that? I can pay for listings. I can fight for attention on social media. But it
         finally dawned on me: if I worked hard enough, I could build my own home base — my own website. And so here we are.
         A place where I can share my journey and the instruments I play, but also a starting ground to build a more
-        professional career doing what I love most. And if I’m going to do this — why not let others be part of the
-        journey? I offer my services to help shape the atmosphere of life’s most special and emotional moments. Why not
+        professional career doing what I love most. And if I'm going to do this — why not let others be part of the
+        journey? I offer my services to help shape the atmosphere of life's most special and emotional moments. Why not
         encourage music to be more universal? Arabic on banjo at a wedding. A duduk filling the room with something
         mystical to help ease the passing of a loved one (in America, not just Armenia). A real Pakistani rabab sampled in
         a hip hop track, with all its organic nuance. A bass-ranged sitar (surbahar) intriguing guests at a formal party.
@@ -188,8 +197,8 @@ const description =
       </p>
 
       <p>
-        Thank you for taking the time to visit, to be curious, and to explore what I’m building here. Feel free to keep
-        exploring, or contact me with any questions and inquiries. I’m an open book (within reason).
+        Thank you for taking the time to visit, to be curious, and to explore what I'm building here. Feel free to keep
+        exploring, or contact me with any questions and inquiries. I'm an open book (within reason).
       </p>
 
       <p>I am based in Richmond, VA (US).</p>
@@ -271,10 +280,10 @@ const description =
 
   <style>
     .about-stage {
-      --dream: 1;
+      --dream: 0;
     }
 
-    /* ── About “timeline” wrapper ── */
+    /* ── About "timeline" wrapper ── */
     .about-timeline {
       position: relative;
       padding-left: 2rem;
