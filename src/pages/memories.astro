@@ -89,7 +89,7 @@ function truncate(text: string, len = 120) {
   <style>
     /* ── Starfield background ─────────────────────────── */
     .memories-bg {
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 0;
       pointer-events: none;
@@ -292,7 +292,7 @@ function truncate(text: string, len = 120) {
 
     /* ── Subtle page grain overlay ───────────────────── */
     .grain-overlay {
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 0;
       pointer-events: none;
@@ -303,15 +303,15 @@ function truncate(text: string, len = 120) {
     }
   </style>
 
-  <!--
-    transition:animate="none" prevents View Transitions from keeping these
-    fixed background elements alive when navigating away from this page.
-    Without this, they persist into other pages (e.g. the About page gets
-    the grain overlay, starfield bleeds over everything).
-  -->
-  <div class="memories-bg" aria-hidden="true"></div>
-  <div class="grain-overlay" aria-hidden="true"></div>
-  <div id="starfield" class="memories-bg" aria-hidden="true"></div>
+  <!-- Page wrapper: position:relative so absolute backgrounds are scoped
+       to this page's DOM tree and get swapped out naturally by View Transitions.
+       This is the correct fix — position:fixed elements are viewport-scoped
+       and bleed onto other pages during transitions regardless of other guards. -->
+  <div class="relative min-h-screen overflow-hidden">
+
+  <div class="memories-bg" aria-hidden="true" transition:name="memories-bg"></div>
+  <div class="grain-overlay" aria-hidden="true" transition:name="memories-grain"></div>
+  <div id="starfield" class="memories-bg" aria-hidden="true" transition:name="memories-starfield"></div>
 
   <section class="relative z-10 mx-auto max-w-5xl px-4 py-12 text-ivory">
 
@@ -501,6 +501,8 @@ function truncate(text: string, len = 120) {
 
   </section>
 
+  </div><!-- end .memories-page-wrapper -->
+
   <!-- GLightbox JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/js/glightbox.min.js"></script>
 
@@ -622,13 +624,5 @@ function truncate(text: string, len = 120) {
       initLightbox();
       initReviewToggles();
     });
-
-    // Nuke the fixed backgrounds the moment we navigate away,
-    // before the page swap happens — transition:animate="none" skips
-    // the animation but leaves elements in the DOM during the transition,
-    // which is enough for them to bleed onto the incoming page.
-    document.addEventListener('astro:before-swap', () => {
-      document.querySelectorAll('.memories-bg, .grain-overlay').forEach(el => el.remove());
-    }, { once: true });
   </script>
 </BaseLayout>
