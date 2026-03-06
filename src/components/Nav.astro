@@ -16,28 +16,27 @@ const authLink = user
   : { href: '/login', label: 'Login' };
 ---
 
-<header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70 border-b border-black/40">
+<header class="nav-header sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70">
   <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip">
     <div class="flex justify-between min-w-0 py-3 sm:py-4">
       <!-- Logo and handle stacked -->
       <div class="flex flex-col items-end gap-1">
         <a href="/" class="block h-[88px] sm:h-[96px] relative group">
-  <div class="absolute inset-0 rounded-[22%] blur-md bg-gradient-to-r from-charcoal via-transparent to-charcoal opacity-30 group-hover:opacity-40 transition-opacity duration-300 pointer-events-none"></div>
-  <img 
-    src="/media/logo4.webp" 
-    alt="HE MUSIQ – HunterEastlandMusiq logo" 
-    class="relative h-full w-auto object-contain rounded-[22%] shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
-    loading="eager"
-  />
-</a>
+          <div class="absolute inset-0 rounded-[22%] blur-md bg-gradient-to-r from-charcoal via-transparent to-charcoal opacity-30 group-hover:opacity-40 transition-opacity duration-300 pointer-events-none"></div>
+          <img 
+            src="/media/logo4.webp" 
+            alt="HE MUSIQ – HunterEastlandMusiq logo" 
+            class="relative h-full w-auto object-contain rounded-[22%] shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
+            loading="eager"
+          />
+        </a>
 
         <a
-  href="/#footer"
-  class="text-[0.83rem] sm:text-sm text-rosewood hover:text-gold font-medium italic tracking-wide pl-[2px] drop-shadow-[0_0_0.5px_ivory]"
->
-  @Tradscendence
-</a>
-
+          href="/#footer"
+          class="text-[0.83rem] sm:text-sm text-rosewood hover:text-gold font-medium italic tracking-wide pl-[2px] drop-shadow-[0_0_0.5px_ivory]"
+        >
+          @Tradscendence
+        </a>
       </div>
 
       <!-- Desktop nav -->
@@ -86,6 +85,24 @@ const authLink = user
     </div>
   </div>
 </header>
+
+<style>
+  /*
+    The bottom-fade effect:
+    - pb-6 adds 24px of empty space below the nav bar content.
+    - mask-image clips that space from fully visible (black) at 80%
+      of the total header height down to fully transparent at 100%.
+    - Because the mask applies to the entire element — including the
+      backdrop-blur — the frosted glass itself fades out, not just
+      an overlay on top of it. This is the key difference vs a
+      pseudo-element approach.
+  */
+  header.nav-header {
+    padding-bottom: 1.5rem;
+    -webkit-mask-image: linear-gradient(to bottom, black 78%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 78%, transparent 100%);
+  }
+</style>
 
 <script>
   const btn = document.getElementById('menuBtn');

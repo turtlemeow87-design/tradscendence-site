@@ -57,7 +57,7 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
   <Divider />
 
   <section class="mx-auto max-w-6xl px-4">
-    <figure class="relative rounded-2xl overflow-hidden frame shadow-soft">
+    <figure class="relative rounded-2xl overflow-hidden shadow-soft">
       <img
         src="/media/hero-placeholder.webp"
         alt="Hunter with instruments"
@@ -68,6 +68,7 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
         fetchpriority="high"
         decoding="async"
       />
+      <!-- Edge fade overlay: all four sides bleed into charcoal background -->
       <div class="hero-fade-overlay"></div>
       <figcaption class="relative p-3 sm:p-4 text-xs sm:text-sm bg-gradient-to-r from-ebony via-ebony to-transparent">
         <div class="font-display">What is sound beyond borders?</div>
@@ -78,14 +79,52 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
 
   <style>
     .hero-fade-overlay {
-      position: absolute; inset: 0; pointer-events: none;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+
+      /*
+        Layered gradients — each handles one edge.
+        The charcoal color (#111111) matches the page background.
+
+        Bottom: strong fade so figcaption blends in naturally.
+        Top: moderate fade to blend into the nav area.
+        Sides: wide, heavy fade so the photo dissolves into the dark bg.
+
+        Multiple gradients composite additively — corners get double-coverage
+        which creates a natural vignette without needing a separate radial pass.
+      */
       background:
-        radial-gradient(ellipse at 50% 115%, rgba(17,17,17,0.85) 12%, rgba(17,17,17,0.0) 55%),
-        linear-gradient(to bottom, rgba(17,17,17,0.0) 72%, rgba(17,17,17,0.85) 98%),
-        linear-gradient(to top, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 22%),
-        linear-gradient(to right, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 20%),
-        linear-gradient(to left, rgba(17,17,17,0.35) 0%, rgba(17,17,17,0.0) 20%);
-      mix-blend-mode: normal;
+        /* Bottom — strongest, covers figcaption area too */
+        linear-gradient(
+          to bottom,
+          rgba(17,17,17,0) 45%,
+          rgba(17,17,17,0.92) 100%
+        ),
+        /* Top */
+        linear-gradient(
+          to bottom,
+          rgba(17,17,17,0.55) 0%,
+          rgba(17,17,17,0) 28%
+        ),
+        /* Left side — wide and heavy */
+        linear-gradient(
+          to right,
+          rgba(17,17,17,0.85) 0%,
+          rgba(17,17,17,0) 38%
+        ),
+        /* Right side — wide and heavy */
+        linear-gradient(
+          to left,
+          rgba(17,17,17,0.85) 0%,
+          rgba(17,17,17,0) 38%
+        ),
+        /* Corner vignette — soft radial to catch the four corners */
+        radial-gradient(
+          ellipse at 50% 50%,
+          rgba(17,17,17,0) 40%,
+          rgba(17,17,17,0.45) 100%
+        );
     }
   </style>
 
@@ -158,14 +197,14 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
         </div>
       </div>
       <InstrumentChat
-  pageContext="Home page featured instruments section — the three featured instruments are the Surbahar (Indian), Baglama Saz (Turkish), and Arabic Oud (Arabic)"
-  suggestedQuestions={[
-    "What is the Surbahar and how does it sound?",
-    "Tell me about the Baglama Saz",
-    "What makes the Arabic Oud unique?",
-    "How are these three instruments related?",
-  ]}
-/>
+        pageContext="Home page featured instruments section — the three featured instruments are the Surbahar (Indian), Baglama Saz (Turkish), and Arabic Oud (Arabic)"
+        suggestedQuestions={[
+          "What is the Surbahar and how does it sound?",
+          "Tell me about the Baglama Saz",
+          "What makes the Arabic Oud unique?",
+          "How are these three instruments related?",
+        ]}
+      />
     </section>
 
     <Divider />
@@ -242,7 +281,6 @@ const watchUrl2 = `https://youtu.be/${SECOND_YT.id}`;
           audio.muted = false; audio.volume = 1;
           audio.play().catch((err) => {
             if (err.name !== 'AbortError') console.warn('play failed:', err);
-            // AbortError is expected on rapid switching — suppress silently
           });
         } else { audio.pause(); }
       });
