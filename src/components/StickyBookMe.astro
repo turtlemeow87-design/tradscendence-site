@@ -122,16 +122,18 @@ const today = new Date().toISOString().split('T')[0];
   .book-me-shimmer {
     background: linear-gradient(
       90deg,
-      var(--accent-gold) 0%,
-      #f5e9c8 38%,
-      var(--accent-gold) 58%,
-      var(--accent-gold-dark) 100%
+      var(--bronze, #8C5A32) 0%,
+      #f5f1e8 35%,
+      var(--accent-gold) 55%,
+      var(--bronze, #8C5A32) 100%
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: shimmer 4s linear infinite;
+    /* Subtle dark halo behind the text for separation from gold bg */
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
   }
 
   .book-me-btn:hover .book-me-shimmer {
