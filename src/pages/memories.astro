@@ -141,13 +141,35 @@ function truncate(text: string, len = 120) {
       flex-shrink: 0;
     }
 
-    /* ── Memory entry fade-in ─────────────────────────── */
+    /* ── Memory entry fade-in (enhanced with scale) ───── */
     .memory-entry {
       opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
+      transform: translateY(18px) scale(0.98);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .memory-entry.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ── Review sidebar entrance (desktop) ────────────── */
+    .memory-entry .review-aside {
+      opacity: 0;
+      transform: translateX(12px);
+      transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+    }
+    .memory-entry.visible .review-aside {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── Review mobile entrance ───────────────────────── */
+    .memory-entry .review-mobile {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.45s ease 0.15s, transform 0.45s ease 0.15s;
+    }
+    .memory-entry.visible .review-mobile {
       opacity: 1;
       transform: translateY(0);
     }
@@ -311,7 +333,7 @@ function truncate(text: string, len = 120) {
         {memoryRows.map((m, i) => (
           <li
             class="memory-entry relative mb-16 last:mb-0"
-            style={`transition-delay: ${i * 80}ms`}
+            style={`transition-delay: ${i * 120}ms`}
           >
             <div class="timeline-dot" aria-hidden="true"></div>
 

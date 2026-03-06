@@ -257,7 +257,7 @@ function getStatusConfig(status: string) {
                 </p>
               </div>
             ) : (
-              submissions.map((sub) => {
+              submissions.map((sub, cardIndex) => {
                 const contract = contracts[sub.id];
                 const subInvoices = invoices[sub.id] || [];
                 const existingReview = reviews[sub.id] ?? null;
@@ -265,7 +265,7 @@ function getStatusConfig(status: string) {
                 const hasNoDocuments = !contract && subInvoices.length === 0;
                 const { label: statusLabel, classes: statusClasses } = getStatusConfig(sub.status);
                 return (
-                  <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id={sub.id}>
+                  <article class="bg-charcoal/80 frame rounded-xl p-6 card-enter" data-submission-id={sub.id} style={`transition-delay: ${cardIndex * 100}ms`}>
 
                     <!-- Header -->
                     <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
@@ -630,5 +630,19 @@ function getStatusConfig(status: string) {
         }
       });
     });
+    // ── Card stagger entrance ─────────────────────────────
+    const cards = document.querySelectorAll('.card-enter');
+    const cardObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            cardObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05 }
+    );
+    cards.forEach(el => cardObserver.observe(el));
   </script>
 </BaseLayout>
