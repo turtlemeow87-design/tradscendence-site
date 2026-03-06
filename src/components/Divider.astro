@@ -1,1 +1,41 @@
-<div class="hr-gothic my-8" role="separator" aria-hidden="true"></div>
+<div class="divider-reveal my-8" role="separator" aria-hidden="true">
+  <div class="hr-gothic"></div>
+</div>
+
+<style>
+  .divider-reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .divider-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+<script>
+  // Runs once per page — observes all divider instances
+  function initDividers() {
+    const dividers = document.querySelectorAll('.divider-reveal');
+    if (!dividers.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    dividers.forEach(el => observer.observe(el));
+  }
+
+  // Run on first load and after each View Transition navigation
+  initDividers();
+  document.addEventListener('astro:page-load', initDividers);
+</script>

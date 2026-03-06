@@ -1,13 +1,14 @@
 ---
 const today = new Date().toISOString().split('T')[0];
 ---
+
 <!-- Floating "Book me" button -->
-<div class="fixed right-4 bottom-4 md:bottom-auto md:top-4 z-50">
+<div class="book-me-launcher fixed right-4 bottom-4 md:bottom-auto md:top-4 z-50">
   <button
     id="open-book"
-    class="rounded-2xl shadow-soft px-4 py-2 font-semibold bg-gold text-ivory hover:bg-golddark hover:text-rosewood focus:outline-none frame"
+    class="book-me-btn rounded-2xl shadow-soft px-4 py-2 font-semibold bg-gold hover:bg-golddark focus:outline-none frame"
   >
-    Book me
+    <span class="book-me-shimmer">Book me</span>
   </button>
 </div>
 
@@ -84,6 +85,63 @@ const today = new Date().toISOString().split('T')[0];
   </form>
 </dialog>
 
+<style>
+  /* ── Entrance animation ───────────────────────────────── */
+  @keyframes bookMeEnter {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .book-me-launcher {
+    animation: bookMeEnter 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+    animation-delay: 1.2s;
+    /* Start invisible so there's no flash before the animation fires */
+    opacity: 0;
+  }
+
+  /* ── Gold shimmer on button text ─────────────────────── */
+  /*
+    Same keyframe as the Memories page title shimmer.
+    bg-gold stays on the button element itself.
+    The span uses background-clip: text to paint the gradient
+    over just the text — -webkit-text-fill-color: transparent
+    cuts out the solid color so the gradient shows through.
+    On hover the shimmer pauses so the darker bg-golddark reads cleanly.
+  */
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+
+  .book-me-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--accent-gold) 0%,
+      #f5e9c8 38%,
+      var(--accent-gold) 58%,
+      var(--accent-gold-dark) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+  }
+
+  .book-me-btn:hover .book-me-shimmer {
+    animation-play-state: paused;
+    /* On hover let rosewood text from Tailwind class show through */
+    background: none;
+    -webkit-text-fill-color: var(--rosewood, #6E2A2A);
+  }
+</style>
+
 <script>
   const openBtn = document.getElementById('open-book');
   const closeBtn = document.getElementById('close-book');
@@ -112,7 +170,6 @@ const today = new Date().toISOString().split('T')[0];
     const formData = new FormData(form);
     const data = Object.fromEntries(formData);
 
-    // Update button state
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending...';
     statusDiv.classList.add('hidden');
@@ -132,7 +189,6 @@ const today = new Date().toISOString().split('T')[0];
         statusDiv.classList.remove('hidden');
         form.reset();
         
-        // Close dialog after short delay
         setTimeout(() => {
           dialog.close();
           statusDiv.classList.add('hidden');

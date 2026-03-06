@@ -3,6 +3,7 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import StickyBookMe from "../components/StickyBookMe.astro";
+import { ViewTransitions } from "astro:transitions";
 
 const {
   title = 'Tradscendence',
@@ -22,6 +23,8 @@ const {
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <!-- View Transitions — smooth cross-page fades, zero config needed -->
+    <ViewTransitions />
     <!-- Google tag (gtag.js) -->
     <script defer src="https://www.googletagmanager.com/gtag/js?id=G-WKHBP3PKLL"></script>
     <script is:inline>
