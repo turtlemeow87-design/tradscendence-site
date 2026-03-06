@@ -30,6 +30,7 @@ export const GET: APIRoute = async ({ request }) => {
           status: "Pending",
           created_at: new Date().toISOString(),
           last_reminded_at: null,
+          admin_notes: null,
           is_registered: false,
           contract: null,
         },
@@ -53,6 +54,7 @@ export const GET: APIRoute = async ({ request }) => {
         cs.status,
         cs.created_at,
         cs.last_reminded_at,
+        cs.admin_notes,
         c.id            AS contract_id,
         c.file_url,
         c.uploaded_at,
@@ -77,6 +79,7 @@ export const GET: APIRoute = async ({ request }) => {
       status: sub.status,
       created_at: sub.created_at,
       last_reminded_at: sub.last_reminded_at || null,
+      admin_notes: sub.admin_notes || null,
       is_registered: sub.is_registered,
       contract: sub.contract_id
         ? {

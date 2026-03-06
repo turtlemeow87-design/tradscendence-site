@@ -33,7 +33,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       <!-- Admin Panel (hidden until unlocked) -->
       <div id="adminContent" class="hidden">
 
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-4">
           <h1 class="font-display text-3xl text-gold">Document Management</h1>
           <button
             id="refreshBtn"
@@ -42,6 +42,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             Refresh
           </button>
         </div>
+
+        <!-- Submission count summary -->
+        <div id="submissionSummary" class="mb-6"></div>
 
         <div id="submissionsList" class="space-y-10">
           <p class="text-ivory/60 text-center py-8">Loading submissions...</p>
@@ -430,6 +433,31 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       if (isDrawerOpen('memoriesDrawer')) closeDrawer('memoriesDrawer', 'memoriesBackdrop');
     });
 
+    // ── Submission summary ────────────────────────────────
+    function renderSummary(submissions: any[]) {
+      const summaryEl = document.getElementById('submissionSummary');
+      if (!summaryEl) return;
+
+      const active = submissions.filter(s => s.status !== 'Complete' && s.status !== 'Declined');
+      const counts: Record<string, number> = {};
+      for (const s of active) {
+        counts[s.status] = (counts[s.status] || 0) + 1;
+      }
+
+      const breakdown = Object.entries(counts)
+        .map(([status, count]) => `<span class="text-ivory/50">${count} ${status}</span>`)
+        .join('<span class="text-ivory/20 mx-1">·</span>');
+
+      summaryEl.innerHTML = `
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm px-1 border border-gold/15 rounded-xl px-4 py-2.5 bg-gold/5">
+          <span class="font-display text-gold">${submissions.length} total</span>
+          <span class="text-ivory/20">·</span>
+          <span class="text-ivory/60">${active.length} active</span>
+          ${breakdown ? `<span class="text-ivory/20">·</span> ${breakdown}` : ''}
+        </div>
+      `;
+    }
+
     // ── Load all ──────────────────────────────────────────
     async function loadAll() {
       const authError = document.getElementById('authError');
@@ -463,6 +491,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           invoiceMap[inv.submission_id].push(inv);
         }
 
+        renderSummary(submissions);
         renderSubmissions(submissions, invoiceMap);
         loadReviews();
       } catch (err) {
@@ -814,13 +843,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to delete');
 
-        // Fade out card
-        const card = btn.closest('[data-memory-id]') as HTMLElement;
-        if (card) {
-          card.style.transition = 'opacity 0.3s ease';
-          card.style.opacity = '0';
-          setTimeout(() => card.remove(), 300);
-        }
+        // Reload list cleanly after delete
+        loadMemories();
       } catch (err: any) {
         alert(err.message || 'Failed to delete');
         btn.disabled = false;
@@ -864,6 +888,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const currentStatus = sub.status || 'Pending';
         const badgeClass   = STATUS_STYLES[currentStatus] || STATUS_STYLES['Pending'];
         const remindedAt   = formatRemindedAt(sub.last_reminded_at);
+        const escapedNotes = (sub.admin_notes || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
         return `
         <article
@@ -920,7 +945,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             </div>
           </div>
 
-          <!-- Reminder -->
+          <!-- Client Reminder -->
           <div class="mt-4 pt-4 border-t border-gold/20">
             <h4 class="font-display text-gold mb-3 text-sm uppercase tracking-wide">Client Reminder</h4>
             <div class="flex items-center gap-3 flex-wrap">
@@ -930,6 +955,24 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 data-email="${sub.email}"
               >Send Reminder</button>
               <span class="remind-timestamp text-ivory/40 text-xs italic">${remindedAt ? `Last sent: ${remindedAt}` : 'Never sent'}</span>
+            </div>
+          </div>
+
+          <!-- Admin Notes -->
+          <div class="mt-4 pt-4 border-t border-gold/20">
+            <h4 class="font-display text-gold mb-3 text-sm uppercase tracking-wide">Admin Notes</h4>
+            <textarea
+              class="notes-textarea w-full bg-charcoal/60 frame rounded-xl px-3 py-2 border border-gold/40 focus:border-gold focus:outline-none text-sm text-ivory resize-none"
+              rows="3"
+              placeholder="Internal notes — not visible to client..."
+              data-submission-id="${sub.id}"
+            >${escapedNotes}</textarea>
+            <div class="flex items-center gap-3 mt-2">
+              <button
+                class="save-notes-btn px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold frame transition"
+                data-submission-id="${sub.id}"
+              >Save Note</button>
+              <span class="notes-feedback text-sm hidden"></span>
             </div>
           </div>
 
@@ -1024,6 +1067,42 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       document.querySelectorAll('.delete-contract-btn').forEach(b   => b.addEventListener('click',  handleContractDelete));
       document.querySelectorAll('.delete-invoice-btn').forEach(b    => b.addEventListener('click',  handleInvoiceDelete));
       document.querySelectorAll('.send-reminder-btn').forEach(b     => b.addEventListener('click',  handleSendReminder));
+      document.querySelectorAll('.save-notes-btn').forEach(b        => b.addEventListener('click',  handleNotesSave));
+    }
+
+    async function handleNotesSave(e: Event) {
+      const btn          = e.currentTarget as HTMLButtonElement;
+      const submissionId = Number(btn.dataset.submissionId);
+      const article      = btn.closest('article') as HTMLElement;
+      const textarea     = article.querySelector('.notes-textarea') as HTMLTextAreaElement;
+      const feedback     = article.querySelector('.notes-feedback') as HTMLElement;
+      const notes        = textarea.value.trim();
+
+      btn.disabled    = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        const res = await fetch('/api/admin/submissions/notes', {
+          method: 'PATCH',
+          headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submission_id: submissionId, notes: notes || null }),
+        });
+        if (res.status === 401) throw new Error('Session expired — please refresh and re-enter your admin key');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save');
+
+        feedback.textContent = '✓ Saved';
+        feedback.className   = 'notes-feedback text-green-400 text-sm';
+        feedback.classList.remove('hidden');
+        setTimeout(() => feedback.classList.add('hidden'), 2500);
+      } catch (err: any) {
+        feedback.textContent = err.message || 'Failed to save';
+        feedback.className   = 'notes-feedback text-rosewood text-sm';
+        feedback.classList.remove('hidden');
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Save Note';
+      }
     }
 
     async function handleStatusSave(e: Event) {

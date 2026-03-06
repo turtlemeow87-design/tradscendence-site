@@ -159,13 +159,13 @@ export const POST: APIRoute = async ({ request }) => {
       console.log("✅ Database insert successful! ID:", result[0]?.id);
     } catch (dbError) {
       console.error("❌ Database error:", dbError);
-      // Continue even if database fails - still send email
+      // Continue even if database fails — still send email
     }
   } else {
     console.log("🔧 Development mode: Skipping database insert");
   }
 
-  // 9) Send email via Resend (skip in development)
+  // 9) Send emails via Resend (skip in development)
   if (!isDevelopment) {
     const resendApiKey = import.meta.env.RESEND_API_KEY;
     const contactEmail = import.meta.env.CONTACT_EMAIL;
@@ -178,11 +178,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     const resend = new Resend(resendApiKey);
 
-    // Build email content
+    // Build admin notification email
     const instrumentList = instruments.length > 0 ? instruments.join(", ") : "Not specified";
     const genreList = genres.length > 0 ? genres.join(", ") : "Not specified";
 
-    const emailBody = `
+    const adminEmailBody = `
 New Inquiry from ${fullName}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -208,29 +208,66 @@ IP: ${ipAddress}
 Timestamp: ${new Date().toISOString()}
     `.trim();
 
+    // Send admin notification
     try {
       const { data, error } = await resend.emails.send({
         from: 'Tradscendence Booking <bookings@soundbeyondborders.com>',
         to: [contactEmail],
         replyTo: email,
         subject: `🎵 SoundBeyondBorders Booking Inquiries and Questions`,
-        text: emailBody,
+        text: adminEmailBody,
       });
 
       if (error) {
-        console.error("❌ Resend error:", error);
+        console.error("❌ Resend error (admin):", error);
         return json(502, { 
           error: "Failed to send email notification." 
         });
       }
 
-      console.log("✅ Email sent successfully:", data);
+      console.log("✅ Admin email sent successfully:", data);
     } catch (emailError) {
-      console.error("❌ Email error:", emailError);
+      console.error("❌ Email error (admin):", emailError);
       return json(502, { 
         error: "Failed to send email notification." 
       });
     }
+
+    // Send client confirmation email
+    // Non-fatal — if this fails, the submission is still saved
+    try {
+      const clientEmailBody = `
+Hi ${firstName},
+
+Your booking inquiry has been received — thank you for reaching out! Hunter will follow up with you shortly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Want to track your booking in one place? Create an account at soundbeyondborders.com and you'll be able to view your inquiry status, sign contracts, and download invoices as your booking progresses.
+
+soundbeyondborders.com/register
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questions in the meantime? You can reply to this email or reach out at soundbeyondborders.com/contact.
+
+— Tradscendence
+      `.trim();
+
+      await resend.emails.send({
+        from: 'Tradscendence <bookings@soundbeyondborders.com>',
+        to: [email],
+        replyTo: contactEmail,
+        subject: `Your inquiry was received — Tradscendence`,
+        text: clientEmailBody,
+      });
+
+      console.log("✅ Client confirmation email sent");
+    } catch (clientEmailError) {
+      // Non-fatal — log but don't fail the request
+      console.error("⚠️ Client confirmation email failed (non-fatal):", clientEmailError);
+    }
+
   } else {
     console.log("🔧 Development mode: Skipping email send");
   }

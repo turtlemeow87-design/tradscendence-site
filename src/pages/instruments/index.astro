@@ -61,7 +61,7 @@ const items = dbItems.map((row) => ({
           <a class="gothic-link" href={href}>{name}</a>
           <button
             type="button"
-            class="opacity-60 hover:opacity-100 transition"
+            class="play-btn opacity-60 hover:opacity-100 transition"
             data-audio={file}
             aria-label={`Play ${name} sample`}
           >
@@ -229,6 +229,7 @@ const items = dbItems.map((row) => ({
       pointer-events: none;
     }
 
+    /* Play button — base */
     .instruments-page button[data-audio] {
       font-size: 1.75rem;
       color: var(--accent-gold, #C2A45F);
@@ -241,6 +242,15 @@ const items = dbItems.map((row) => ({
        -3px -3px var(--bronze, #CD7F32),
         2px -2px var(--bronze, #CD7F32),
        -3px 3px var(--bronze, #CD7F32);
+      /* Transitions for opacity (Tailwind), lift, and glow */
+      transition: opacity 0.15s ease, transform 0.2s ease, filter 0.2s ease;
+    }
+
+    /* Play button — hover: lift + soft gold glow */
+    .instruments-page button[data-audio]:hover {
+      transform: translateY(-2px);
+      filter: drop-shadow(0 0 7px rgba(194, 164, 95, 0.75))
+              drop-shadow(0 0 14px rgba(194, 164, 95, 0.35));
     }
   </style>
 </BaseLayout>
