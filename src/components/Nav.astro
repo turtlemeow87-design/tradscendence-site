@@ -16,8 +16,31 @@ const authLink = user
   : { href: '/login', label: 'Login' };
 ---
 
-<header class="nav-header sticky top-0 z-40 backdrop-blur">
-  <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip">
+<!--
+  Architecture note (for future maintainers / Opus context):
+
+  backdrop-filter creates its own GPU compositing layer. A parent element's
+  mask-image CANNOT clip into a child's compositing layer in Chrome or Safari.
+  So we can't put backdrop-blur on <header> and mask on <header> — the mask
+  would only affect the background gradient, not the blur.
+
+  Solution: a single child div ("nav-backing") owns BOTH backdrop-filter AND
+  mask-image. When they're on the same element, the mask correctly clips the
+  entire compositing layer — blur included. The <header> is just a sticky
+  positioning shell. The child div does all visual work.
+
+  Structure:
+    <header>           — sticky shell, no visual styling
+      <div.nav-backing> — absolute, has backdrop-filter + gradient bg + mask
+      <div.relative>    — nav content sits above the backing
+-->
+
+<header class="nav-header sticky top-0 z-40">
+  <!-- Visual backing layer: blur + gradient + mask fade — all on one element -->
+  <div class="nav-backing" aria-hidden="true"></div>
+
+  <!-- Nav content — sits above the backing -->
+  <div class="relative z-10 mx-auto max-w-6xl px-4 w-full overflow-x-clip">
     <div class="flex justify-between min-w-0 py-3 sm:py-4">
       <!-- Logo and handle stacked -->
       <div class="flex flex-col items-end gap-1">
@@ -88,28 +111,57 @@ const authLink = user
 
 <style>
   /*
-    backdrop-filter creates its own GPU compositing layer, and browsers
-    don't reliably apply mask-image to that layer. So instead of masking,
-    we fade the *background color* using a gradient.
-
-    The backdrop-blur layer technically extends the full header height,
-    but without the charcoal backing color it's visually transparent —
-    so fading the background achieves the same perceived effect.
-
-    pb-10 extends the header downward to give the fade room to breathe.
-    The gradient goes from full charcoal/80 at top → transparent at bottom.
-    border-b is removed — a hard border at the bottom fights the fade.
+    The header is just a positioning shell — no visual properties here
+    except the extended padding that gives the fade room to breathe.
   */
   header.nav-header {
-    padding-bottom: 2.5rem;
+    padding-bottom: 2.8rem;
+    border-bottom: none;
+  }
+
+  /*
+    nav-backing: owns BOTH backdrop-filter and mask-image on one element.
+    This lets the mask correctly clip the blur compositing layer.
+
+    - Background gradient: charcoal → transparent (visual darkening)
+    - Backdrop-filter: blurs page content scrolling underneath
+    - Mask: fades the ENTIRE layer (blur + background) to transparent
+            at the bottom — no hard line.
+  */
+  .nav-backing {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    /* Charcoal tint that fades out */
     background: linear-gradient(
       to bottom,
-      rgba(17, 17, 17, 0.82) 0%,
-      rgba(17, 17, 17, 0.75) 55%,
-      rgba(17, 17, 17, 0.25) 80%,
+      rgba(17, 17, 17, 0.85) 0%,
+      rgba(17, 17, 17, 0.65) 45%,
+      rgba(17, 17, 17, 0.25) 75%,
       rgba(17, 17, 17, 0) 100%
     );
-    border-bottom: none;
+
+    /* Blur the page content behind the nav */
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    backdrop-filter: blur(14px) saturate(1.1);
+
+    /* Fade the ENTIRE compositing layer (blur + bg) to invisible */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 45%,
+      rgba(0, 0, 0, 0.4) 75%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 45%,
+      rgba(0, 0, 0, 0.4) 75%,
+      transparent 100%
+    );
   }
 </style>
 
