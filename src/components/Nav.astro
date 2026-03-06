@@ -16,7 +16,7 @@ const authLink = user
   : { href: '/login', label: 'Login' };
 ---
 
-<header class="nav-header sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-charcoal/70">
+<header class="nav-header sticky top-0 z-40 backdrop-blur">
   <div class="mx-auto max-w-6xl px-4 w-full overflow-x-clip">
     <div class="flex justify-between min-w-0 py-3 sm:py-4">
       <!-- Logo and handle stacked -->
@@ -88,19 +88,28 @@ const authLink = user
 
 <style>
   /*
-    The bottom-fade effect:
-    - pb-6 adds 24px of empty space below the nav bar content.
-    - mask-image clips that space from fully visible (black) at 80%
-      of the total header height down to fully transparent at 100%.
-    - Because the mask applies to the entire element — including the
-      backdrop-blur — the frosted glass itself fades out, not just
-      an overlay on top of it. This is the key difference vs a
-      pseudo-element approach.
+    backdrop-filter creates its own GPU compositing layer, and browsers
+    don't reliably apply mask-image to that layer. So instead of masking,
+    we fade the *background color* using a gradient.
+
+    The backdrop-blur layer technically extends the full header height,
+    but without the charcoal backing color it's visually transparent —
+    so fading the background achieves the same perceived effect.
+
+    pb-10 extends the header downward to give the fade room to breathe.
+    The gradient goes from full charcoal/80 at top → transparent at bottom.
+    border-b is removed — a hard border at the bottom fights the fade.
   */
   header.nav-header {
-    padding-bottom: 1.5rem;
-    -webkit-mask-image: linear-gradient(to bottom, black 78%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 78%, transparent 100%);
+    padding-bottom: 2.5rem;
+    background: linear-gradient(
+      to bottom,
+      rgba(17, 17, 17, 0.82) 0%,
+      rgba(17, 17, 17, 0.75) 55%,
+      rgba(17, 17, 17, 0.25) 80%,
+      rgba(17, 17, 17, 0) 100%
+    );
+    border-bottom: none;
   }
 </style>
 
