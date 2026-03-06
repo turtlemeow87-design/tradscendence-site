@@ -234,14 +234,27 @@ function getStatusConfig(status: string) {
           <!-- Bookings Section -->
           <section id="bookings" class="scroll-mt-28 space-y-6">
             {submissions.length === 0 ? (
-              <div class="bg-charcoal/80 frame rounded-xl p-8 text-center">
-                <p class="text-ivory/70 mb-4">No booking inquiries yet</p>
+              <!-- ═══ ENHANCED: Zero-bookings empty state ═══ -->
+              <div class="bg-charcoal/80 frame rounded-xl p-10 text-center max-w-lg mx-auto">
+                <div class="mb-5 flex items-center justify-center gap-4 opacity-40">
+                  <span class="block h-px w-10 bg-gradient-to-r from-transparent to-[var(--bronze)]"></span>
+                  <span class="text-[var(--accent-gold)] text-lg">♪</span>
+                  <span class="block h-px w-10 bg-gradient-to-l from-transparent to-[var(--bronze)]"></span>
+                </div>
+                <h3 class="font-display text-xl text-gold mb-3">No Bookings Yet</h3>
+                <p class="text-ivory/60 text-sm leading-relaxed mb-6">
+                  Once you submit a booking inquiry, it will appear here along with
+                  any contracts, invoices, and documents related to your event.
+                </p>
                 <a
                   href="/contact"
                   class="inline-block rounded-xl px-6 py-3 bg-gold text-ivory hover:bg-gold-dark hover:text-rosewood font-semibold frame transition"
                 >
-                  Submit Inquiry
+                  Submit an Inquiry
                 </a>
+                <p class="text-ivory/30 text-xs mt-4">
+                  Questions? Feel free to <a href="/contact" class="text-gold/60 hover:text-gold underline underline-offset-2">reach out</a> anytime.
+                </p>
               </div>
             ) : (
               submissions.map((sub) => {
@@ -249,6 +262,7 @@ function getStatusConfig(status: string) {
                 const subInvoices = invoices[sub.id] || [];
                 const existingReview = reviews[sub.id] ?? null;
                 const isComplete = sub.status === "Complete";
+                const hasNoDocuments = !contract && subInvoices.length === 0;
                 const { label: statusLabel, classes: statusClasses } = getStatusConfig(sub.status);
                 return (
                   <article class="bg-charcoal/80 frame rounded-xl p-6" data-submission-id={sub.id}>
@@ -288,6 +302,15 @@ function getStatusConfig(status: string) {
                         </div>
                       )}
                     </div>
+
+                    <!-- ═══ NEW: No-documents placeholder ═══ -->
+                    {hasNoDocuments && sub.status !== "Declined" && (
+                      <div class="mt-4 pt-4 border-t border-gold/10">
+                        <p class="text-ivory/30 text-sm italic">
+                          No documents uploaded yet — contracts and invoices will appear here when ready.
+                        </p>
+                      </div>
+                    )}
 
                     <!-- Contract -->
                     {contract && (
@@ -440,6 +463,15 @@ function getStatusConfig(status: string) {
                             <p class="review-error text-rosewood text-sm hidden"></p>
                           </form>
                         )}
+                      </div>
+                    )}
+
+                    <!-- ═══ NEW: Review availability hint on non-Complete, non-Declined bookings ═══ -->
+                    {!isComplete && sub.status !== "Declined" && (
+                      <div class="mt-4 pt-4 border-t border-gold/10">
+                        <p class="text-ivory/20 text-xs italic">
+                          You'll be able to leave a review once your event is complete.
+                        </p>
                       </div>
                     )}
 
