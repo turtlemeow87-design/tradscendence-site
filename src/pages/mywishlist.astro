@@ -10,9 +10,9 @@ const FORMSPREE_ENDPOINT = "https://formspree.io/f/mblzzrqb";
  */
 const ORDERED_COUNTS: Record<string, number> = {};
 
-// Edit this array to add/remove items.
-const WISHLIST = [
-  { id: "small-coil-008-strings", name: "Small Coil of .008\" strings", url: "https://www.musiciansmallusa.com/steel-wire-small-coil/" },
+// Edit this array to add/remove items. `description` is optional — a line shown under the title.
+const WISHLIST: { id: string; name: string; description?: string; url: string }[] = [
+  { id: "small-coil-008-strings", name: "Small Coil of .008\" strings", description: "(Choose .008\" from the list)", url: "https://www.musiciansmallusa.com/steel-wire-small-coil/" },
 ];
 ---
 
@@ -65,6 +65,10 @@ const WISHLIST = [
 
 
                 </div>
+
+                {item.description && (
+                  <p class="item-description mt-1 text-sm opacity-80">{item.description}</p>
+                )}
 
                 <a
                   href={item.url}
