@@ -105,6 +105,10 @@ const today = new Date().toISOString().split('T')[0];
     opacity: 0;
   }
 
+  .book-me-launcher.chat-typing {
+    visibility: hidden;
+  }
+
   /* ── Gold shimmer on button text ─────────────────────── */
   /*
     Same keyframe as the Memories page title shimmer.
@@ -206,6 +210,12 @@ const today = new Date().toISOString().split('T')[0];
       submitBtn.disabled = false;
       submitBtn.textContent = 'Send';
     }
+  });
+
+  // Hidden while the instrument chat box has focus, back as soon as it loses focus
+  window.addEventListener('chat-input-active', (e) => {
+    const launcher = document.querySelector('.book-me-launcher') as HTMLElement | null;
+    launcher?.classList.toggle('chat-typing', (e as CustomEvent).detail.active);
   });
 
   window.addEventListener('message-field-active', (e) => {

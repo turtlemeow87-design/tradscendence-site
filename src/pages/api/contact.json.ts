@@ -139,6 +139,7 @@ export const POST: APIRoute = async ({ request }) => {
   console.log(`   Location: ${location}`);
 
   // 8) Save to database (skip in development)
+  let saved = false;
   if (!isDevelopment) {
     try {
       const sql = neon(import.meta.env.DATABASE_URL);
@@ -156,6 +157,7 @@ export const POST: APIRoute = async ({ request }) => {
         RETURNING id
       `;
       
+      saved = true;
       console.log("✅ Database insert successful! ID:", result[0]?.id);
     } catch (dbError) {
       console.error("❌ Database error:", dbError);
@@ -208,7 +210,9 @@ IP: ${ipAddress}
 Timestamp: ${new Date().toISOString()}
     `.trim();
 
-    // Send admin notification
+    // Send admin notification.
+    // If it fails but the inquiry was saved, it's still in the admin panel — tell the visitor it
+    // went through rather than prompting them to resubmit and create a duplicate.
     try {
       const { data, error } = await resend.emails.send({
         from: 'Tradscendence Booking <bookings@soundbeyondborders.com>',
@@ -220,17 +224,21 @@ Timestamp: ${new Date().toISOString()}
 
       if (error) {
         console.error("❌ Resend error (admin):", error);
-        return json(502, { 
-          error: "Failed to send email notification." 
-        });
+        if (!saved) {
+          return json(502, {
+            error: "Failed to send email notification."
+          });
+        }
+      } else {
+        console.log("✅ Admin email sent successfully:", data);
       }
-
-      console.log("✅ Admin email sent successfully:", data);
     } catch (emailError) {
       console.error("❌ Email error (admin):", emailError);
-      return json(502, { 
-        error: "Failed to send email notification." 
-      });
+      if (!saved) {
+        return json(502, {
+          error: "Failed to send email notification."
+        });
+      }
     }
 
     // Send client confirmation email

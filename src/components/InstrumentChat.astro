@@ -227,6 +227,20 @@ const questions = suggestedQuestions ?? defaultQuestions;
       }
     }
 
+    // Tuck the floating "Book me" button away while typing — on phones it sits over the Send button.
+    // The short delay on blur lets a tap on Send finish before the button reappears under the finger.
+    let bookMeTimer: ReturnType<typeof setTimeout> | undefined;
+    const setChatActive = (active: boolean) =>
+      window.dispatchEvent(new CustomEvent('chat-input-active', { detail: { active } }));
+    input.addEventListener('focus', () => {
+      clearTimeout(bookMeTimer);
+      setChatActive(true);
+    });
+    input.addEventListener('blur', () => {
+      clearTimeout(bookMeTimer);
+      bookMeTimer = setTimeout(() => setChatActive(false), 300);
+    });
+
     sendBtn.addEventListener('click', () => sendMessage(input.value));
     input.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !e.shiftKey) {

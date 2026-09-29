@@ -2,7 +2,8 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import StickyBookMe from "../components/StickyBookMe.astro";
+// Floating "Book me" links to /contact. The quick-booking popup version is StickyBookMe.astro (kept, unused).
+import BookMeLink from "../components/BookMeLink.astro";
 
 const {
   title = 'Tradscendence',
@@ -32,7 +33,7 @@ const {
     </script>
   </head>
   <body class="min-h-screen flex flex-col">
-    <StickyBookMe />
+    <BookMeLink />
     {!hideHeader && <Nav />}
     <main class="page-enter flex-1">
       <slot />

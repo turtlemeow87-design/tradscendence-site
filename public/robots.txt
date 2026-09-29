@@ -10,9 +10,10 @@ Disallow: /dist/
 Disallow: /media/*.mp4$
 Disallow: /media/*.mov$
 Disallow: /media/*.zip$
-# --- Optional: block Astro's internal or temp paths ---
-Disallow: /_astro/
+# --- Optional: block dev-server paths ---
+# (/_astro/ is NOT blocked: it holds the CSS and JS Google needs to render pages)
 Disallow: /__vite/
 
-# --- Important: sitemap link ---
-Sitemap: https://www.soundbeyondborders.com/sitemap-0.xml
+# --- Important: sitemap links ---
+Sitemap: https://soundbeyondborders.com/sitemap-index.xml
+Sitemap: https://soundbeyondborders.com/sitemap-instruments.xml

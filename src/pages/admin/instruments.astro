@@ -66,7 +66,7 @@ const title = "Admin — Manage Instruments";
                 <label class="block text-sm opacity-70 mb-1">Slug (URL path) *</label>
                 <input id="f-slug" type="text" required placeholder="ArabicOud"
                   class="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white" />
-                <span class="text-xs opacity-50">PascalCase, no spaces. e.g. BaglamaSaz</span>
+                <span id="f-slug-hint" class="text-xs opacity-50">PascalCase, no spaces. e.g. BaglamaSaz</span>
               </div>
               <div>
                 <label class="block text-sm opacity-70 mb-1">Display Name *</label>
@@ -218,9 +218,11 @@ const title = "Admin — Manage Instruments";
       if (!ADMIN_KEY) return;
 
       try {
-        await fetch(API_LIST, {
+        // Confirm the key first — a wrong key used to open the panel and only fail on save
+        const res = await fetch('/api/admin/check', {
           headers: { 'x-admin-key': ADMIN_KEY },
         });
+        if (!res.ok) throw new Error('Invalid key');
         loginGate.classList.add('hidden');
         adminPanel.classList.remove('hidden');
         loginError.classList.add('hidden');
@@ -274,12 +276,24 @@ const title = "Admin — Manage Instruments";
       }
     }
 
+    // The slug is the page's web address; saving an edit never changes it, so lock it when editing
+    function setSlugEditable(editable) {
+      const slugInput = document.getElementById('f-slug');
+      slugInput.readOnly = !editable;
+      slugInput.classList.toggle('opacity-50', !editable);
+      slugInput.classList.toggle('cursor-not-allowed', !editable);
+      document.getElementById('f-slug-hint').textContent = editable
+        ? 'PascalCase, no spaces. e.g. BaglamaSaz'
+        : "This is the page's web address, so it can't be changed after creation.";
+    }
+
     // ── Modal: Add New ──
     addNewBtn.addEventListener('click', () => {
       document.getElementById('form-mode').value = 'add';
       document.getElementById('form-original-slug').value = '';
       modalTitle.textContent = 'Add New Instrument';
       form.reset();
+      setSlugEditable(true);
       document.getElementById('f-ready').checked = true;
       modalOverlay.classList.remove('hidden');
     });
@@ -295,6 +309,7 @@ const title = "Admin — Manage Instruments";
         modalTitle.textContent = `Edit: ${inst.name}`;
 
         document.getElementById('f-slug').value = inst.slug || '';
+        setSlugEditable(false);
         document.getElementById('f-name').value = inst.name || '';
         document.getElementById('f-origin').value = inst.origin_prefix || '';
         document.getElementById('f-tagline').value = inst.tagline || '';

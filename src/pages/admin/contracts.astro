@@ -363,6 +363,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       "Declined":         "bg-rosewood/20 text-rosewood border-rosewood/40",
     };
 
+    // Escape DB values before they go into innerHTML — submissions come from the public contact form
+    function esc(value: unknown): string {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Event dates are calendar days stored without a time, and arrive as midnight UTC.
+    // Formatting in the browser's timezone would show the day before anywhere in the US.
+    function formatEventDate(value: string, options: Intl.DateTimeFormatOptions = {}): string {
+      return new Date(value).toLocaleDateString('en-US', { ...options, timeZone: 'UTC' });
+    }
+
     let ADMIN_KEY = '';
     let allSubmissions: any[] = [];
 
@@ -445,7 +461,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
 
       const breakdown = Object.entries(counts)
-        .map(([status, count]) => `<span class="text-ivory/50">${count} ${status}</span>`)
+        .map(([status, count]) => `<span class="text-ivory/50">${count} ${esc(status)}</span>`)
         .join('<span class="text-ivory/20 mx-1">·</span>');
 
       summaryEl.innerHTML = `
@@ -571,8 +587,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           : 'border-gold/30 bg-gold/5'}" data-review-id="${r.id}">
           <div class="flex items-start justify-between gap-3 mb-2">
             <div>
-              <p class="font-display text-gold text-sm">${r.reviewer_name}</p>
-              ${r.submission_location ? `<p class="text-ivory/40 text-xs">${r.submission_location}</p>` : ''}
+              <p class="font-display text-gold text-sm">${esc(r.reviewer_name)}</p>
+              ${r.submission_location ? `<p class="text-ivory/40 text-xs">${esc(r.submission_location)}</p>` : ''}
               <p class="text-ivory/30 text-xs">${date}</p>
             </div>
             <span class="px-2 py-0.5 rounded-full text-xs font-semibold border shrink-0 ${r.approved
@@ -581,7 +597,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               ${r.approved ? '✓ Published' : '⏳ Pending'}
             </span>
           </div>
-          <p class="text-ivory/70 text-sm leading-relaxed mb-3 italic">"${r.body}"</p>
+          <p class="text-ivory/70 text-sm leading-relaxed mb-3 italic">"${esc(r.body)}"</p>
           ${!r.approved
             ? `<button class="approve-review-btn px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-ivory border border-emerald-500/40 text-xs font-semibold transition" data-review-id="${r.id}">Approve</button>`
             : `<button class="reject-review-btn px-3 py-1.5 rounded-lg bg-rosewood/20 text-rosewood hover:bg-rosewood hover:text-ivory border border-rosewood/40 text-xs font-semibold transition" data-review-id="${r.id}">Unpublish</button>`
@@ -641,7 +657,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       listEl.innerHTML = memories.map(m => {
         const dateStr = m.event_date
-          ? new Date(m.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+          ? formatEventDate(m.event_date, { year: 'numeric', month: 'short', day: 'numeric' })
           : '';
         const photoCount = Array.isArray(m.photo_urls) ? m.photo_urls.length : 0;
         return `
@@ -651,14 +667,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             data-memory-id="${m.id}">
             <div class="flex items-start justify-between gap-3 mb-1">
               <div class="flex-1 min-w-0">
-                <p class="font-display text-gold text-sm leading-snug">${m.title}</p>
+                <p class="font-display text-gold text-sm leading-snug">${esc(m.title)}</p>
                 ${(dateStr || m.location) ? `
                   <p class="text-ivory/50 text-xs mt-0.5">
-                    ${[dateStr, m.location].filter(Boolean).join(' · ')}
+                    ${esc([dateStr, m.location].filter(Boolean).join(' · '))}
                   </p>
                 ` : ''}
                 ${m.linked_submission_label ? `
-                  <p class="text-cyan-400/70 text-xs mt-0.5 truncate">↗ ${m.linked_submission_label}</p>
+                  <p class="text-cyan-400/70 text-xs mt-0.5 truncate">↗ ${esc(m.linked_submission_label)}</p>
                 ` : ''}
                 <p class="text-ivory/30 text-xs mt-0.5">
                   ${[
@@ -682,7 +698,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               <button
                 class="delete-memory-btn px-3 py-1.5 rounded-lg bg-rosewood/20 text-rosewood hover:bg-rosewood hover:text-ivory border border-rosewood/40 text-xs font-semibold transition"
                 data-memory-id="${m.id}"
-                data-title="${m.title.replace(/"/g, '&quot;')}"
+                data-title="${esc(m.title)}"
               >Delete</button>
             </div>
           </div>
@@ -715,7 +731,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       for (const s of complete) {
         const label = [
           s.name || `${s.first_name ?? ''} ${s.last_name ?? ''}`.trim(),
-          s.event_date ? new Date(s.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+          s.event_date ? formatEventDate(s.event_date, { month: 'short', day: 'numeric', year: 'numeric' }) : '',
           s.location || '',
         ].filter(Boolean).join(' · ');
 
@@ -888,7 +904,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const currentStatus = sub.status || 'Pending';
         const badgeClass   = STATUS_STYLES[currentStatus] || STATUS_STYLES['Pending'];
         const remindedAt   = formatRemindedAt(sub.last_reminded_at);
-        const escapedNotes = (sub.admin_notes || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const escapedNotes = esc(sub.admin_notes);
 
         return `
         <article
@@ -900,30 +916,30 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
           <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
-              <h3 class="font-display text-xl text-gold">${sub.name}${sub.preferred_name ? ` <span class="text-ivory/50 text-sm font-sans">(Preferred: ${sub.preferred_name})</span>` : ''}</h3>
+              <h3 class="font-display text-xl text-gold">${esc(sub.name)}${sub.preferred_name ? ` <span class="text-ivory/50 text-sm font-sans">(Preferred: ${esc(sub.preferred_name)})</span>` : ''}</h3>
               <p class="text-ivory/60 text-sm flex items-center gap-2">
-                ${sub.email}
+                ${esc(sub.email)}
                 ${sub.is_registered
                   ? '<span class="px-2 py-0.5 rounded-md bg-green-500/20 text-green-400 border border-green-500/40 text-xs font-semibold">Registered</span>'
                   : '<span class="px-2 py-0.5 rounded-md bg-gold/20 text-gold border border-gold/40 text-xs font-semibold">No Account</span>'}
               </p>
-              ${sub.event_date ? `<p class="text-ivory/60 text-sm">Event: ${new Date(sub.event_date).toLocaleDateString()}</p>` : ''}
+              ${sub.event_date ? `<p class="text-ivory/60 text-sm">Event: ${formatEventDate(sub.event_date)}</p>` : ''}
               <p class="text-ivory/60 text-sm">Submitted: ${new Date(sub.created_at).toLocaleDateString()}</p>
             </div>
             <div class="flex items-center gap-3">
               <span class="status-badge px-3 py-1 rounded-lg border text-sm font-semibold ${badgeClass}">
-                ${currentStatus}
+                ${esc(currentStatus)}
               </span>
               <button
                 class="delete-submission-btn px-3 py-1 rounded-lg border border-rosewood/60 text-rosewood hover:bg-rosewood hover:text-ivory text-sm font-semibold transition"
                 data-submission-id="${sub.id}"
-                data-name="${sub.name}"
+                data-name="${esc(sub.name)}"
               >Delete</button>
             </div>
           </div>
 
-          ${sub.location   ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Location:</span> ${sub.location}</p>` : ''}
-          ${sub.instruments?.length ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Instruments:</span> ${sub.instruments.join(', ')}</p>` : ''}
+          ${sub.location   ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Location:</span> ${esc(sub.location)}</p>` : ''}
+          ${sub.instruments?.length ? `<p class="text-ivory/80 text-sm mb-2"><span class="text-gold">Instruments:</span> ${esc(sub.instruments.join(', '))}</p>` : ''}
 
           <!-- Status -->
           <div class="mt-4 pt-4 border-t border-gold/20">
@@ -952,7 +968,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               <button
                 class="send-reminder-btn px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold frame transition"
                 data-submission-id="${sub.id}"
-                data-email="${sub.email}"
+                data-email="${esc(sub.email)}"
               >Send Reminder</button>
               <span class="remind-timestamp text-ivory/40 text-xs italic">${remindedAt ? `Last sent: ${remindedAt}` : 'Never sent'}</span>
             </div>
@@ -985,11 +1001,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   <p class="text-green-400 font-semibold mb-1">✓ Contract Uploaded</p>
                   <p class="text-ivory/60 text-sm">Uploaded: ${new Date(sub.contract.uploaded_at).toLocaleDateString()}</p>
                   ${sub.contract.signed_at
-                    ? `<p class="text-green-400 text-sm mt-1">Signed by ${sub.contract.signature_name} on ${new Date(sub.contract.signed_at).toLocaleDateString()}</p>`
+                    ? `<p class="text-green-400 text-sm mt-1">Signed by ${esc(sub.contract.signature_name)} on ${new Date(sub.contract.signed_at).toLocaleDateString()}</p>`
                     : '<p class="text-gold text-sm mt-1">Awaiting client signature</p>'}
                 </div>
                 <div class="flex gap-2">
-                  <a href="${sub.contract.file_url}" target="_blank" rel="noopener noreferrer"
+                  <a href="${esc(sub.contract.file_url)}" target="_blank" rel="noopener noreferrer"
                     class="px-4 py-2 rounded-xl bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 font-semibold transition">
                     View PDF
                   </a>
@@ -998,7 +1014,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     data-contract-id="${sub.contract.id}"
                     data-submission-id="${sub.id}"
                     data-signed="${sub.contract.signed_at ? 'true' : 'false'}"
-                    data-signer="${sub.contract.signature_name || ''}"
+                    data-signer="${esc(sub.contract.signature_name)}"
                   >Delete</button>
                 </div>
               </div>
@@ -1022,17 +1038,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 ${invoices.map((inv: any) => `
                   <div class="flex items-center justify-between bg-charcoal/60 rounded-lg px-4 py-3 border border-gold/20">
                     <div>
-                      <p class="text-ivory/90 font-semibold text-sm">${inv.label}</p>
+                      <p class="text-ivory/90 font-semibold text-sm">${esc(inv.label)}</p>
                       <p class="text-ivory/50 text-xs">Uploaded: ${new Date(inv.uploaded_at).toLocaleDateString()}</p>
                     </div>
                     <div class="flex gap-2">
-                      <a href="${inv.file_url}" target="_blank" rel="noopener noreferrer"
+                      <a href="${esc(inv.file_url)}" target="_blank" rel="noopener noreferrer"
                         class="px-3 py-1 rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-ivory border border-gold/40 text-sm font-semibold transition">
                         View PDF
                       </a>
                       <button
                         class="delete-invoice-btn px-3 py-1 rounded-lg border border-rosewood/60 text-rosewood hover:bg-rosewood hover:text-ivory text-sm font-semibold transition"
-                        data-invoice-id="${inv.id}" data-label="${inv.label}" data-submission-id="${sub.id}">
+                        data-invoice-id="${inv.id}" data-label="${esc(inv.label)}" data-submission-id="${sub.id}">
                         Delete
                       </button>
                     </div>

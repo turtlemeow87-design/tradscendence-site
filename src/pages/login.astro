@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
+// Same-site paths only ("/dashboard") — rejects "//host", "/\host", "https:…", "javascript:…", embedded whitespace
+const rawRedirect = Astro.url.searchParams.get('redirect') || '';
+const redirect = /^\/(?![\/\\])[^\s\\\u0000-\u001f]*$/.test(rawRedirect) ? rawRedirect : '/dashboard';
 const resetSuccess = Astro.url.searchParams.get('reset') === 'success';
 ---
 

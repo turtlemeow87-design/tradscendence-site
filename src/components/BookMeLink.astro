@@ -1,0 +1,80 @@
+---
+// Floating "Book me" button — links to the full contact form.
+// The older quick-booking popup is kept in StickyBookMe.astro; swap it back in BaseLayout to reuse it.
+// Hidden on the contact page itself, where it would just link to the page you're on.
+const onContactPage = Astro.url.pathname.replace(/\/+$/, '') === '/contact';
+---
+
+{!onContactPage && (
+  <div class="book-me-launcher fixed right-4 bottom-4 md:bottom-auto md:top-4 z-50">
+    <a
+      href="/contact"
+      class="book-me-btn inline-block rounded-2xl shadow-soft px-4 py-2 font-semibold bg-gold hover:bg-golddark focus:outline-none frame"
+    >
+      <span class="book-me-shimmer">Book me</span>
+    </a>
+  </div>
+)}
+
+<style>
+  /* ── Entrance animation ───────────────────────────────── */
+  @keyframes bookMeEnter {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .book-me-launcher {
+    animation: bookMeEnter 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+    animation-delay: 1.2s;
+    /* Start invisible so there's no flash before the animation fires */
+    opacity: 0;
+  }
+
+  .book-me-launcher.chat-typing {
+    visibility: hidden;
+  }
+
+  /* ── Gold shimmer on button text (same as StickyBookMe) ── */
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+
+  .book-me-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--bronze, #8C5A32) 0%,
+      #f5f1e8 35%,
+      var(--accent-gold) 55%,
+      var(--bronze, #8C5A32) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+    /* Subtle dark halo behind the text for separation from gold bg */
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+  }
+
+  .book-me-btn:hover .book-me-shimmer {
+    animation-play-state: paused;
+    background: none;
+    -webkit-text-fill-color: var(--rosewood, #6E2A2A);
+  }
+</style>
+
+<script>
+  // Hidden while the instrument chat box has focus (it sits over the Send button on phones),
+  // back as soon as it loses focus
+  window.addEventListener('chat-input-active', (e) => {
+    const launcher = document.querySelector('.book-me-launcher') as HTMLElement | null;
+    launcher?.classList.toggle('chat-typing', (e as CustomEvent).detail.active);
+  });
+</script>

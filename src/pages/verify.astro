@@ -2,7 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const email = Astro.url.searchParams.get('email') || '';
-const redirect = Astro.url.searchParams.get('redirect') || '/dashboard';
+// Same-site paths only ("/dashboard") — rejects "//host", "/\host", "https:…", "javascript:…", embedded whitespace
+const rawRedirect = Astro.url.searchParams.get('redirect') || '';
+const redirect = /^\/(?![\/\\])[^\s\\\u0000-\u001f]*$/.test(rawRedirect) ? rawRedirect : '/dashboard';
 const mode = Astro.url.searchParams.get('mode') || 'login';
 const isReset = mode === 'reset';
 

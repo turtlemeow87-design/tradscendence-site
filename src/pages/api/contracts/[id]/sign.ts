@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { neon } from "@neondatabase/serverless";
 import { put } from "@vercel/blob";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
@@ -11,6 +11,30 @@ function json(status: number, body: Record<string, unknown>) {
       "Cache-Control": "no-store",
     },
   });
+}
+
+// The built-in PDF fonts only cover Western European letters. Letters outside that set are
+// folded to their plain form (ş→s, ğ→g, ı→i, Ł→L) so Turkish, Polish, etc. names still stamp;
+// the exact spelling is kept in the database. Other scripts (Arabic, Armenian…) still throw.
+const PLAIN_LETTERS: Record<string, string> = { "ı": "i", "ł": "l", "Ł": "L", "đ": "d", "Đ": "D", "ħ": "h", "Ħ": "H" };
+
+function toStampText(text: string, font: PDFFont): string {
+  const supported = new Set(font.getCharacterSet());
+  const canDraw = (s: string) => [...s].every((c) => supported.has(c.codePointAt(0)!));
+  let out = "";
+  for (const ch of text.normalize("NFC")) {
+    if (canDraw(ch)) {
+      out += ch;
+      continue;
+    }
+    // A stray accent mark folds to "" and is dropped
+    const plain = PLAIN_LETTERS[ch] ?? ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (!canDraw(plain)) {
+      throw new Error(`Stamp font cannot draw "${ch}"`);
+    }
+    out += plain;
+  }
+  return out;
 }
 
 // Stamps the signature block onto the last page of a PDF and returns the modified bytes.
@@ -38,7 +62,7 @@ async function stampPdf(
   const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  // Format date/time in EST
+  // Format date/time in Eastern time, labelled EST or EDT to match the date
   const formattedDate = signedAt.toLocaleDateString("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
@@ -50,6 +74,7 @@ async function stampPdf(
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
+    timeZoneName: "short",
   });
 
   // Stamp layout constants
@@ -86,7 +111,7 @@ async function stampPdf(
     font: helvetica,
     color: labelColor,
   });
-  lastPage.drawText(signatureName, {
+  lastPage.drawText(toStampText(signatureName, helveticaBold), {
     x: blockX,
     y: baseY + lineSpacing * 2.5,
     size: 8,
@@ -102,7 +127,7 @@ async function stampPdf(
     font: helvetica,
     color: labelColor,
   });
-  lastPage.drawText(`${formattedDate} at ${formattedTime} EST`, {
+  lastPage.drawText(`${formattedDate} at ${formattedTime}`, {
     x: blockX,
     y: baseY + lineSpacing * 0.6,
     size: 7,
