@@ -10,6 +10,14 @@ export default defineConfig({
   site: 'https://soundbeyondborders.com',
   output: 'server',
   adapter: vercel(),
+  // Astro 5.14.2+ ignores the incoming host unless it's listed here and falls back to "localhost".
+  // Its cross-site form check then rejected our own sign-out and admin PDF uploads (403).
+  security: {
+    allowedDomains: [
+      { hostname: 'soundbeyondborders.com', protocol: 'https' },
+      { hostname: 'www.soundbeyondborders.com', protocol: 'https' },
+    ],
+  },
   integrations: [
     sitemap({
       filter: (page) => !NOT_IN_SITEMAP.test(new URL(page).pathname),
